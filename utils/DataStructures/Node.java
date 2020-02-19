@@ -2,9 +2,9 @@ package utils.DataStructures;
 
 public final class Node {
 
-    public Node parent;
-    public int val;
-    public int[] seed;
+    private Node parent;
+    private int val;
+    private int[] seed;
 
     public Node(Node parent, int val, int[] seed) {
         this.parent = parent;
@@ -14,6 +14,18 @@ public final class Node {
 
     public String toString() {
         return "Node(val: " + val + ", seed: " + seed + ")";
+    }
+
+    public Node get_parent() {
+        return this.parent;
+    }
+
+    public int get_val() {
+        return this.val;
+    }
+
+    public int[] get_seed() {
+        return this.seed;
     }
 
 }

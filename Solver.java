@@ -7,7 +7,6 @@ public class Solver {
 
     public static void main(String[] args) {
         ArrayList<int[]> points = StringSplitter.parse(args, "(", ")", ", ");
-        int[] start = points.get(0);
 
         int[][] grid = new int[10][10];
         for (int i = 0; i < points.size(); i++) {
@@ -17,12 +16,13 @@ public class Solver {
         ArrayList<Node> curr_nodes = new ArrayList<Node>() {
             private static final long serialVersionUID = 1L;
             {
-                add(new Node(null, grid[start[0]][start[1]], start));
+                add(new Node(null, grid[points.get(0)[0]][points.get(0)[1]], points.get(0)));
             }
         };
 
         Dijkstra.set_grid(grid);
         Node last_child = Dijkstra.solve(curr_nodes);
+
         System.out.println(last_child);
     }
 
