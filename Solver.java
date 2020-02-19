@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import utils.Algorithms.Dijkstra;
-// import utils.Algorithms.ReverseTraversal;
 import utils.DataStructures.Node;
 import utils.Parsers.StringSplitter;
 
@@ -18,15 +17,13 @@ public class Solver {
         ArrayList<Node> curr_nodes = new ArrayList<Node>() {
             private static final long serialVersionUID = 1L;
             {
-                add(new Node(grid[start[0]][start[1]], start));
+                add(new Node(null, grid[start[0]][start[1]], start));
             }
         };
 
         Dijkstra.set_grid(grid);
         Node last_child = Dijkstra.solve(curr_nodes);
         System.out.println(last_child);
-
-        // int[] path = ReverseTraversal.traverse(last);
     }
 
 }

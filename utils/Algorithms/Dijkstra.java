@@ -40,8 +40,7 @@ public class Dijkstra {
                     coords = new int[] { node.seed[0], node.seed[1]-- };
                 }
                 if ((Math.abs(coords[0]) <= grid.length) && (Math.abs(coords[1]) <= grid[0].length)) {
-                    final Node new_node = new Node(grid[coords[0]][coords[1]], coords);
-                    new_node.parent = node;
+                    final Node new_node = new Node(node, grid[coords[0]][coords[1]], coords);
                     if (grid[coords[0]][coords[1]] == empty) {
                         grid[coords[0]][coords[1]] = 2;
                         next_nodes.add(new_node);

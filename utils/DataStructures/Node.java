@@ -6,8 +6,8 @@ public final class Node {
     public int val;
     public int[] seed;
 
-    public Node(int val, int[] seed) {
-        this.parent = null;
+    public Node(Node parent, int val, int[] seed) {
+        this.parent = parent;
         this.val = val;
         this.seed = seed;
     }
