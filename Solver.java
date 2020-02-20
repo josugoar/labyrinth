@@ -23,7 +23,16 @@ public class Solver {
         System.out.println(last_child);
     }
 
+    /**
+     * Put points in grid
+     *
+     * @param grid   int[][]
+     * @param points ArrayList<int[]>
+     * @return grid with points
+     */
     public static int[][] put_points(int[][] grid, ArrayList<int[]> points) {
+        // First and second points are treated as start and end
+        // Each following point behaves as an obstacle
         for (int i = 0; i < points.size(); i++) {
             final int[] point = points.get(i);
             if (i < 2) {

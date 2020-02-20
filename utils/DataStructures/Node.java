@@ -6,6 +6,13 @@ public final class Node {
     private final int val;
     private final int[] seed;
 
+    /**
+     * Individual node which stores pointer to parent node
+     *
+     * @param parent Node
+     * @param val    int
+     * @param seed   int[]
+     */
     public Node(final Node parent, final int val, final int[] seed) {
         this.parent = parent;
         this.val = val;
