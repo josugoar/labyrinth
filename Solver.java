@@ -1,45 +1,46 @@
-import java.util.ArrayList;
-import utils.Algorithms.RecursiveDijkstra;
+import java.util.List;
+
+import utils.Algorithms.RecursivePathfinder;
 import utils.DataStructures.Node;
 import utils.Parsers.StringSplitter;
 
+// String[0]: shape
+// String[1]: start
+// String[2]: end
+// String[3] (optional): obstacles
 public class Solver {
 
     public static void main(final String[] args) {
-        final ArrayList<int[]> points = StringSplitter.parse(args, "(", ")", ", ");
-        final int[][] grid = put_points(new int[10][10], points);
+        // Parse command line argument into integer arrays
+        final List<List<int[]>> points = StringSplitter.parse(args);
 
-        final int[] start = points.get(0);
-        final ArrayList<Node> curr_nodes = new ArrayList<Node>() {
-            private static final long serialVersionUID = 1L;
-            {
-                add(new Node(null, grid[start[0]][start[1]], start));
-            }
-        };
+        // Get relevant points
+        final int[] shape = points.get(0).get(0);
+        final int[] end = points.get(2).get(0);
 
-        RecursiveDijkstra.set_grid(grid);
-        final Node last_child = RecursiveDijkstra.solve(curr_nodes);
+        // Initialize grid and fill it with values
+        int[][] grid = new int[shape[0]][shape[1]];
+        if (points.size() > 2) {
+            grid = fill(grid, points.get(2), 1);
+        }
+        grid[end[0]][end[0]] = -1;
 
+        // Call pathfinding algorithm from starting coordinates
+        final Node last_child = RecursivePathfinder.find(grid, points.get(1).get(0));
         System.out.println(last_child);
     }
 
     /**
-     * Put points in grid
+     * Fill grid with values
      *
      * @param grid   int[][]
      * @param points ArrayList<int[]>
-     * @return grid with points
+     * @param cell   int
+     * @return grid with inserted points
      */
-    public static int[][] put_points(int[][] grid, ArrayList<int[]> points) {
-        // First and second points are treated as start and end
-        // Each following point behaves as an obstacle
-        for (int i = 0; i < points.size(); i++) {
-            final int[] point = points.get(i);
-            if (i < 2) {
-                grid[point[0]][point[1]] = -(i + 1);
-            } else {
-                grid[point[0]][point[1]] = 1;
-            }
+    public static int[][] fill(final int[][] grid, final List<int[]> points, final int cell) {
+        for (final int[] point : points) {
+            grid[point[0]][point[1]] = cell;
         }
         return grid;
     }
