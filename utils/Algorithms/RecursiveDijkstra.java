@@ -3,7 +3,7 @@ package utils.Algorithms;
 import java.util.ArrayList;
 import utils.DataStructures.Node;
 
-public class Dijkstra {
+public class RecursiveDijkstra {
 
     private static int[][] grid;
     private static int empty = 0;

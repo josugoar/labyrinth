@@ -1,25 +1,13 @@
 import java.util.ArrayList;
-import utils.Algorithms.Dijkstra;
+import utils.Algorithms.RecursiveDijkstra;
 import utils.DataStructures.Node;
 import utils.Parsers.StringSplitter;
 
 public class Solver {
 
-    // TODO: Improve Node toString method (show seed values)
-    // TODO: Generalize search by number of dimensions
-
     public static void main(final String[] args) {
         final ArrayList<int[]> points = StringSplitter.parse(args, "(", ")", ", ");
-
-        final int[][] grid = new int[10][10];
-        for (int i = 0; i < points.size(); i++) {
-            final int[] point = points.get(i);
-            if (i < 2) {
-                grid[point[0]][point[1]] = -(i + 1);
-            } else {
-                grid[point[0]][point[1]] = 1;
-            }
-        }
+        final int[][] grid = put_points(new int[10][10], points);
 
         final int[] start = points.get(0);
         final ArrayList<Node> curr_nodes = new ArrayList<Node>() {
@@ -29,10 +17,22 @@ public class Solver {
             }
         };
 
-        Dijkstra.set_grid(grid);
-        final Node last_child = Dijkstra.solve(curr_nodes);
+        RecursiveDijkstra.set_grid(grid);
+        final Node last_child = RecursiveDijkstra.solve(curr_nodes);
 
         System.out.println(last_child);
+    }
+
+    public static int[][] put_points(int[][] grid, ArrayList<int[]> points) {
+        for (int i = 0; i < points.size(); i++) {
+            final int[] point = points.get(i);
+            if (i < 2) {
+                grid[point[0]][point[1]] = -(i + 1);
+            } else {
+                grid[point[0]][point[1]] = 1;
+            }
+        }
+        return grid;
     }
 
 }
