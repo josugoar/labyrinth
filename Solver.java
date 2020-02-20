@@ -5,23 +5,32 @@ import utils.Parsers.StringSplitter;
 
 public class Solver {
 
-    public static void main(String[] args) {
-        ArrayList<int[]> points = StringSplitter.parse(args, "(", ")", ", ");
+    // TODO: Improve Node toString method (show seed values)
+    // TODO: Generalize search by number of dimensions
 
-        int[][] grid = new int[10][10];
+    public static void main(final String[] args) {
+        final ArrayList<int[]> points = StringSplitter.parse(args, "(", ")", ", ");
+
+        final int[][] grid = new int[10][10];
         for (int i = 0; i < points.size(); i++) {
-            grid[points.get(i)[0]][points.get(i)[1]] = -(i + 1);
+            final int[] point = points.get(i);
+            if (i < 2) {
+                grid[point[0]][point[1]] = -(i + 1);
+            } else {
+                grid[point[0]][point[1]] = 1;
+            }
         }
 
-        ArrayList<Node> curr_nodes = new ArrayList<Node>() {
+        final int[] start = points.get(0);
+        final ArrayList<Node> curr_nodes = new ArrayList<Node>() {
             private static final long serialVersionUID = 1L;
             {
-                add(new Node(null, grid[points.get(0)[0]][points.get(0)[1]], points.get(0)));
+                add(new Node(null, grid[start[0]][start[1]], start));
             }
         };
 
         Dijkstra.set_grid(grid);
-        Node last_child = Dijkstra.solve(curr_nodes);
+        final Node last_child = Dijkstra.solve(curr_nodes);
 
         System.out.println(last_child);
     }
