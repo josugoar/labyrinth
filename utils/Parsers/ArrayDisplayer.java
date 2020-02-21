@@ -11,7 +11,11 @@ public class ArrayDisplayer {
                 if (cell instanceof Empty) {
                     System.out.printf("-");
                 } else if (cell instanceof Node) {
-                    System.out.printf("*");
+                    if (cell.get_path()) {
+                        System.out.printf("$");
+                    } else {
+                        System.out.printf("*");
+                    }
                 } else if (cell instanceof Obstacle) {
                     System.out.printf("#");
                 } else {

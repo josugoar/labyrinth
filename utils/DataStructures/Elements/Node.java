@@ -7,6 +7,7 @@ public final class Node extends Element {
     private final Node parent;
     private final Element val;
     private final int[] seed;
+    private boolean path = false;
 
     /**
      * Individual node which stores pointer to parent node
@@ -35,6 +36,15 @@ public final class Node extends Element {
 
     public int[] get_seed() {
         return this.seed;
+    }
+
+    @Override
+    public boolean get_path() {
+        return this.path;
+    }
+
+    public void set_path(final boolean path) {
+        this.path = path;
     }
 
 }

@@ -15,18 +15,26 @@ public class RecursivePathfinder {
      * @param start int[]
      * @return last child node pointing to endpoint
      */
-    public static Node awake(final Element[][] grid, final int[] start) {
-        // Time method call
-        final long start_time = System.currentTimeMillis();
-        final Node last_child = find(grid, new ArrayList<Node>() {
-            private static final long serialVersionUID = 1L;
-            {
-                add(new Node(null, grid[start[0]][start[1]], start));
+    public static Node awake(final Element[][] grid, final int[] start, final boolean time) {
+        try {
+            final long start_time = System.currentTimeMillis();
+            final Node last_child = find(grid, new ArrayList<Node>() {
+                private static final long serialVersionUID = 1L;
+                {
+                    add(new Node(null, grid[start[0]][start[1]], start));
+                }
+            });
+            ArrayDisplayer.plot(Backtracker.traverse(grid, last_child));
+            // Time method call
+            if (time) {
+                final long end_time = System.currentTimeMillis();
+                System.out.println("Elapsed time in miliseconds: " + (end_time - start_time));
             }
-        });
-        final long end_time = System.currentTimeMillis();
-        System.out.println("Elapsed time in miliseconds: " + (end_time - start_time));
-        return last_child;
+            return last_child;
+        } catch (StackOverflowError e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -36,7 +44,7 @@ public class RecursivePathfinder {
      * @param curr_nodes ArrayList<Node>
      * @return last child node pointing to endpoint
      */
-    private static Node find(final Element[][] grid, final ArrayList<Node> curr_nodes) {
+    private static Node find(final Element[][] grid, final ArrayList<Node> curr_nodes) throws StackOverflowError {
         final ArrayList<Node> new_nodes = new ArrayList<Node>();
         for (final Node node : curr_nodes) {
             // Generate neighbor children from parent node seed
@@ -61,8 +69,9 @@ public class RecursivePathfinder {
                 }
             }
         }
+        // Handle no solution grid
         if (curr_nodes.equals(new_nodes)) {
-            throw new StackOverflowError();
+            throw new StackOverflowError("No solution...");
         }
         // Display array
         ArrayDisplayer.plot(grid);

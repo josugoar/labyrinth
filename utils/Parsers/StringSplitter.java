@@ -20,6 +20,7 @@ public class StringSplitter {
      */
     public static List<List<int[]>> parse(final String[] args) {
         final ArrayList<List<int[]>> point_wrapper = new ArrayList<List<int[]>>(3);
+        // Range through points
         for (final String arg : args) {
             int i = 0;
             final ArrayList<int[]> points = new ArrayList<int[]>();
