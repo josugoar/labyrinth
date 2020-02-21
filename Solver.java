@@ -21,7 +21,7 @@ public class Solver {
         // Initialize grid and fill it with values
         int[][] grid = new int[shape[0]][shape[1]];
         if (points.size() > 2) {
-            grid = fill(grid, points.get(2), 1);
+            grid = fill(grid, points.get(3), 1);
         }
         grid[end[0]][end[0]] = -1;
 
@@ -38,7 +38,7 @@ public class Solver {
      * @param cell   int
      * @return grid with inserted points
      */
-    public static int[][] fill(final int[][] grid, final List<int[]> points, final int cell) {
+    public static int[][] fill(int[][] grid, final List<int[]> points, final int cell) {
         for (final int[] point : points) {
             grid[point[0]][point[1]] = cell;
         }

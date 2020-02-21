@@ -1,7 +1,9 @@
 package utils.Algorithms;
 
 import java.util.ArrayList;
+
 import utils.DataStructures.Node;
+import utils.Parsers.ArrayDisplayer;
 
 public class RecursivePathfinder {
 
@@ -59,7 +61,7 @@ public class RecursivePathfinder {
                     // Check for valid grid values
                     if (new_val == empty) {
                         // Modify empty value
-                        new_val = 2;
+                        grid[new_coords[0]][new_coords[1]] = 2;
                         next_nodes.add(new_node);
                     } else if (new_val == end) {
                         return new_node;
@@ -67,6 +69,8 @@ public class RecursivePathfinder {
                 }
             }
         }
+        // Display array
+        ArrayDisplayer.plot(grid);
         // Call method recursively until convergence
         return solve(next_nodes);
     }
