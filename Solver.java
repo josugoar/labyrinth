@@ -12,20 +12,11 @@ import utils.Parsers.StringSplitter;
 
 public class Solver {
 
-    // TODO: Add element inheritance
-    // Each element is a class which inherits from parent Element
-    // Empty: empty cell (0)
-    // Obstacle: obstacle cell (1)
-    // Pickup: cell that must be accessed before reaching end
-    // End: end cell
-
     public static void main(final String[] args) {
         // Parse command line arguments into integer arrays
         final List<List<int[]>> points = StringSplitter.parse(args);
-
         // Initialize grid
         final Element[][] grid = initialize(points);
-
         // Call pathfinding algorithm from starting coordinates
         final Node last_child = RecursivePathfinder.awake(grid, points.get(1).get(0));
 

@@ -37,7 +37,7 @@ public class RecursivePathfinder {
      * @return last child node pointing to endpoint
      */
     private static Node find(final Element[][] grid, final ArrayList<Node> curr_nodes) {
-        final ArrayList<Node> next_nodes = new ArrayList<Node>();
+        final ArrayList<Node> new_nodes = new ArrayList<Node>();
         for (final Node node : curr_nodes) {
             // Generate neighbor children from parent node seed
             final int[] seed = node.get_seed();
@@ -53,7 +53,7 @@ public class RecursivePathfinder {
                         if (new_val instanceof Empty) {
                             // Modify empty value
                             grid[new_coords[0]][new_coords[1]] = new_node;
-                            next_nodes.add(new_node);
+                            new_nodes.add(new_node);
                         } else if (new_val instanceof End) {
                             return new_node;
                         }
@@ -61,9 +61,12 @@ public class RecursivePathfinder {
                 }
             }
         }
+        if (curr_nodes.equals(new_nodes)) {
+            throw new StackOverflowError();
+        }
         // Display array
         ArrayDisplayer.plot(grid);
         // Call method recursively until convergence
-        return find(grid, next_nodes);
+        return find(grid, new_nodes);
     }
 }
