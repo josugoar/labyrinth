@@ -31,8 +31,11 @@ public class RecursivePathfinder {
                 System.out.println("Elapsed time in miliseconds: " + (end_time - start_time));
             }
             return last_child;
-        } catch (StackOverflowError e) {
-            System.out.println(e.getMessage());
+        } catch (StackOverflowError e1) {
+            System.out.println(e1.getMessage());
+            return null;
+        } catch (InterruptedException e2) {
+            e2.printStackTrace();
             return null;
         }
     }
@@ -42,9 +45,12 @@ public class RecursivePathfinder {
      *
      * @param grid       Element[][]
      * @param curr_nodes ArrayList<Node>
+     * @throws StackOverflowError
      * @return last child node pointing to endpoint
+     * @throws InterruptedException
      */
-    private static Node find(final Element[][] grid, final ArrayList<Node> curr_nodes) throws StackOverflowError {
+    private static Node find(final Element[][] grid, final ArrayList<Node> curr_nodes)
+            throws StackOverflowError, InterruptedException {
         final ArrayList<Node> new_nodes = new ArrayList<Node>();
         for (final Node node : curr_nodes) {
             // Generate neighbor children from parent node seed
@@ -75,6 +81,7 @@ public class RecursivePathfinder {
         }
         // Display array
         ArrayDisplayer.plot(grid);
+        Thread.sleep(500);
         // Call method recursively until convergence
         return find(grid, new_nodes);
     }

@@ -38,7 +38,6 @@ public final class Node extends Element {
         return this.seed;
     }
 
-    @Override
     public boolean get_path() {
         return this.path;
     }

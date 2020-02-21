@@ -5,14 +5,20 @@ import utils.DataStructures.Elements.*;
 
 public class ArrayDisplayer {
 
+    /**
+     * Show grid in command line
+     *
+     * @param arr Element[][]
+     */
     public static void plot(final Element[][] arr) {
+        // clearScreen();
         for (final Element[] row : arr) {
-            for (final Element cell : row) {
+            for (Element cell : row) {
                 if (cell instanceof Empty) {
                     System.out.printf("-");
                 } else if (cell instanceof Node) {
-                    if (cell.get_path()) {
-                        System.out.printf("$");
+                    if (((Node) cell).get_path()) {
+                        System.out.printf("^");
                     } else {
                         System.out.printf("*");
                     }
@@ -26,5 +32,13 @@ public class ArrayDisplayer {
             System.out.println("");
         }
         System.out.println("");
+    }
+
+    /**
+     * Clear screen
+     */
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 }
