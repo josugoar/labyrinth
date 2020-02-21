@@ -6,19 +6,16 @@ import java.util.List;
 
 public class StringSplitter {
 
-    // String filler
+    // String filters
     private static String l = "(";
     private static String m = ", ";
     private static String r = ")";
     private static String s = " ";
 
     /**
-     * Parse string array conatining integer point arrays
+     * Parse string array containing integer points
      *
      * @param args String[]
-     * @param l    String
-     * @param r    String
-     * @param m    String
      * @return parsed points
      */
     public static List<List<int[]>> parse(final String[] args) {

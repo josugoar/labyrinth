@@ -8,10 +8,11 @@ import utils.DataStructures.Elements.Node;
 import utils.DataStructures.Elements.Obstacle;
 import utils.Parsers.StringSplitter;
 
-// String[0]: shape
-// String[1]: start
-// String[2]: end
-// String[3] (optional): obstacles
+// String[0]:               shape
+// String[1]:               start
+// String[2]:               end
+// String[3] (optional):    obstacles
+
 public class Solver {
 
     // TODO: Add element inheritance
@@ -22,65 +23,42 @@ public class Solver {
     // End: end cell
 
     public static void main(final String[] args) {
-        // Parse command line argument into integer arrays
+        // Parse command line arguments into integer arrays
         final List<List<int[]>> points = StringSplitter.parse(args);
 
-        // Get relevant points
-        final int[] shape = points.get(0).get(0);
-        final int[] end = points.get(2).get(0);
-
-        // Initialize grid and fill it with values
-        Element[][] grid = new Element[shape[0]][shape[1]];
-        grid = fill1(grid, null, Empty.class);
-        if (points.size() > 2) {
-            grid = fill2(grid, points.get(3), Obstacle.class);
-        }
-        grid[end[0]][end[0]] = new End();
+        // Initialize grid
+        final Element[][] grid = initialize(points);
 
         // Call pathfinding algorithm from starting coordinates
         final Node last_child = RecursivePathfinder.find(grid, points.get(1).get(0));
+
         System.out.println(last_child);
     }
 
     /**
-     * Fill grid with values
+     * Initilize grid and fill it with objects
      *
-     * @param grid   int[][]
-     * @param points ArrayList<int[]>
-     * @param empty  int
-     * @return grid with inserted points
+     * @param grid   Element[][]
+     * @param points List<int[]>
+     * @param cls    Element
+     * @return grid with inserted objects
      */
-    public static Element[][] fill1(Element[][] grid, final List<int[]> points, final Class<Empty> cls) {
-        if (points != null) {
-            for (final int[] point : points) {
-                try {
-                    grid[point[0]][point[1]] = cls.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            try {
-                for (int i = 0; i < grid.length; i++) {
-                    for (int j = 0; j < grid[0].length; j++) {
-                        grid[i][j] = cls.newInstance();
-                    }
-                }
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+    public static Element[][] initialize(final List<List<int[]>> points) {
+        // Include empty objects
+        final int[] shape = points.get(0).get(0);
+        final Element[][] grid = new Element[shape[0]][shape[1]];
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                grid[i][j] = new Empty();
             }
         }
-        return grid;
-    }
-
-    public static Element[][] fill2(Element[][] grid, final List<int[]> points, final Class<Obstacle> cls) {
-        for (final int[] point : points) {
-            try {
-                grid[point[0]][point[1]] = cls.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        // Include obstacle objects
+        for (final int[] point : points.get(3)) {
+            grid[point[0]][point[1]] = new Obstacle();
         }
+        // Include end objects
+        final int[] end = points.get(2).get(0);
+        grid[end[0]][end[0]] = new End();
         return grid;
     }
 

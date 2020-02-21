@@ -22,7 +22,7 @@ public final class Node extends Element {
     }
 
     public String toString() {
-        return String.format("Node(val: %d, seed: [%d, %d])", this.val, this.seed[0], this.seed[1]);
+        return String.format("Node(val: %s, seed: [%d, %d])", this.val, this.seed[0], this.seed[1]);
     }
 
     public Node get_parent() {
