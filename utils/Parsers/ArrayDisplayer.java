@@ -1,9 +1,7 @@
 package utils.Parsers;
 
 import utils.DataStructures.Element;
-import utils.DataStructures.Elements.Empty;
-import utils.DataStructures.Elements.Node;
-import utils.DataStructures.Elements.Obstacle;
+import utils.DataStructures.Elements.*;
 
 public class ArrayDisplayer {
 

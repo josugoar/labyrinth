@@ -2,10 +2,7 @@ import java.util.List;
 
 import utils.Algorithms.RecursivePathfinder;
 import utils.DataStructures.Element;
-import utils.DataStructures.Elements.Empty;
-import utils.DataStructures.Elements.End;
-import utils.DataStructures.Elements.Node;
-import utils.DataStructures.Elements.Obstacle;
+import utils.DataStructures.Elements.*;
 import utils.Parsers.StringSplitter;
 
 // String[0]:               shape
@@ -30,7 +27,7 @@ public class Solver {
         final Element[][] grid = initialize(points);
 
         // Call pathfinding algorithm from starting coordinates
-        final Node last_child = RecursivePathfinder.find(grid, points.get(1).get(0));
+        final Node last_child = RecursivePathfinder.awake(grid, points.get(1).get(0));
 
         System.out.println(last_child);
     }
@@ -38,9 +35,7 @@ public class Solver {
     /**
      * Initilize grid and fill it with objects
      *
-     * @param grid   Element[][]
-     * @param points List<int[]>
-     * @param cls    Element
+     * @param points List<List<int[]>>
      * @return grid with inserted objects
      */
     public static Element[][] initialize(final List<List<int[]>> points) {
@@ -53,12 +48,20 @@ public class Solver {
             }
         }
         // Include obstacle objects
-        for (final int[] point : points.get(3)) {
-            grid[point[0]][point[1]] = new Obstacle();
+        try {
+            for (final int[] obstacle : points.get(3)) {
+                grid[obstacle[0]][obstacle[1]] = new Obstacle();
+            }
+        } catch (final Exception e) {
+            System.out.println("No obstacles initialized");
         }
         // Include end objects
-        final int[] end = points.get(2).get(0);
-        grid[end[0]][end[0]] = new End();
+        for (final int[] end : points.get(2)) {
+            grid[end[0]][end[0]] = new End();
+        }
+        // Include start objects
+        final int[] start = points.get(1).get(0);
+        grid[start[0]][start[1]] = new Start();
         return grid;
     }
 
