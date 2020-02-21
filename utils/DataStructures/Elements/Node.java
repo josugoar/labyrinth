@@ -1,9 +1,11 @@
-package utils.DataStructures;
+package utils.DataStructures.Elements;
 
-public final class Node {
+import utils.DataStructures.Element;
+
+public final class Node extends Element {
 
     private final Node parent;
-    private final int val;
+    private final Element val;
     private final int[] seed;
 
     /**
@@ -13,7 +15,7 @@ public final class Node {
      * @param val    int
      * @param seed   int[]
      */
-    public Node(final Node parent, final int val, final int[] seed) {
+    public Node(final Node parent, final Element val, final int[] seed) {
         this.parent = parent;
         this.val = val;
         this.seed = seed;
@@ -27,7 +29,7 @@ public final class Node {
         return this.parent;
     }
 
-    public int get_val() {
+    public Element get_val() {
         return this.val;
     }
 

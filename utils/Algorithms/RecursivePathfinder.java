@@ -2,12 +2,15 @@ package utils.Algorithms;
 
 import java.util.ArrayList;
 
-import utils.DataStructures.Node;
+import utils.DataStructures.Element;
+import utils.DataStructures.Elements.Empty;
+import utils.DataStructures.Elements.End;
+import utils.DataStructures.Elements.Node;
 import utils.Parsers.ArrayDisplayer;
 
 public class RecursivePathfinder {
 
-    private static int[][] grid;
+    private static Element[][] grid;
     private static int empty = 0;
     private static int end = -1;
 
@@ -18,7 +21,7 @@ public class RecursivePathfinder {
      * @param start    int[]
      * @return last node pointing to ending coordinates
      */
-    public static Node find(final int[][] new_grid, final int[] start) {
+    public static Node find(final Element[][] new_grid, final int[] start) {
         grid = new_grid;
         return solve(new ArrayList<Node>() {
             private static final long serialVersionUID = 1L;
@@ -56,21 +59,21 @@ public class RecursivePathfinder {
                 }
                 // Check for out of bounds coordinates
                 if ((Math.abs(new_coords[0]) <= grid.length - 1) && (Math.abs(new_coords[1]) <= grid[0].length - 1)) {
-                    int new_val = grid[new_coords[0]][new_coords[1]];
+                    Element new_val = grid[new_coords[0]][new_coords[1]];
                     final Node new_node = new Node(node, new_val, new_coords);
                     // Check for valid grid values
-                    if (new_val == empty) {
+                    if (new_val instanceof Empty) {
                         // Modify empty value
-                        grid[new_coords[0]][new_coords[1]] = 2;
+                        grid[new_coords[0]][new_coords[1]] = new_node;
                         next_nodes.add(new_node);
-                    } else if (new_val == end) {
+                    } else if (new_val instanceof End) {
                         return new_node;
                     }
                 }
             }
         }
-        // Display array
-        ArrayDisplayer.plot(grid);
+        // // Display array
+        // ArrayDisplayer.plot(grid);
         // Call method recursively until convergence
         return solve(next_nodes);
     }
