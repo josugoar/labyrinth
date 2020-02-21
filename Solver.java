@@ -74,23 +74,11 @@ public class Solver {
     }
 
     public static Element[][] fill2(Element[][] grid, final List<int[]> points, final Class<Obstacle> cls) {
-        if (points != null) {
-            for (final int[] point : points) {
-                try {
-                    grid[point[0]][point[1]] = cls.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            for (Element[] elements : grid) {
-                for (Element element : elements) {
-                    try {
-                        element = cls.newInstance();
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
+        for (final int[] point : points) {
+            try {
+                grid[point[0]][point[1]] = cls.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
         return grid;

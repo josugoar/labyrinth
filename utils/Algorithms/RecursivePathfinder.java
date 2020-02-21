@@ -11,8 +11,6 @@ import utils.Parsers.ArrayDisplayer;
 public class RecursivePathfinder {
 
     private static Element[][] grid;
-    private static int empty = 0;
-    private static int end = -1;
 
     /**
      * Wrapper for solve method
@@ -72,18 +70,10 @@ public class RecursivePathfinder {
                 }
             }
         }
-        // // Display array
-        // ArrayDisplayer.plot(grid);
+        // Display array
+        ArrayDisplayer.plot(grid);
         // Call method recursively until convergence
         return solve(next_nodes);
-    }
-
-    public static void set_empty(final int new_empty) {
-        empty = new_empty;
-    }
-
-    public static void set_end(final int new_end) {
-        end = new_end;
     }
 
 }
