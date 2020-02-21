@@ -10,6 +10,13 @@ import utils.Parsers.StringSplitter;
 // String[3] (optional): obstacles
 public class Solver {
 
+    // TODO: Add element inheritance
+    // Each element is a class which inherits from parent Element
+    // Empty: empty cell (0)
+    // Obstacle: obstacle cell (1)
+    // Pickup: cell that must be accessed before reaching end
+    // End: end cell
+
     public static void main(final String[] args) {
         // Parse command line argument into integer arrays
         final List<List<int[]>> points = StringSplitter.parse(args);
