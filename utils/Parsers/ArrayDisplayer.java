@@ -13,7 +13,7 @@ public class ArrayDisplayer {
     public static void plot(final Element[][] arr) {
         // clearScreen();
         for (final Element[] row : arr) {
-            for (Element cell : row) {
+            for (final Element cell : row) {
                 if (cell instanceof Empty) {
                     System.out.printf("-");
                 } else if (cell instanceof Node) {
@@ -24,8 +24,10 @@ public class ArrayDisplayer {
                     }
                 } else if (cell instanceof Obstacle) {
                     System.out.printf("#");
-                } else {
+                } else if (cell instanceof Start) {
                     System.out.printf("0");
+                } else {
+                    System.out.printf("1");
                 }
                 System.out.printf(" ");
             }
