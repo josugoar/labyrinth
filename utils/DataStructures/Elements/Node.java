@@ -13,7 +13,7 @@ public final class Node extends Element {
      * Individual node which stores pointer to parent node
      *
      * @param parent Node
-     * @param val    int
+     * @param val    Element
      * @param seed   int[]
      */
     public Node(final Node parent, final Element val, final int[] seed) {
@@ -22,8 +22,17 @@ public final class Node extends Element {
         this.seed = seed;
     }
 
+    @Override
     public String toString() {
-        return String.format("Node(val: %s, seed: [%d, %d])", this.val, this.seed[0], this.seed[1]);
+        if (parent == null) {
+            return String.format("Node(parent: null, val: %s, seed: [%d, %d], path: %b)", this.val, this.seed[0],
+                    this.seed[1], this.path);
+        } else {
+            return String.format("Node(parent: [%d, %d], val: %s, seed: [%d, %d], path: %b)", this.parent.seed[0],
+                    this.parent.seed[1], this.val, this.seed[0], this.seed[1], this.path);
+
+        }
+
     }
 
     public Node get_parent() {
