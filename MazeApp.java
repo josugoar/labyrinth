@@ -348,7 +348,7 @@ public class MazeApp implements Runnable {
 
     private static class PathFinder {
 
-        private static int DELAY_N = 200;
+        private static final int DELAY_N = 200;
 
         private static int delay_n = 0;
         private static int[] start = null;
