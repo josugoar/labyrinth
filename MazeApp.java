@@ -23,18 +23,15 @@ import javax.swing.Timer;
 
 public class MazeApp implements Runnable {
 
-    private static final int ROWS = 34;
-    private static final int COLS = 34;
+    // TODO: Add Javadocs
+    // TODO: Improve Cell inheritance
+
+    private static final int ROWS = 10;
+    private static final int COLS = 10;
 
     protected static JFrame frame;
-    protected static Cell[][] grid = new Cell[ROWS][COLS];
+    protected static Cell[][] grid = new Cell[10][10];
     protected static LinkedHashMap<String, Cell> cellMap = new LinkedHashMap<String, Cell>();
-    // (new Comparator<int[]>() {
-    // @Override
-    // public int compare(final int[] o1, final int[] o2) {
-    // return o1[0] + o1[1] - o2[0] + o2[1];
-    // }
-    // });
 
     public static void main(final String[] args) {
         // Invoke MazeApp asynchronously in event dispatch thread
@@ -85,10 +82,29 @@ public class MazeApp implements Runnable {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                PathFinder.awake(getGrid());
+                PathFinder.awake();
             }
         });
         return button;
+    }
+
+    private static void paintPanel(final Cell panel, final Color color) {
+        panel.setColor(color);
+        panel.repaint();
+    }
+
+    private static void resetPanel(final Cell panel) {
+        getGrid()[panel.getSeed()[0]][panel.getSeed()[1]] = null;
+        paintPanel(panel, Color.WHITE);
+    }
+
+    private static void drawNode(final List<Cell.Node> gen, final int delay) {
+        for (final Cell.Node node : gen) {
+            new Timer(delay, e -> {
+                paintPanel(getCellMap().get(Arrays.toString(node.getSeed())), Color.BLUE);
+                ((Timer) e.getSource()).stop();
+            }).start();
+        }
     }
 
     private static void drawTerminal() {
@@ -320,25 +336,6 @@ public class MazeApp implements Runnable {
             }
         }
 
-        private static void paintPanel(final Cell panel, final Color color) {
-            panel.setColor(color);
-            panel.repaint();
-        }
-
-        private static void resetPanel(final Cell panel) {
-            MazeApp.getGrid()[panel.getSeed()[0]][panel.getSeed()[1]] = null;
-            paintPanel(panel, Color.WHITE);
-        }
-
-        private static void drawNode(final List<Cell.Node> gen, int delay) {
-            for (final Cell.Node node : gen) {
-                new Timer(delay, e -> {
-                    paintPanel(MazeApp.getCellMap().get(Arrays.toString(node.getSeed())), Color.BLUE);
-                    ((Timer) e.getSource()).stop();
-                }).start();
-            }
-        }
-
         public Cell getPanel() {
             return this.panel;
         }
@@ -351,20 +348,22 @@ public class MazeApp implements Runnable {
 
     private static class PathFinder {
 
-        private static int delay = 0;
+        private static int DELAY_N = 200;
 
+        private static int delay_n = 0;
         private static int[] start = null;
 
-        public static Cell.Node awake(final Cell[][] grid) {
+        public static Cell.Node awake() {
             try {
                 // Find EndPoint from Start Node
-                final Cell.Node lastChild = find(grid, new ArrayList<Cell.Node>() {
+                final Cell.Node lastChild = find(MazeApp.getGrid(), new ArrayList<Cell.Node>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        add(new Cell.Node(null, grid[getStart()[0]][getStart()[1]], getStart()));
+                        add(new Cell.Node(null, MazeApp.getGrid()[getStart()[0]][getStart()[1]], getStart()));
                     }
                 });
-                traverse(grid, lastChild.getParent());
+                traverse(MazeApp.getGrid(), lastChild.getParent());
+                MazeApp.drawTerminal();
                 return lastChild;
                 // Catch no solution grid error
             } catch (final StackOverflowError e) {
@@ -402,21 +401,23 @@ public class MazeApp implements Runnable {
             if (curr_nodes.equals(new_nodes)) {
                 throw new StackOverflowError("No solution...");
             }
-            // Display array
-            // MazeApp.drawTerminal();
-            CellListener.drawNode(new_nodes, delay++ * 100);
+            // Display generation
+            MazeApp.drawNode(new_nodes, delay_n++ * DELAY_N);
             // Call method recursively until convergence
             return find(grid, new_nodes);
         }
 
-        private static void traverse(final Cell[][] grid, final Cell.Node lastChild) {
-            if (lastChild.getParent() != null) {
-                new Timer(delay++ * 100, e -> {
-                    CellListener.paintPanel(MazeApp.getCellMap().get(Arrays.toString(lastChild.getSeed())), Color.CYAN);
+        private static Cell.Node traverse(final Cell[][] grid, final Cell.Node child) {
+            // Inversely traverse path
+            if (child.getParent() != null) {
+                new Timer(delay_n++ * DELAY_N, e -> {
+                    MazeApp.paintPanel(MazeApp.getCellMap().get(Arrays.toString(child.getSeed())), Color.CYAN);
                     ((Timer) e.getSource()).stop();
                 }).start();
-                lastChild.setPath(true);
-                traverse(grid, lastChild.getParent());
+                child.setPath(true);
+                return traverse(grid, child.getParent());
+            } else {
+                return child;
             }
         }
 
