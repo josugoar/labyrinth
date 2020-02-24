@@ -24,7 +24,13 @@ import javax.swing.Timer;
 public class MazeApp implements Runnable {
 
     // TODO: Add Javadocs
-    // TODO: Improve Cell inheritance
+    // TODO: Change ROWS and COLS to FRAME_SIZE (N*N)
+    // TODO: Store coordinates in java.awt.Point, not int[]
+    // TODO: Convert PathFinder into abstract class and add Dijkstra and AStar inherintance
+        // TODO: PathFinder has grid and start atributes, when grid is modified start is reseted
+    // TODO: Include multiple PathFinderListener for each Cell.Star
+    // TODO: Convert Cell into superclass
+        // TODO: Convert CELL_SIZE to inline constant
 
     private static final int ROWS = 10;
     private static final int COLS = 10;
