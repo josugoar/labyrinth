@@ -26,10 +26,13 @@ public class MazeApp implements Runnable {
     // TODO: Add Javadocs
     // TODO: Change ROWS and COLS to FRAME_SIZE (N*N)
     // TODO: Store coordinates in java.awt.Point, not int[]
+    // TODO: Create Grid object
+        // TODO: Grid has layout (ListedHashMap/TreeMap<Point, Cell>), start (ListedHashMap/TreeMap<String, Cell> of algorithm type) and end (ArrayList<Cell>)
     // TODO: Convert PathFinder into abstract class and add Dijkstra and AStar inherintance
         // TODO: PathFinder has grid and start atributes, when grid is modified start is reseted
-    // TODO: Include multiple PathFinderListener for each Cell.Star
+        // TODO: Strore grid layout and relevant points (start, end ...) in Grid object
     // TODO: Convert Cell into superclass
+        // TODO: Include multiple PathFinderListener for each Cell.Star
         // TODO: Convert CELL_SIZE to inline constant
 
     private static final int ROWS = 10;
