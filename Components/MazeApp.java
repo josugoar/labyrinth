@@ -20,22 +20,14 @@ import Components.JWrapper.JWSplitPane;
  */
 public class MazeApp extends JFrame implements Runnable {
 
-    // TODO: Change ArrayList to Component[]
-
     private static final long serialVersionUID = 1L;
+
+    private enum Mode {
+        START, END, EMPTY, OBSTACLE
+    }
 
     public static final void main(final String[] args) {
         EventQueue.invokeLater(new MazeApp());
-    }
-
-    @Override
-    public final void run() {
-        this.setComponents();
-        this.pack();
-        this.setVisible(true);
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null);
     }
 
     private final void setComponents() {
@@ -48,60 +40,67 @@ public class MazeApp extends JFrame implements Runnable {
         this.add(new JWSplitPane(JWSplitPane.HORIZONTAL_SPLIT,
                 // Left JWPanel
                 wrapper.JWComponent(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                        new Dimension(250, 525), new ArrayList<Component>(2) {
+                        new ArrayList<Component>() {
                             private static final long serialVersionUID = 1L;
                             {
                                 // Left JWPanel JWButtons
                                 add(Box.createVerticalGlue());
                                 add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                        new Dimension(100, 50), new ArrayList<Component>(2) {
+                                        new ArrayList<Component>() {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                             }
-                                        }));
+                                        }
+                                ));
                                 add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                        new Dimension(100, 50), new ArrayList<Component>(2) {
+                                        new ArrayList<Component>() {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                             }
-                                        }));
+                                        }
+                                ));
                                 add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                        new Dimension(100, 50), new ArrayList<Component>(2) {
+                                        new ArrayList<Component>() {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                             }
-                                        }));
+                                        }
+                                ));
                                 add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                        new Dimension(100, 50), new ArrayList<Component>(2) {
+                                        new ArrayList<Component>() {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                             }
-                                        }));
+                                        }
+                                ));
                                 add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                        new Dimension(100, 50), new ArrayList<Component>(2) {
+                                        new ArrayList<Component>() {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                                 add(new JWButton("Button", new Dimension(80, 30), null));
                                             }
-                                        }));
+                                        }
+                                ));
                             }
-                        })),
+                        },
+                        new Dimension(200, 0)
+                )),
                 // Right JWSplitPane
                 new JWSplitPane(JWSplitPane.VERTICAL_SPLIT,
                     // Top Right JWGridLayout
-                    new JWGridLayout(20, 20, new Dimension(500, 500)),
+                    new JWGridLayout(20, 20,new Dimension(500, 500)),
                     // Bottom Right JWPanel
-                    new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 12), new Dimension(500, 50),
-                        new ArrayList<Component>(1) {
+                    new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 12),
+                        new ArrayList<Component>() {
                             private static final long serialVersionUID = 1L;
                             {
                                 // Bottom Right JWPanel JWButtons
@@ -109,10 +108,26 @@ public class MazeApp extends JFrame implements Runnable {
                                 add(new JWButton("Button", new Dimension(100, 20), null));
                                 add(new JWButton("Button", new Dimension(100, 20), null));
                             }
-                        }
+                        },
+                        new Dimension(500, 50)
                     )
                 )
         ));
+    }
+
+    @Override
+    public final void run() {
+        this.setComponents();
+        this.pack();
+        this.setVisible(true);
+        this.setResizable(false);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+    }
+
+    @Override
+    public final String toString() {
+        return String.format("%s", this.getClass());
     }
 
 }
