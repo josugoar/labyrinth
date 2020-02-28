@@ -1,4 +1,4 @@
-package Components.Controller;
+package src.controller;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -16,8 +16,8 @@ import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;
 
-import Components.MazeApp;
-import Components.View.JWrapper.JWPanel;
+import src.MazeApp;
+import src.view.components.JWPanel;
 
 /**
  * GridLayout controller
@@ -59,7 +59,7 @@ public class JWGrid extends JWPanel {
     public static final class Cell extends JWPanel {
 
         private static enum State {
-            START, END, CURR_NODE, NEXT_NODE, OBSTACLE, EMPTY
+            START, END, OBSTACLE, EMPTY, CURR_NODE, NEXT_NODE
         }
 
         private static final long serialVersionUID = 1L;
@@ -70,7 +70,7 @@ public class JWGrid extends JWPanel {
             super(new FlowLayout(), null, null);
             this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             this.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(final MouseEvent e) {
+                public void mousePressed(final MouseEvent e) {
                     switch (((MazeApp) SwingUtilities.getWindowAncestor(Cell.this)).getMode()) {
                         case START:
                             Cell.this.setState(State.START);

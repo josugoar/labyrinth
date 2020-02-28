@@ -1,4 +1,4 @@
-package Components.Model;
+package src.model;
 
 import java.awt.Point;
 import java.io.Serializable;
