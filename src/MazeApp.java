@@ -11,36 +11,73 @@ import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 
 import src.controller.JWGrid;
+import src.model.PathFinder.Dijkstra;
 import src.view.JWrapper;
 import src.view.components.JWButton;
 import src.view.components.JWPanel;
 import src.view.components.JWSplitPane;
 
 /**
- * Runnable MazeApp JApplet
+ * A <code>java.lang.Runnable</code> extended version of
+ * <code>java.awt.JFrame</code> that includes <code>src.MazeApp</code> solver,
+ * generation, edition and interactive visualization features.
  *
  * @author JoshGoA
+ * @version 0.1
+ * @see java.lang.Runnable Runnable
+ * @see javax.swing.JFrame JFrame
  */
 public class MazeApp extends JFrame implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Cell Mode
+     * Enum of <code>src.controller.JWGrid.Cell</code> mode constants: START, END,
+     * OBSTACLE, EMPTY.
      */
-    public enum Mode {
+    public static enum Mode {
         START, END, OBSTACLE, EMPTY
     }
 
-    private Mode mode = Mode.OBSTACLE;
+    /**
+     * <code>src.controller.JWGrid.Cell</code> <code>src.MazeApp.Mode</code>
+     * selection.
+     */
+    private Mode mode = Mode.EMPTY;
+    /**
+     * <code>src.controller.JWGrid</code> algorithm modifier.
+     */
     private int size = 20, speed = 1, density = 1;
 
     /**
-     * Initialize HTML-like Container tree
+     * A <code>src.controller.JWGrid</code> conatining <code>src.controller.JWGrid.Cell</code>.
      *
+     * @see src.controller.JWGrid JWGrid
+     * @see src.controller.JWGrid.Cell Cell
+     */
+    private JWGrid layout = new JWGrid(size, size, new Dimension(470, 500));
+
+    /**
+     * Invoke runnable in system EventQueue dispatch thread.
+     *
+     * @see javax.swing.SwingUtilities#invokeLater(Runnable doRun) invokeLater()
+     */
+    public final void start() {
+        SwingUtilities.invokeLater(new MazeApp());
+    }
+
+    /**
+     * Initialize HTML-like Container tree.
+     *
+     * @see src.view.JWrapper JWrapper
+     * @see src.view.components.JWButton JWButton
+     * @see src.view.components.JWPanel JWPanel
+     * @see src.view.components.JWSlider JWSlider
+     * @see src.view.components.JWSplitPane JWSplitPane
      * @return New tree
      */
     private final Container initTree() {
@@ -56,17 +93,37 @@ public class MazeApp extends JFrame implements Runnable {
                     new ArrayList<Component>() {
                         private static final long serialVersionUID = 1L;
                         {
-                            // Left JWPanel JWButtons
+                            // Left JWPanel JWComponents
+                            // Algorithm modifiers
                             this.add(Box.createVerticalGlue());
                             this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
+                                            // Reset JWGrid
+                                            this.add(new JWButton("Clear",
+                                                    new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(final ActionEvent e) {
+                                                            MazeApp.this.layout.setGrid(MazeApp.this.size, MazeApp.this.size);
+                                                        }
+                                                    },
+                                                    new Dimension(80, 30)
+                                            ));
+                                            // Awake PathFinder
+                                            this.add(new JWButton("Awake",
+                                                    new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(final ActionEvent e) {
+                                                            new Dijkstra().awake(MazeApp.this.layout.getGrid());
+                                                        }
+                                                    },
+                                                    new Dimension(80, 30)
+                                            ));
                                         }
                                     }
                             ));
+                            this.add(new JSlider(JSlider.HORIZONTAL, 0, 10, 5));
                             this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
@@ -110,18 +167,19 @@ public class MazeApp extends JFrame implements Runnable {
             // Right JWSplitPane
             new JWSplitPane(JWSplitPane.VERTICAL_SPLIT,
                 // Top Right JWGridLayout
-                new JWGrid(20, 20, new Dimension(470, 500)),
+                layout,
                 // Bottom Right JWPanel
                 new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 12),
                     new ArrayList<Component>() {
                         private static final long serialVersionUID = 1L;
                         {
-                            // Bottom Right JWPanel JWButtons
+                            // Bottom Right JWPanel JWComponents
+                            // MazeApp mode modifiers
                             this.add(new JWButton("Start",
                                     new ActionListener() {
                                         @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            MazeApp.this.setMode(Mode.START);
+                                        public void actionPerformed(final ActionEvent e) {
+                                            MazeApp.this.mode = Mode.START;
                                         }
                                     },
                                     new Dimension(100, 20)
@@ -129,8 +187,8 @@ public class MazeApp extends JFrame implements Runnable {
                             this.add(new JWButton("End",
                                     new ActionListener() {
                                         @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            MazeApp.this.setMode(Mode.END);
+                                        public void actionPerformed(final ActionEvent e) {
+                                            MazeApp.this.mode = Mode.END;
                                         }
                                     },
                                     new Dimension(100, 20)
@@ -138,8 +196,8 @@ public class MazeApp extends JFrame implements Runnable {
                             this.add(new JWButton("Obstacle",
                                     new ActionListener() {
                                         @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            MazeApp.this.setMode(Mode.OBSTACLE);
+                                        public void actionPerformed(final ActionEvent e) {
+                                            MazeApp.this.mode = Mode.OBSTACLE;
                                         }
                                     },
                                     new Dimension(100, 20)
@@ -147,8 +205,8 @@ public class MazeApp extends JFrame implements Runnable {
                             this.add(new JWButton("Empty",
                                     new ActionListener() {
                                         @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            MazeApp.this.setMode(Mode.EMPTY);
+                                        public void actionPerformed(final ActionEvent e) {
+                                            MazeApp.this.mode = Mode.EMPTY;
                                         }
                                     },
                                     new Dimension(100, 20)
@@ -161,11 +219,6 @@ public class MazeApp extends JFrame implements Runnable {
         );
     }
 
-    public final void start() {
-        // Invoke runnable in system EventQueue dispatch thread
-        SwingUtilities.invokeLater(new MazeApp());
-    }
-
     @Override
     public final void run() {
         this.setContentPane(initTree());
@@ -176,17 +229,8 @@ public class MazeApp extends JFrame implements Runnable {
         this.setLocationRelativeTo(null);
     }
 
-    @Override
-    public final String toString() {
-        return String.format("%s", this.getClass());
-    }
-
     public final Mode getMode() {
         return this.mode;
-    }
-
-    protected final void setMode(final Mode mode) {
-        this.mode = mode;
     }
 
 }

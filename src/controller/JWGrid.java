@@ -1,37 +1,43 @@
 package src.controller;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import src.MazeApp;
 import src.view.components.JWPanel;
 
 /**
- * GridLayout controller
+ * A <code>src.view.components.JWPanel</code> <code>java.awt.GridLayout</code>
+ * <code>src.controller.JWGrid.Cell</code> controller.
  *
  * @author JoshGoA
+ * @see src.view.components.JWPanel JWPanel
  */
 public class JWGrid extends JWPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final Map<Point, Component> grid;
+    /**
+     * <code>src.controller.JWGrid</code> <code>src.controller.JWGrid.Cell</code>
+     * storage.
+     */
+    private Map<Point, Cell> grid;
 
     /**
-     * Create GridLayout JPanel of given shape
+     * Create <code>java.awt.GridLayout</code>
+     * <code>src.view.components.JWPanel</code> of given shape filled with
+     * <code>src.controller.JWGrid.Cell</code>.
      *
      * @param rows          int
      * @param cols          int
@@ -39,7 +45,16 @@ public class JWGrid extends JWPanel {
      */
     public JWGrid(final int rows, final int cols, final Dimension preferredSize) {
         super(new GridLayout(rows, cols, 0, 0), preferredSize);
-        this.grid = new HashMap<Point, Component>(rows * cols) {
+        this.setGrid(rows, cols);
+    }
+
+    public final Map<Point, Cell> getGrid() {
+        return this.grid;
+    }
+
+    public final void setGrid(final int rows, final int cols) {
+        this.removeAll();
+        this.grid = new LinkedHashMap<Point, Cell>(rows * cols) {
             private static final long serialVersionUID = 1L;
             {
                 for (int row = 0; row < rows; row++) {
@@ -50,24 +65,34 @@ public class JWGrid extends JWPanel {
             }
         };
         this.addJW(this.getGrid().values());
+        this.revalidate();
     }
 
-    public final Map<Point, Component> getGrid() {
-        return this.grid;
-    }
+    /**
+     * Internal <code>src.controller.JWGrid</code>
+     * <code>src.view.components.JWPanel</code>.
+     *
+     * @see javax.swing.JPanel JPanel
+     */
+    public static final class Cell extends JPanel {
 
-    public static final class Cell extends JWPanel {
-
-        private static enum State {
-            START, END, OBSTACLE, EMPTY, CURR_NODE, NEXT_NODE
+        /**
+         * Enum of <code>src.controller.JWGrid.Cell</code> states: START, END, OBSTACLE,
+         * EMPTY, CURR_NODE, NEXT_NODE, PATH_NODE.
+         */
+        public static enum State {
+            START, END, OBSTACLE, EMPTY, CURR_NODE, NEXT_NODE, PATH_NODE
         }
 
         private static final long serialVersionUID = 1L;
 
+        /**
+         * <code>src.controller.JWGrid.Cell</code>
+         * <code>src.controller.JWGrid.Cell.State</code> selection.
+         */
         private State state = State.EMPTY;
 
-        public Cell() {
-            super(new FlowLayout(), null, null);
+        {
             this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             this.addMouseListener(new MouseAdapter() {
                 public void mousePressed(final MouseEvent e) {
@@ -78,11 +103,11 @@ public class JWGrid extends JWPanel {
                         case END:
                             Cell.this.setState(State.END);
                             break;
-                        case EMPTY:
-                            Cell.this.setState(State.EMPTY);
+                        case OBSTACLE:
+                            Cell.this.setState(State.OBSTACLE);
                             break;
                         default:
-                            Cell.this.setState(State.OBSTACLE);
+                            Cell.this.setState(State.EMPTY);
                     }
                 }
             });
@@ -91,12 +116,12 @@ public class JWGrid extends JWPanel {
         @Override
         protected final void paintComponent(final Graphics g) {
             Color color;
-            switch (this.getState()) {
+            switch (this.state) {
                 case START:
-                    color = Color.GREEN;
+                    color = Color.RED;
                     break;
                 case END:
-                    color = Color.RED;
+                    color = Color.GREEN;
                     break;
                 case OBSTACLE:
                     color = Color.BLACK;
@@ -107,6 +132,9 @@ public class JWGrid extends JWPanel {
                 case NEXT_NODE:
                     color = Color.BLUE;
                     break;
+                case PATH_NODE:
+                    color = Color.YELLOW;
+                    break;
                 default:
                     color = Color.WHITE;
             }
@@ -116,15 +144,15 @@ public class JWGrid extends JWPanel {
 
         @Override
         public final String toString() {
-            return String.format("%s (state: %s)", this.getClass(), this.getState());
+            return String.format("Cell(state: %s)", this.state);
         }
 
         public final State getState() {
             return this.state;
         }
 
-        private final void setState(final State state) {
-            this.state = Objects.requireNonNull(state, "'state' must not be null");
+        public final void setState(final State state) {
+            this.state = state;
             this.repaint();
         }
 

@@ -4,9 +4,9 @@ import java.awt.Component;
 import java.io.Serializable;
 
 /**
- * Component wrapper interface
+ * <code>java.io.Serializable</code> component wrapper interface.
  *
- * @author JoshGoA
+ * @see java.io.Serializable Serializable
  */
 @FunctionalInterface
 public abstract interface JWrapper extends Serializable {
@@ -14,9 +14,10 @@ public abstract interface JWrapper extends Serializable {
     static final long serialVersionUID = 1L;
 
     /**
-     * Single Component multiple reference pointer
+     * Single <code>java.awt.Component</code> multiple reference pointer.
      *
      * @param component Component
+     * @see java.awt.Component Component
      */
     abstract Component JWComponent(final Component component);
 

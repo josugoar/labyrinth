@@ -5,12 +5,17 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 
+/**
+ * An extended <code>javax.swing.JButton</code> implementation.
+ *
+ * @see javax.swing.JButton JButton
+ */
 public final class JWButton extends JButton {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Enclose JButton Text, Dimension and ActionListener
+     * Enclose JButton Text, Dimension and ActionListener.
      *
      * @param text          String
      * @param l             ActionListener
@@ -23,10 +28,10 @@ public final class JWButton extends JButton {
     }
 
     /**
-     * Enclose JButton Text and ActionListener
+     * Enclose JButton Text and ActionListener.
      *
-     * @param text          String
-     * @param l             ActionListener
+     * @param text String
+     * @param l    ActionListener
      */
     public JWButton(final String text, final ActionListener l) {
         this(text, l, null);

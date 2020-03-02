@@ -4,12 +4,17 @@ import java.awt.Component;
 
 import javax.swing.JSplitPane;
 
+/**
+ * An extended <code>javax.swing.JSplitPane</code> implementation.
+ *
+ * @see javax.swing.JSplitPane JSplitPane
+ */
 public final class JWSplitPane extends JSplitPane {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Anchor JSplitPane disabling divider
+     * Anchor JSplitPane disabling divider.
      *
      * @param newOrientation    int
      * @param newLeftComponent  Component

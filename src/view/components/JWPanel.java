@@ -8,12 +8,18 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+/**
+ * An extended <code>javax.swing.JPanel</code> implementation.
+ *
+ * @see javax.swing.JPanel JPanel
+ */
 public class JWPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Enclose JPanel LayoutManager, Component and Dimension
+     * Enclose <code>javax.swing.JPanel</code> LayoutManager, Component and
+     * Dimension.
      *
      * @param layout        LayoutManager
      * @param comps         List<Component>
@@ -30,7 +36,7 @@ public class JWPanel extends JPanel {
     }
 
     /**
-     * Enclose JPanel LayoutManager and Component
+     * Enclose <code>javax.swing.JPanel</code> LayoutManager and Component.
      *
      * @param layout LayoutManager
      * @param comps  List<Component>
@@ -40,7 +46,7 @@ public class JWPanel extends JPanel {
     }
 
     /**
-     * Enclose JPanel LayoutManager and Dimension
+     * Enclose <code>javax.swing.JPanel</code> LayoutManager and Dimension.
      *
      * @param layout        LayoutManager
      * @param preferredSize Dimension
@@ -50,7 +56,7 @@ public class JWPanel extends JPanel {
     }
 
     /**
-     * Enclose JPanel LayoutManager
+     * Enclose <code>javax.swing.JPanel</code> LayoutManager.
      *
      * @param layout LayoutManager
      */
@@ -59,12 +65,13 @@ public class JWPanel extends JPanel {
     }
 
     /**
-     * Add multiple child Component to panel
+     * Add multiple child <code>java.awt.Component</code>
+     * <code>java.util.Collection<T></code> to <code>javax.swing.JPanel</code>.
      *
      * @param comps List<Component>
      */
-    public final void addJW(final Collection<Component> comps) {
-        for (final Component comp : comps) {
+    public final <T extends Component> void addJW(final Collection<T> comps) {
+        for (final T comp : comps) {
             this.add(comp);
         }
     }
