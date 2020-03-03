@@ -19,6 +19,7 @@ import src.model.PathFinder.Dijkstra;
 import src.view.JWrapper;
 import src.view.components.JWButton;
 import src.view.components.JWPanel;
+import src.view.components.JWSlider;
 import src.view.components.JWSplitPane;
 
 /**
@@ -34,7 +35,7 @@ import src.view.components.JWSplitPane;
 public class MazeApp extends JFrame implements Runnable {
 
     /**
-     * Enum of <code>src.controller.JWGrid.Cell</code> mode constants: START, END,
+     * Enum of <code>src.controller.Cell</code> mode constants: START, END,
      * OBSTACLE, EMPTY.
      */
     public static enum Mode {
@@ -44,8 +45,7 @@ public class MazeApp extends JFrame implements Runnable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * <code>src.controller.JWGrid.Cell</code> <code>src.MazeApp.Mode</code>
-     * selection.
+     * <code>src.controller.Cell</code> <code>src.MazeApp.Mode</code> selection.
      */
     private Mode mode = Mode.EMPTY;
 
@@ -55,12 +55,12 @@ public class MazeApp extends JFrame implements Runnable {
     private int size = 20, speed = 1, density = 1;
 
     /**
-     * A <code>src.controller.JWGrid</code> containing <code>src.controller.JWGrid.Cell</code>.
+     * A <code>src.controller.JWGrid</code> containing <code>src.controller.Cell</code>.
      *
      * @see src.controller.JWGrid JWGrid
-     * @see src.controller.JWGrid.Cell Cell
+     * @see src.controller.Cell Cell
      */
-    private JWGrid layout = new JWGrid(size, size, new Dimension(470, 500));
+    private final JWGrid layout = new JWGrid(size, size, new Dimension(470, 500));
 
     /**
      * Invoke runnable in system EventQueue dispatch thread.
@@ -123,8 +123,19 @@ public class MazeApp extends JFrame implements Runnable {
                                             ));
                                         }
                                     }
+                                    // new Dimension(200, 0)
                             ));
-                            this.add(new JSlider(JSlider.HORIZONTAL, 0, 10, 5));
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                                    new ArrayList<Component>() {
+                                        private static final long serialVersionUID = 1L;
+                                        {
+                                            this.add(new JWSlider());
+                                            this.add(new JWSlider());
+                                            this.add(new JWSlider());
+                                        }
+                                    },
+                                    new Dimension(100, 80)
+                            ));
                             this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;

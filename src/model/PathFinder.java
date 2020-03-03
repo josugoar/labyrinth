@@ -9,8 +9,7 @@ import java.util.Set;
 import javax.swing.Timer;
 
 import src.controller.JWGrid;
-import src.controller.JWGrid.Cell;
-import src.controller.JWGrid.Cell.State;
+import src.controller.Cell;
 
 /**
  * A <code>java.io.Serializable</code> abstract class containing common
@@ -51,7 +50,7 @@ public abstract class PathFinder implements Serializable {
      */
     private static final void traverse(final Node<Cell> child) {
         if (child.getParent() != null) {
-            child.getInner().setState(State.PATH_NODE);
+            child.getInner().setState(Cell.State.PATH);
             PathFinder.traverse(child.getParent());
         }
     }
@@ -83,7 +82,7 @@ public abstract class PathFinder implements Serializable {
                             }
                         } else {
                             outer: for (final Cell cell : grid.values()) {
-                                if (cell.getState() == State.START) {
+                                if (cell.getState() == Cell.State.START) {
                                     for (final Point seed : grid.keySet()) {
                                         if (grid.get(seed) == cell) {
                                             this.add(new Node<Cell>(seed, cell));
@@ -133,7 +132,7 @@ public abstract class PathFinder implements Serializable {
                             switch (cell.getState()) {
                                 case EMPTY:
                                     // Store node in generation
-                                    cell.setState(State.NEXT_NODE);
+                                    cell.setState(Cell.State.GERMINATED);
                                     newGen.add(newNode);
                                     break;
                                 case END:
@@ -155,7 +154,7 @@ public abstract class PathFinder implements Serializable {
             // Change Cell State to visited
             final Timer timer = new Timer(PathFinder.delay, e -> {
                 for (final Node<Cell> node : newGen) {
-                    grid.get(node.getSeed()).setState(State.CURR_NODE);
+                    grid.get(node.getSeed()).setState(Cell.State.VISITED);
                 }
                 this.find(grid, newGen);
                 ((Timer) e.getSource()).stop();
