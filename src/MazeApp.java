@@ -33,8 +33,6 @@ import src.view.components.JWSplitPane;
  */
 public class MazeApp extends JFrame implements Runnable {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Enum of <code>src.controller.JWGrid.Cell</code> mode constants: START, END,
      * OBSTACLE, EMPTY.
@@ -43,18 +41,21 @@ public class MazeApp extends JFrame implements Runnable {
         START, END, OBSTACLE, EMPTY
     }
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * <code>src.controller.JWGrid.Cell</code> <code>src.MazeApp.Mode</code>
      * selection.
      */
     private Mode mode = Mode.EMPTY;
+
     /**
      * <code>src.controller.JWGrid</code> algorithm modifier.
      */
     private int size = 20, speed = 1, density = 1;
 
     /**
-     * A <code>src.controller.JWGrid</code> conatining <code>src.controller.JWGrid.Cell</code>.
+     * A <code>src.controller.JWGrid</code> containing <code>src.controller.JWGrid.Cell</code>.
      *
      * @see src.controller.JWGrid JWGrid
      * @see src.controller.JWGrid.Cell Cell
@@ -128,7 +129,15 @@ public class MazeApp extends JFrame implements Runnable {
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
+                                            this.add(new JWButton("Test",
+                                                    new ActionListener() {
+                                                        @Override
+                                                        public void actionPerformed(final ActionEvent e) {
+                                                            MazeApp.this.layout.setGrid(MazeApp.this.size+10, MazeApp.this.size+10);
+                                                        }
+                                                    },
+                                                    new Dimension(80, 30)
+                                            ));
                                             this.add(new JWButton("Button", null, new Dimension(80, 30)));
                                         }
                                     }

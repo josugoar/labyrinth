@@ -2,12 +2,13 @@ package src.model;
 
 import java.awt.Point;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Timer;
 
+import src.controller.JWGrid;
 import src.controller.JWGrid.Cell;
 import src.controller.JWGrid.Cell.State;
 
@@ -40,7 +41,7 @@ public abstract class PathFinder implements Serializable {
      * @return Children Node
      * @throws StackOverflowError
      */
-    protected abstract void find(final Map<Point, Cell> grid, final List<Node<Cell>> currGen) throws StackOverflowError;
+    protected abstract void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen) throws StackOverflowError;
 
     /**
      * Traverse through child nodes until no parent <code>src.model.Node</code> is
@@ -62,23 +63,36 @@ public abstract class PathFinder implements Serializable {
      */
     public final void awake(final Map<Point, Cell> grid) {
         try {
-            this.find(grid, new ArrayList<Node<Cell>>() {
+            this.find(grid, new HashSet<Node<Cell>>() {
                 private static final long serialVersionUID = 1L;
                 {
-                    // Get starting <code>src.controller.JWGrid.Cell</code>
-                    outer: for (final Cell cell : grid.values()) {
-                        if (cell.getState() == State.START) {
+                    final boolean directAccess = true;
+                    // Get starting Cell
+                    final Cell start = ((JWGrid) grid.get(new Point(0, 0)).getParent()).getStart();
+                    // No starting Cell
+                    if (start == null) {
+                        throw new NullPointerException("No starting node found...");
+                        // Find starting Point
+                    } else {
+                        if (directAccess) {
                             for (final Point seed : grid.keySet()) {
-                                if (grid.get(seed) == cell) {
-                                    this.add(new Node<Cell>(seed, cell));
-                                    break outer;
+                                if (grid.get(seed) == start) {
+                                    this.add(new Node<Cell>(seed, start));
+                                    break;
+                                }
+                            }
+                        } else {
+                            outer: for (final Cell cell : grid.values()) {
+                                if (cell.getState() == State.START) {
+                                    for (final Point seed : grid.keySet()) {
+                                        if (grid.get(seed) == cell) {
+                                            this.add(new Node<Cell>(seed, cell));
+                                            break outer;
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                    // No starting <code>src.controller.JWGrid.Cell</code>
-                    if (this.size() == 0) {
-                        throw new NullPointerException("No starting node found...");
                     }
                 }
             });
@@ -98,16 +112,19 @@ public abstract class PathFinder implements Serializable {
         private static final long serialVersionUID = -5681531921187779771L;
 
         @Override
-        protected final void find(final Map<Point, Cell> grid, final List<Node<Cell>> currGen)
+        protected final void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen)
                 throws StackOverflowError {
-            // Initialize empty new generation
-            final List<Node<Cell>> newGen = new ArrayList<Node<Cell>>();
+            // Endpoint flag
+            Node<Cell> endpoint = null;
+            // Initialize empty new generation HashSet
+            // for enhanced speeds in non-duplicate Node
+            final Set<Node<Cell>> newGen = new HashSet<Node<Cell>>();
             // Range through neighbors
             for (final Node<Cell> node : currGen) {
                 for (int row = node.getSeed().x - 1; row < node.getSeed().x + 2; row++) {
                     for (int col = node.getSeed().y - 1; col < node.getSeed().y + 2; col++) {
                         // Check if neighbor exists
-                        if ((row < (int) Math.sqrt(grid.size())) && (row >= 0) && (col < (int) Math.sqrt(grid.size()))
+                        if ((row < Math.sqrt(grid.size())) && (row >= 0) && (col < Math.sqrt(grid.size()))
                                 && (col >= 0)) {
                             // Get Cell to check its State
                             final Cell cell = grid.get(new Point(row, col));
@@ -121,8 +138,8 @@ public abstract class PathFinder implements Serializable {
                                     break;
                                 case END:
                                     // Endpoint found
-                                    PathFinder.traverse(newNode.getParent());
-                                    return;
+                                    endpoint = newNode;
+                                    break;
                                 default:
                                     break;
                             }
@@ -130,8 +147,11 @@ public abstract class PathFinder implements Serializable {
                     }
                 }
             }
-            // TODO: Draw entire generation before returning
-            if (end) { }
+            // Draw entire generation before returning
+            if (endpoint != null) {
+                PathFinder.traverse(endpoint.getParent());
+                return;
+            }
             // Change Cell State to visited
             final Timer timer = new Timer(PathFinder.delay, e -> {
                 for (final Node<Cell> node : newGen) {
