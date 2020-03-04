@@ -49,7 +49,7 @@ public final class JWGrid extends JPanel {
     public final void setGrid(final int rows, final int cols) {
         this.removeAll();
         this.setLayout(new GridLayout(rows, cols, 0, 0));
-        // Override grid LinkedHashMap to preserve order
+        // Override JWGrid LinkedHashMap to preserve order
         this.grid = new LinkedHashMap<Point, Cell>(rows * cols) {
             private static final long serialVersionUID = 1L;
             {

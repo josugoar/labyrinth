@@ -28,9 +28,7 @@ public class JWPanel extends JPanel {
     public <T extends Component> JWPanel(final LayoutManager layout, final Collection<T> comps, final Dimension preferredSize) {
         super(layout);
         this.addJW(comps);
-        if (preferredSize != null) {
-            this.setPreferredSize(preferredSize);
-        }
+        if (preferredSize != null) this.setPreferredSize(preferredSize);
     }
 
     /**

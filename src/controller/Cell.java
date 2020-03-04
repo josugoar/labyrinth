@@ -20,8 +20,9 @@ import src.MazeApp;
 public final class Cell extends JPanel {
 
     /**
-     * Enum of <code>src.controller.Cell</code> states: START, END, OBSTACLE, EMPTY,
-     * VISITED, GERMINATED, PATH.
+     * Enum of <code>src.controller.Cell</code> states: <code>START</code>,
+     * <code>END</code>, <code>OBSTACLE</code>, <code>EMPTY</code>,
+     * <code>VISITED</code>, <code>GERMINATED</code>, <code>PATH</code>.
      */
     public static enum State {
         START, END, OBSTACLE, EMPTY, VISITED, GERMINATED, PATH
@@ -91,17 +92,15 @@ public final class Cell extends JPanel {
             switch (((MazeApp) SwingUtilities.getWindowAncestor(Cell.this)).getMode()) {
                 case START:
                     // Override previous starting Cell
-                    if (panel.getStart() != null) {
+                    if (panel.getStart() != null)
                         panel.getStart().setState(State.EMPTY);
-                    }
                     panel.setStart(Cell.this);
                     Cell.this.setState(State.START);
                     break;
                 case END:
                     // Override previous endpoint Cell
-                    if (panel.getEnd() != null) {
+                    if (panel.getEnd() != null)
                         panel.getEnd().setState(State.EMPTY);
-                    }
                     panel.setEnd(Cell.this);
                     Cell.this.setState(State.END);
                     break;

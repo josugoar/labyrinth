@@ -20,11 +20,12 @@ public final class JWSplitPane extends JSplitPane {
      * @param newLeftComponent  Component
      * @param newRightComponent Component
      */
-    public JWSplitPane(final int newOrientation, final Component newLeftComponent, final Component newRightComponent) {
+    public JWSplitPane(final int newOrientation, final Component newLeftComponent, final Component newRightComponent,
+            final boolean enabled) {
         super(newOrientation, newLeftComponent, newRightComponent);
-        this.setEnabled(false);
+        this.setEnabled(enabled);
         this.setDividerLocation(-1);
-        this.setOneTouchExpandable(true);
+        this.setOneTouchExpandable(enabled);
     }
 
 }

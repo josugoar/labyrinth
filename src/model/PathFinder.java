@@ -37,7 +37,7 @@ public abstract class PathFinder implements Serializable {
      * Run given algorithm to find last child <code>src.model.Node<Cell></code>.
      *
      * @param arrayList List<Node>
-     * @return Children Node
+     * @return Child Node
      * @throws StackOverflowError
      */
     protected abstract void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen) throws StackOverflowError;
@@ -66,37 +66,39 @@ public abstract class PathFinder implements Serializable {
                 private static final long serialVersionUID = 1L;
                 {
                     final boolean directAccess = true;
-                    // Get starting Cell
-                    final Cell start = ((JWGrid) grid.get(new Point(0, 0)).getParent()).getStart();
-                    // No starting Cell
-                    if (start == null) {
-                        throw new NullPointerException("No starting node found...");
-                        // Find starting Point
-                    } else {
-                        if (directAccess) {
-                            for (final Point seed : grid.keySet()) {
-                                if (grid.get(seed) == start) {
-                                    this.add(new Node<Cell>(seed, start));
-                                    break;
-                                }
+                    // Find starting Point
+                    if (directAccess) {
+                        // Get starting Cell
+                        final Cell start = ((JWGrid) grid.get(new Point(0, 0)).getParent()).getStart();
+                        // No starting Cell
+                        if (start == null) throw new NullPointerException("No starting node found...");
+                        // Get starting Point
+                        for (final Point seed : grid.keySet()) {
+                            if (grid.get(seed) == start) {
+                                this.add(new Node<Cell>(seed, start));
+                                break;
                             }
-                        } else {
-                            outer: for (final Cell cell : grid.values()) {
-                                if (cell.getState() == Cell.State.START) {
-                                    for (final Point seed : grid.keySet()) {
-                                        if (grid.get(seed) == cell) {
-                                            this.add(new Node<Cell>(seed, cell));
-                                            break outer;
-                                        }
+                        }
+                    } else {
+                        // Get starting Cell
+                        outer: for (final Cell cell : grid.values()) {
+                            if (cell.getState() == Cell.State.START) {
+                                // Get starting Point
+                                for (final Point seed : grid.keySet()) {
+                                    if (grid.get(seed) == cell) {
+                                        this.add(new Node<Cell>(seed, cell));
+                                        break outer;
                                     }
                                 }
                             }
                         }
+                        // No starting Cell
+                        if (this.size() == 0) throw new NullPointerException("No starting node found...");
                     }
                 }
             });
         } catch (final Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
         }
     }
 
@@ -146,6 +148,8 @@ public abstract class PathFinder implements Serializable {
                     }
                 }
             }
+            // Handle no solution grid
+            if (currGen.equals(newGen)) throw new StackOverflowError("No solution...");
             // Draw entire generation before returning
             if (endpoint != null) {
                 PathFinder.traverse(endpoint.getParent());

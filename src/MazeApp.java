@@ -4,14 +4,13 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JSlider;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import src.controller.JWGrid;
@@ -35,8 +34,8 @@ import src.view.components.JWSplitPane;
 public class MazeApp extends JFrame implements Runnable {
 
     /**
-     * Enum of <code>src.controller.Cell</code> mode constants: START, END,
-     * OBSTACLE, EMPTY.
+     * Enum of <code>src.controller.Cell</code> mode constants: <code>START</code>,
+     * <code>END</code>, <code>OBSTACLE</code>, <code>EMPTY</code>.
      */
     public static enum Mode {
         START, END, OBSTACLE, EMPTY
@@ -52,7 +51,7 @@ public class MazeApp extends JFrame implements Runnable {
     /**
      * <code>src.controller.JWGrid</code> algorithm modifier.
      */
-    private int size = 20, speed = 1, density = 1;
+    private int size = 50, speed = 1, density = 1;
 
     /**
      * A <code>src.controller.JWGrid</code> containing <code>src.controller.Cell</code>.
@@ -95,147 +94,118 @@ public class MazeApp extends JFrame implements Runnable {
                         private static final long serialVersionUID = 1L;
                         {
                             // Left JWPanel JWComponents
-                            // Algorithm modifiers
+                            // Action JWButton
                             this.add(Box.createVerticalGlue());
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             // Reset JWGrid
                                             this.add(new JWButton("Clear",
-                                                    new ActionListener() {
-                                                        @Override
-                                                        public void actionPerformed(final ActionEvent e) {
-                                                            MazeApp.this.layout.setGrid(MazeApp.this.size, MazeApp.this.size);
-                                                        }
+                                                    e -> {
+                                                        MazeApp.this.layout.setStart(null);
+                                                        MazeApp.this.layout.setEnd(null);
+                                                        MazeApp.this.layout.setGrid(MazeApp.this.size, MazeApp.this.size);
                                                     },
                                                     new Dimension(80, 30)
                                             ));
                                             // Awake PathFinder
                                             this.add(new JWButton("Awake",
-                                                    new ActionListener() {
-                                                        @Override
-                                                        public void actionPerformed(final ActionEvent e) {
-                                                            new Dijkstra().awake(MazeApp.this.layout.getGrid());
-                                                        }
-                                                    },
+                                                    e -> new Dijkstra().awake(MazeApp.this.layout.getGrid()),
                                                     new Dimension(80, 30)
                                             ));
                                         }
                                     }
-                                    // new Dimension(200, 0)
                             ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                            // Algorithm modifiers
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.LEFT, 10, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.add(new JWSlider());
-                                            this.add(new JWSlider());
+                                            this.add(new JLabel("  Size"));
                                             this.add(new JWSlider());
                                         }
-                                    },
-                                    new Dimension(100, 80)
+                                    }
                             ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.LEFT, 10, 0),
+                                    new ArrayList<Component>() {
+                                        private static final long serialVersionUID = 1L;
+                                        {
+                                            this.add(new JLabel("  Speed"));
+                                            this.add(new JWSlider());
+                                        }
+                                    }
+                            ));
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.LEFT, 10, 0),
+                                    new ArrayList<Component>() {
+                                        private static final long serialVersionUID = 1L;
+                                        {
+                                            this.add(new JLabel("  Density"));
+                                            this.add(new JWSlider());
+                                        }
+                                    }
+                            ));
+                            // Algorithm selectors
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 0),
+                                    new ArrayList<Component>() {
+                                        private static final long serialVersionUID = 1L;
+                                        {
+                                            this.add(new JComboBox());
+                                            this.add(new JComboBox());
+                                        }
+                                    }
+                            ));
+                            // Action JWButton
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             this.add(new JWButton("Test",
-                                                    new ActionListener() {
-                                                        @Override
-                                                        public void actionPerformed(final ActionEvent e) {
-                                                            MazeApp.this.layout.setGrid(MazeApp.this.size+10, MazeApp.this.size+10);
-                                                        }
-                                                    },
+                                                    e -> MazeApp.this.layout.setGrid(20, 20),
                                                     new Dimension(80, 30)
                                             ));
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                        }
-                                    }
-                            ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                    new ArrayList<Component>() {
-                                        private static final long serialVersionUID = 1L;
-                                        {
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                        }
-                                    }
-                            ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                    new ArrayList<Component>() {
-                                        private static final long serialVersionUID = 1L;
-                                        {
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
-                                        }
-                                    }
-                            ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
-                                    new ArrayList<Component>() {
-                                        private static final long serialVersionUID = 1L;
-                                        {
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
                                             this.add(new JWButton("Button", null, new Dimension(80, 30)));
                                         }
                                     }
                             ));
                         }
                     },
-                    new Dimension(200, 0)
+                    new Dimension(225, 0)
             )),
             // Right JWSplitPane
             new JWSplitPane(JWSplitPane.VERTICAL_SPLIT,
                 // Top Right JWGridLayout
                 layout,
                 // Bottom Right JWPanel
-                new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 12),
+                new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
                     new ArrayList<Component>() {
                         private static final long serialVersionUID = 1L;
                         {
                             // Bottom Right JWPanel JWComponents
                             // MazeApp mode modifiers
                             this.add(new JWButton("Start",
-                                    new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(final ActionEvent e) {
-                                            MazeApp.this.mode = Mode.START;
-                                        }
-                                    },
+                                    e -> MazeApp.this.mode = Mode.START,
                                     new Dimension(100, 20)
                             ));
                             this.add(new JWButton("End",
-                                    new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(final ActionEvent e) {
-                                            MazeApp.this.mode = Mode.END;
-                                        }
-                                    },
+                                    e -> MazeApp.this.mode = Mode.END,
                                     new Dimension(100, 20)
                             ));
                             this.add(new JWButton("Obstacle",
-                                    new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(final ActionEvent e) {
-                                            MazeApp.this.mode = Mode.OBSTACLE;
-                                        }
-                                    },
+                                    e -> MazeApp.this.mode = Mode.OBSTACLE,
                                     new Dimension(100, 20)
                             ));
                             this.add(new JWButton("Empty",
-                                    new ActionListener() {
-                                        @Override
-                                        public void actionPerformed(final ActionEvent e) {
-                                            MazeApp.this.mode = Mode.EMPTY;
-                                        }
-                                    },
+                                    e -> MazeApp.this.mode = Mode.EMPTY,
                                     new Dimension(100, 20)
                             ));
                         }
                     },
-                    new Dimension(470, 50)
-                )
-            )
+                    new Dimension(0, 30)
+                ),
+                true
+            ),
+            false
         );
     }
 
