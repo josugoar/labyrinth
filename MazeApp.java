@@ -21,6 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+/**
+ * MazeApp
+ */
 public class MazeApp implements Runnable {
 
     private static final int ROWS = 24;
