@@ -97,7 +97,7 @@ public abstract class PathFinder implements Serializable {
                 }
             });
         } catch (final Exception e) {
-            System.out.println(e.toString());
+            System.err.println(e.toString());
         }
     }
 

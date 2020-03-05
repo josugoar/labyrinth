@@ -57,13 +57,13 @@ public class MazeApp extends JFrame implements Runnable {
      * <code>src.controller.JWGrid</code> feature modifier: draw delay between
      * recursive iterations.
      */
-    private int speed = 1;
+    private int speed = 50;
 
     /**
      * <code>src.controller.JWGrid</code> feature modifier: generator obstacle
      * density
      */
-    private int density = 1;
+    private int density = 50;
 
     /**
      * A <code>src.controller.JWGrid</code> containing <code>src.controller.Cell</code>.
