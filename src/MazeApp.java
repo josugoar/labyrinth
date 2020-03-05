@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import src.controller.Cell;
 import src.controller.JWGrid;
 import src.model.PathFinder.Dijkstra;
 import src.view.JWrapper;
@@ -107,23 +108,16 @@ public class MazeApp extends JFrame implements Runnable {
                         private static final long serialVersionUID = 1L;
                         {
                             this.add(Box.createVerticalGlue());
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            // Reset JWGrid
-                                            this.add(new JWButton("Clear",
-                                                    e -> {
-                                                        MazeApp.this.layout.setStart(null);
-                                                        MazeApp.this.layout.setEnd(null);
-                                                        MazeApp.this.layout.setGrid(MazeApp.this.dimension, MazeApp.this.dimension);
-                                                    },
-                                                    new Dimension(80, 30)
-                                            ));
+                                            // Generate random obstacle pattern
+                                            this.add(new JWButton("Generate", null, new Dimension(87, 30)));
                                             // Awake PathFinder
                                             this.add(new JWButton("Awake",
                                                     e -> new Dijkstra().awake(MazeApp.this.layout.getGrid()),
-                                                    new Dimension(80, 30)
+                                                    new Dimension(87, 30)
                                             ));
                                         }
                                     }
@@ -181,14 +175,50 @@ public class MazeApp extends JFrame implements Runnable {
                                         }
                                     }
                             ));
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             // Load JWGrid
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
+                                            this.add(new JWButton("Load", null, new Dimension(87, 30)));
                                             // Save JWGrid
-                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
+                                            this.add(new JWButton("Save", null, new Dimension(87, 30)));
+                                        }
+                                    }
+                            ));
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 0),
+                                    new ArrayList<Component>() {
+                                        private static final long serialVersionUID = 1L;
+                                        {
+                                            // Reset entire JWGrid
+                                            this.add(new JWButton("Reset",
+                                                    e -> {
+                                                        MazeApp.this.layout.setStart(null);
+                                                        MazeApp.this.layout.setEnd(null);
+                                                        MazeApp.this.layout.setGrid(MazeApp.this.dimension, MazeApp.this.dimension);
+                                                    },
+                                                    new Dimension(87, 30)
+                                            ));
+                                            // Reset JWGrid
+                                            this.add(new JWButton("Clear",
+                                                    e -> {
+                                                        for (final Cell cell : MazeApp.this.layout.getGrid().values()) {
+                                                            switch(cell.getState()) {
+                                                                case VISITED:
+                                                                    cell.setState(Cell.State.EMPTY);
+                                                                    break;
+                                                                case GERMINATED:
+                                                                    cell.setState(Cell.State.EMPTY);
+                                                                    break;
+                                                                case PATH:
+                                                                    cell.setState(Cell.State.EMPTY);
+                                                                    break;
+                                                                default:
+                                                            }
+                                                        }
+                                                    },
+                                                    new Dimension(87, 30)
+                                            ));
                                         }
                                     }
                             ));

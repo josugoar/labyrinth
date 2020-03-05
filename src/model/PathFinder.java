@@ -155,7 +155,8 @@ public abstract class PathFinder implements Serializable {
                 return;
                 // Change Cell State to visited
             } else if (newGen.size() != 0) {
-                new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
+                // Invert speed parameter
+                new Timer(Math.abs(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed() - 100),
                         e -> {
                             for (final Node<Cell> node : newGen) {
                                 grid.get(node.getSeed()).setState(Cell.State.VISITED);
