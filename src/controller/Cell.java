@@ -37,6 +37,7 @@ public final class Cell extends JPanel {
     private State state = State.EMPTY;
 
     {
+        // Initialize Cell with border and CellListener
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         this.addMouseListener(new CellListener());
     }
@@ -44,6 +45,7 @@ public final class Cell extends JPanel {
     @Override
     public final void paintComponent(final Graphics g) {
         Color color;
+        // Paint Cell depending on state
         switch (this.state) {
             case START:
                 color = Color.RED;
@@ -80,14 +82,20 @@ public final class Cell extends JPanel {
     }
 
     public final void setState(final State state) {
+        // Refresh Cell Color on state change
         this.state = state;
         this.repaint();
     }
 
+    /**
+     * An extended <code>java.awt.event.MouseAdapter</code> implementation for
+     * <code>src.controller.Cell</code>
+     */
     private final class CellListener extends MouseAdapter {
 
         @Override
         public void mousePressed(final MouseEvent e) {
+            // Change Cell depending on MazeApp mode
             final JWGrid panel = (JWGrid) Cell.this.getParent();
             switch (((MazeApp) SwingUtilities.getWindowAncestor(Cell.this)).getMode()) {
                 case START:
@@ -114,10 +122,10 @@ public final class Cell extends JPanel {
 
         @Override
         public void mouseEntered(final MouseEvent e) {
-            // Check MouseDown
+            // Check mousedown
             if ((e.getModifiersEx() & (MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK
                     | MouseEvent.BUTTON3_DOWN_MASK)) != 0) {
-                // Drag mouse
+                // Drag mouse to quickly change desired Cell state
                 switch (((MazeApp) SwingUtilities.getWindowAncestor(Cell.this)).getMode()) {
                     case OBSTACLE:
                         Cell.this.setState(State.OBSTACLE);
@@ -126,7 +134,6 @@ public final class Cell extends JPanel {
                         Cell.this.setState(State.EMPTY);
                         break;
                     default:
-                        break;
                 }
             }
         }

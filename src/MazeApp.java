@@ -23,7 +23,7 @@ import src.view.components.JWSplitPane;
 
 /**
  * A <code>java.lang.Runnable</code> extended version of
- * <code>java.awt.JFrame</code> that includes <code>src.MazeApp</code> solver,
+ * <code>java.awt.JFrame</code> that includes <code>src.MazeApp</code> solving,
  * generation, edition and interactive visualization features.
  *
  * @author JoshGoA
@@ -49,9 +49,21 @@ public class MazeApp extends JFrame implements Runnable {
     private Mode mode = Mode.EMPTY;
 
     /**
-     * <code>src.controller.JWGrid</code> algorithm modifier.
+     * <code>src.controller.JWGrid</code> feature modifier: layout size.
      */
-    private int size = 50, speed = 1, density = 1;
+    private int dimension = 50;
+
+    /**
+     * <code>src.controller.JWGrid</code> feature modifier: draw delay between
+     * recursive iterations.
+     */
+    private int speed = 1;
+
+    /**
+     * <code>src.controller.JWGrid</code> feature modifier: generator obstacle
+     * density
+     */
+    private int density = 1;
 
     /**
      * A <code>src.controller.JWGrid</code> containing <code>src.controller.Cell</code>.
@@ -59,7 +71,7 @@ public class MazeApp extends JFrame implements Runnable {
      * @see src.controller.JWGrid JWGrid
      * @see src.controller.Cell Cell
      */
-    private final JWGrid layout = new JWGrid(size, size, new Dimension(470, 500));
+    private final JWGrid layout = new JWGrid(dimension, dimension, new Dimension(470, 500));
 
     /**
      * Invoke runnable in system EventQueue dispatch thread.
@@ -67,11 +79,11 @@ public class MazeApp extends JFrame implements Runnable {
      * @see javax.swing.SwingUtilities#invokeLater(Runnable doRun) invokeLater()
      */
     public final void start() {
-        SwingUtilities.invokeLater(new MazeApp());
+        SwingUtilities.invokeLater(this);
     }
 
     /**
-     * Initialize HTML-like Container tree.
+     * Initialize Container tree.
      *
      * @see src.view.JWrapper JWrapper
      * @see src.view.components.JWButton JWButton
@@ -81,7 +93,7 @@ public class MazeApp extends JFrame implements Runnable {
      * @return New tree
      */
     private final Container initTree() {
-        // Set custom JPanel wrapper for BoxLayout self-reference
+        // Set custom JWPanel wrapper for BoxLayout self-reference
         final JWrapper JWBox = (final Component panel) -> {
             ((JWPanel) panel).setLayout(new BoxLayout((JWPanel) panel, BoxLayout.Y_AXIS));
             return panel;
@@ -90,11 +102,10 @@ public class MazeApp extends JFrame implements Runnable {
         return new JWSplitPane(JWSplitPane.HORIZONTAL_SPLIT,
             // Left JWPanel
             JWBox.JWComponent(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                    // Left JWPanel Component
                     new ArrayList<Component>() {
                         private static final long serialVersionUID = 1L;
                         {
-                            // Left JWPanel JWComponents
-                            // Action JWButton
                             this.add(Box.createVerticalGlue());
                             this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
                                     new ArrayList<Component>() {
@@ -105,7 +116,7 @@ public class MazeApp extends JFrame implements Runnable {
                                                     e -> {
                                                         MazeApp.this.layout.setStart(null);
                                                         MazeApp.this.layout.setEnd(null);
-                                                        MazeApp.this.layout.setGrid(MazeApp.this.size, MazeApp.this.size);
+                                                        MazeApp.this.layout.setGrid(MazeApp.this.dimension, MazeApp.this.dimension);
                                                     },
                                                     new Dimension(80, 30)
                                             ));
@@ -117,13 +128,18 @@ public class MazeApp extends JFrame implements Runnable {
                                         }
                                     }
                             ));
-                            // Algorithm modifiers
+                            // Feature modifiers
                             this.add(new JWPanel(new FlowLayout(FlowLayout.LEFT, 10, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.add(new JLabel("  Size"));
-                                            this.add(new JWSlider());
+                                            this.add(new JLabel("  Dimension"));
+                                            this.add(new JWSlider(2, 100, 50,
+                                                e -> {
+                                                    final JWSlider source = (JWSlider) e.getSource();
+                                                    ((MazeApp) SwingUtilities.getWindowAncestor(source)).setDimension(source.getValue());
+                                                }
+                                            ));
                                         }
                                     }
                             ));
@@ -132,7 +148,12 @@ public class MazeApp extends JFrame implements Runnable {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             this.add(new JLabel("  Speed"));
-                                            this.add(new JWSlider());
+                                            this.add(new JWSlider(1, 100, 50,
+                                                e -> {
+                                                    final JWSlider source = (JWSlider) e.getSource();
+                                                    ((MazeApp) SwingUtilities.getWindowAncestor(source)).setSpeed(source.getValue());
+                                                }
+                                            ));
                                         }
                                     }
                             ));
@@ -141,7 +162,12 @@ public class MazeApp extends JFrame implements Runnable {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             this.add(new JLabel("  Density"));
-                                            this.add(new JWSlider());
+                                            this.add(new JWSlider(1, 100, 50,
+                                                e -> {
+                                                    final JWSlider source = (JWSlider) e.getSource();
+                                                    ((MazeApp) SwingUtilities.getWindowAncestor(source)).setDensity(source.getValue());
+                                                }
+                                            ));
                                         }
                                     }
                             ));
@@ -155,15 +181,13 @@ public class MazeApp extends JFrame implements Runnable {
                                         }
                                     }
                             ));
-                            // Action JWButton
                             this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 25, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.add(new JWButton("Test",
-                                                    e -> MazeApp.this.layout.setGrid(20, 20),
-                                                    new Dimension(80, 30)
-                                            ));
+                                            // Load JWGrid
+                                            this.add(new JWButton("Button", null, new Dimension(80, 30)));
+                                            // Save JWGrid
                                             this.add(new JWButton("Button", null, new Dimension(80, 30)));
                                         }
                                     }
@@ -178,10 +202,10 @@ public class MazeApp extends JFrame implements Runnable {
                 layout,
                 // Bottom Right JWPanel
                 new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
+                    // Bottom Right JWPanel Component
                     new ArrayList<Component>() {
                         private static final long serialVersionUID = 1L;
                         {
-                            // Bottom Right JWPanel JWComponents
                             // MazeApp mode modifiers
                             this.add(new JWButton("Start",
                                     e -> MazeApp.this.mode = Mode.START,
@@ -213,14 +237,83 @@ public class MazeApp extends JFrame implements Runnable {
     public final void run() {
         this.setContentPane(initTree());
         this.pack();
+        this.setTitle("MazeApp");
         this.setVisible(true);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
     }
 
+    @Override
+    public final String toString() {
+        return String.format("MazeApp(mode: , size: , speed: , density: )", this.mode, this.dimension, this.speed,
+                this.density);
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + density;
+        result = prime * result + ((layout == null) ? 0 : layout.hashCode());
+        result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+        result = prime * result + dimension;
+        result = prime * result + speed;
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MazeApp other = (MazeApp) obj;
+        if (density != other.density)
+            return false;
+        if (layout == null) {
+            if (other.layout != null)
+                return false;
+        } else if (!layout.equals(other.layout))
+            return false;
+        if (mode != other.mode)
+            return false;
+        if (dimension != other.dimension)
+            return false;
+        if (speed != other.speed)
+            return false;
+        return true;
+    }
+
     public final Mode getMode() {
         return this.mode;
+    }
+
+    public final int getDimension() {
+        return this.dimension;
+    }
+
+    public final void setDimension(final int dimension) {
+        this.dimension = dimension;
+        MazeApp.this.layout.setGrid(this.dimension, this.dimension);
+    }
+
+    public final int getSpeed() {
+        return this.speed;
+    }
+
+    public final void setSpeed(final int speed) {
+        this.speed = speed;
+    }
+
+    public final int getDensity() {
+        return this.density;
+    }
+
+    public void setDensity(final int density) {
+        this.density = density;
     }
 
 }

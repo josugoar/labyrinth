@@ -6,10 +6,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import src.controller.JWGrid;
+import src.MazeApp;
 import src.controller.Cell;
+import src.controller.JWGrid;
 
 /**
  * A <code>java.io.Serializable</code> abstract class containing common
@@ -27,11 +29,6 @@ public abstract class PathFinder implements Serializable {
     public enum Algorithm {
         DIJKSTRA, A_STAR
     }
-
-    /**
-     * Draw delay between recursive iterations.
-     */
-    private static int delay = 200;
 
     /**
      * Run given algorithm to find last child <code>src.model.Node<Cell></code>.
@@ -71,7 +68,8 @@ public abstract class PathFinder implements Serializable {
                         // Get starting Cell
                         final Cell start = ((JWGrid) grid.get(new Point(0, 0)).getParent()).getStart();
                         // No starting Cell
-                        if (start == null) throw new NullPointerException("No starting node found...");
+                        if (start == null)
+                            throw new NullPointerException("No starting node found...");
                         // Get starting Point
                         for (final Point seed : grid.keySet()) {
                             if (grid.get(seed) == start) {
@@ -93,7 +91,8 @@ public abstract class PathFinder implements Serializable {
                             }
                         }
                         // No starting Cell
-                        if (this.size() == 0) throw new NullPointerException("No starting node found...");
+                        if (this.size() == 0)
+                            throw new NullPointerException("No starting node found...");
                     }
                 }
             });
@@ -110,7 +109,7 @@ public abstract class PathFinder implements Serializable {
      */
     public static final class Dijkstra extends PathFinder {
 
-        private static final long serialVersionUID = -5681531921187779771L;
+        private static final long serialVersionUID = 1L;
 
         @Override
         protected final void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen)
@@ -118,7 +117,7 @@ public abstract class PathFinder implements Serializable {
             // Endpoint flag
             Node<Cell> endpoint = null;
             // Initialize empty new generation HashSet
-            // for enhanced speeds in non-duplicate Node
+            // for enhanced speed in non-duplicate Node
             final Set<Node<Cell>> newGen = new HashSet<Node<Cell>>();
             // Range through neighbors
             for (final Node<Cell> node : currGen) {
@@ -142,29 +141,29 @@ public abstract class PathFinder implements Serializable {
                                     endpoint = newNode;
                                     break;
                                 default:
-                                    break;
                             }
                         }
                     }
                 }
             }
             // Handle no solution grid
-            if (currGen.equals(newGen)) throw new StackOverflowError("No solution...");
+            if (currGen.equals(newGen))
+                throw new StackOverflowError("No solution...");
             // Draw entire generation before returning
             if (endpoint != null) {
                 PathFinder.traverse(endpoint.getParent());
                 return;
+                // Change Cell State to visited
+            } else if (newGen.size() != 0) {
+                new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
+                        e -> {
+                            for (final Node<Cell> node : newGen) {
+                                grid.get(node.getSeed()).setState(Cell.State.VISITED);
+                            }
+                            this.find(grid, newGen);
+                            ((Timer) e.getSource()).stop();
+                        }).start();
             }
-            // Change Cell State to visited
-            final Timer timer = new Timer(PathFinder.delay, e -> {
-                for (final Node<Cell> node : newGen) {
-                    grid.get(node.getSeed()).setState(Cell.State.VISITED);
-                }
-                this.find(grid, newGen);
-                ((Timer) e.getSource()).stop();
-            });
-            timer.setRepeats(false);
-            timer.start();
         }
 
     }

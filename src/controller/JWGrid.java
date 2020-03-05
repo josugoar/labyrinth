@@ -26,7 +26,7 @@ public final class JWGrid extends JPanel {
     /**
      * <code>src.controller.Cell</code> endpoint pointer.
      */
-    private Cell start, end = null;
+    private Cell start = null, end = null;
 
     /**
      * Create <code>java.awt.GridLayout</code>

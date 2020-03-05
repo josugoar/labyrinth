@@ -23,14 +23,11 @@ import javax.swing.Timer;
 
 public class MazeApp implements Runnable {
 
-    // TODO: Add Javadocs
-    // TODO: Improve Cell inheritance
-
-    private static final int ROWS = 10;
-    private static final int COLS = 10;
+    private static final int ROWS = 24;
+    private static final int COLS = 24;
 
     protected static JFrame frame;
-    protected static Cell[][] grid = new Cell[10][10];
+    protected static Cell[][] grid = new Cell[ROWS][COLS];
     protected static LinkedHashMap<String, Cell> cellMap = new LinkedHashMap<String, Cell>();
 
     public static void main(final String[] args) {

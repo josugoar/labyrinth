@@ -18,10 +18,12 @@ public final class Node<T> implements Serializable {
      * Pointer to parent <code>src.model.Node<T></code>.
      */
     private Node<T> parent;
+
     /**
      * Inner reference.
      */
     private final T inner;
+
     /**
      * Euclidean coordinates.
      */
