@@ -20,14 +20,14 @@ public final class Node<T> implements Serializable {
     private Node<T> parent;
 
     /**
-     * Inner reference.
-     */
-    private final T inner;
-
-    /**
      * Euclidean coordinates.
      */
     private final Point seed;
+
+    /**
+     * Inner reference.
+     */
+    private final T inner;
 
     /**
      * Enclose <code>src.model.Node<T></code> <code>src.model.Node<T></code>, Point

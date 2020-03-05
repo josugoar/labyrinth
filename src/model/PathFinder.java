@@ -11,6 +11,7 @@ import javax.swing.Timer;
 
 import src.MazeApp;
 import src.controller.Cell;
+import src.controller.Cell.State;
 import src.controller.JWGrid;
 
 /**
@@ -31,23 +32,27 @@ public abstract class PathFinder implements Serializable {
     }
 
     /**
+     * Running flag for draw loops.
+     */
+    protected boolean isRunning = false;
+
+    /**
      * Run given algorithm to find last child <code>src.model.Node<Cell></code>.
      *
      * @param arrayList List<Node>
-     * @return Child Node
      * @throws StackOverflowError
      */
     protected abstract void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen) throws StackOverflowError;
 
     /**
-     * Traverse through child nodes until no parent <code>src.model.Node</code> is
-     * reached.
+     * Traverse through child nodes until no parent
+     * <code>src.model.Node<Cell></code> is reached.
      *
      * @param child Node
      */
     private static final void traverse(final Node<Cell> child) {
         if (child.getParent() != null) {
-            child.getInner().setState(Cell.State.PATH);
+            child.getInner().setState(State.PATH);
             PathFinder.traverse(child.getParent());
         }
     }
@@ -59,6 +64,8 @@ public abstract class PathFinder implements Serializable {
      */
     public final void awake(final Map<Point, Cell> grid) {
         try {
+            // Set running
+            this.isRunning = true;
             this.find(grid, new HashSet<Node<Cell>>() {
                 private static final long serialVersionUID = 1L;
                 {
@@ -80,7 +87,7 @@ public abstract class PathFinder implements Serializable {
                     } else {
                         // Get starting Cell
                         outer: for (final Cell cell : grid.values()) {
-                            if (cell.getState() == Cell.State.START) {
+                            if (cell.getState() == State.START) {
                                 // Get starting Point
                                 for (final Point seed : grid.keySet()) {
                                     if (grid.get(seed) == cell) {
@@ -97,8 +104,14 @@ public abstract class PathFinder implements Serializable {
                 }
             });
         } catch (final Exception e) {
+            // Redirect running
+            this.isRunning = false;
             System.err.println(e.toString());
         }
+    }
+
+    public final boolean getIsRunning() {
+        return this.isRunning;
     }
 
     /**
@@ -126,19 +139,22 @@ public abstract class PathFinder implements Serializable {
                         // Check if neighbor exists
                         if ((row < Math.sqrt(grid.size())) && (row >= 0) && (col < Math.sqrt(grid.size()))
                                 && (col >= 0)) {
+                            // Get Point coordinates
+                            final Point point = new Point(row, col);
                             // Get Cell to check its State
-                            final Cell cell = grid.get(new Point(row, col));
+                            final Cell cell = grid.get(point);
                             // Create new Node pointing to parent and Cell
-                            final Node<Cell> newNode = new Node<Cell>(node, new Point(row, col), cell);
+                            final Node<Cell> newNode = new Node<Cell>(node, point, cell);
                             switch (cell.getState()) {
                                 case EMPTY:
                                     // Store node in generation
-                                    cell.setState(Cell.State.GERMINATED);
+                                    cell.setState(State.GERMINATED);
                                     newGen.add(newNode);
                                     break;
                                 case END:
                                     // Endpoint found
                                     endpoint = newNode;
+                                    this.isRunning = false;
                                     break;
                                 default:
                             }
@@ -153,14 +169,16 @@ public abstract class PathFinder implements Serializable {
             if (endpoint != null) {
                 PathFinder.traverse(endpoint.getParent());
                 return;
-                // Change Cell State to visited
+                // Check for final generation
             } else if (newGen.size() != 0) {
                 // Invert speed parameter
-                new Timer(Math.abs(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed() - 100),
+                new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
                         e -> {
+                            // Change Cell State to visited
                             for (final Node<Cell> node : newGen) {
-                                grid.get(node.getSeed()).setState(Cell.State.VISITED);
+                                grid.get(node.getSeed()).setState(State.VISITED);
                             }
+                            // Call method recursively until convergence
                             this.find(grid, newGen);
                             ((Timer) e.getSource()).stop();
                         }).start();

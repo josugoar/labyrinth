@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.JPanel;
 
@@ -24,9 +25,14 @@ public final class JWGrid extends JPanel {
     private Map<Point, Cell> grid;
 
     /**
+     * <code>src.controller.Cell</code> starting pointer.
+     */
+    private Cell start = null;
+
+    /**
      * <code>src.controller.Cell</code> endpoint pointer.
      */
-    private Cell start = null, end = null;
+    private Cell end = null;
 
     /**
      * Create <code>java.awt.GridLayout</code>
@@ -38,8 +44,8 @@ public final class JWGrid extends JPanel {
      * @param preferredSize Dimension
      */
     public JWGrid(final int rows, final int cols, final Dimension preferredSize) {
-        this.setPreferredSize(preferredSize);
         this.setGrid(rows, cols);
+        this.setPreferredSize(preferredSize);
     }
 
     public final Map<Point, Cell> getGrid() {
@@ -47,7 +53,9 @@ public final class JWGrid extends JPanel {
     }
 
     public final void setGrid(final int rows, final int cols) {
+        // Remove all Cell from JWGrid
         this.removeAll();
+        // Reset layout with new rows and columns
         this.setLayout(new GridLayout(rows, cols, 0, 0));
         // Override JWGrid LinkedHashMap to preserve order
         this.grid = new LinkedHashMap<Point, Cell>(rows * cols) {
@@ -71,7 +79,7 @@ public final class JWGrid extends JPanel {
     }
 
     public final void setStart(final Cell start) {
-        this.start = start;
+        this.start = Objects.requireNonNull(start, "'start' must not be null");
     }
 
     public final Cell getEnd() {
@@ -79,7 +87,7 @@ public final class JWGrid extends JPanel {
     }
 
     public final void setEnd(final Cell end) {
-        this.end = end;
+        this.end = Objects.requireNonNull(end, "'end' must not be null");
     }
 
 }

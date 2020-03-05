@@ -24,7 +24,8 @@ public final class JWButton extends JButton {
     public JWButton(final String text, final ActionListener l, final Dimension preferredSize) {
         super(text);
         this.addActionListener(l);
-        this.setPreferredSize(preferredSize);
+        if (preferredSize != null)
+            this.setPreferredSize(preferredSize);
     }
 
     /**
