@@ -1,4 +1,4 @@
-package src;
+package app;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -14,21 +14,21 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import src.controller.Cell;
-import src.controller.Cell.State;
-import src.controller.JWGrid;
-import src.model.PathFinder;
-import src.model.PathFinder.Dijkstra;
-import src.view.JWrapper;
-import src.view.components.JWButton;
-import src.view.components.JWPanel;
-import src.view.components.JWSlider;
-import src.view.components.JWSplitPane;
+import app.controller.Cell;
+import app.controller.Cell.State;
+import app.controller.JWGrid;
+import app.model.PathFinder;
+import app.model.PathFinder.Dijkstra;
+import app.view.JWrapper;
+import app.view.components.JWButton;
+import app.view.components.JWPanel;
+import app.view.components.JWSlider;
+import app.view.components.JWSplitPane;
 
 /**
  * A <code>java.lang.Runnable</code> extended version of
  * <code>java.awt.JFrame</code> implementation that includes
- * <code>src.MazeApp</code> solving, generation, edition and interactive
+ * <code>app.MazeApp</code> solving, generation, edition and interactive
  * visualization features.
  *
  * @author JoshGoA
@@ -39,7 +39,7 @@ import src.view.components.JWSplitPane;
 public class MazeApp extends JFrame implements Runnable {
 
     /**
-     * Enum of <code>src.controller.Cell</code> mode constants: <code>START</code>,
+     * Enum of <code>app.controller.Cell</code> mode constants: <code>START</code>,
      * <code>END</code>, <code>OBSTACLE</code>, <code>EMPTY</code>.
      */
     public static enum Mode {
@@ -49,44 +49,44 @@ public class MazeApp extends JFrame implements Runnable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * <code>src.controller.Cell</code> <code>src.MazeApp.Mode</code> selection.
+     * <code>app.controller.Cell</code> <code>app.MazeApp.Mode</code> selection.
      *
-     * @see src.MazeApp.Mode Mode
+     * @see app.MazeApp.Mode Mode
      */
     private Mode mode = Mode.EMPTY;
 
     /**
-     * <code>src.controller.JWGrid</code> feature modifier: layout size.
+     * <code>app.controller.JWGrid</code> feature modifier: layout size.
      */
     private int dimension = 50;
 
     /**
-     * <code>src.controller.JWGrid</code> feature modifier: draw delay between
+     * <code>app.controller.JWGrid</code> feature modifier: draw delay between
      * recursive iterations.
      */
     private int speed = 50;
 
     /**
-     * <code>src.controller.JWGrid</code> feature modifier: generator obstacle
+     * <code>app.controller.JWGrid</code> feature modifier: generator obstacle
      * density.
      */
     private int density = 50;
 
     /**
-     * <code>src.controller.JWGrid</code> feature modifier:
-     * <code>src.model.PathFinder</code> algorithm selector.
+     * <code>app.controller.JWGrid</code> feature modifier:
+     * <code>app.model.PathFinder</code> algorithm selector.
      *
-     * @see src.model.PathFinder PathFinder
-     * @see src.model.PathFinder.Dijkstra Dijkstra
+     * @see app.model.PathFinder PathFinder
+     * @see app.model.PathFinder.Dijkstra Dijkstra
      */
     private PathFinder pathfinder = new Dijkstra();
 
     /**
-     * A <code>src.controller.JWGrid</code> containing
-     * <code>src.controller.Cell</code>.
+     * A <code>app.controller.JWGrid</code> containing
+     * <code>app.controller.Cell</code>.
      *
-     * @see src.controller.JWGrid JWGrid
-     * @see src.controller.Cell Cell
+     * @see app.controller.JWGrid JWGrid
+     * @see app.controller.Cell Cell
      */
     private final JWGrid layout = new JWGrid(dimension, dimension, new Dimension(500, 500));
 
@@ -102,11 +102,11 @@ public class MazeApp extends JFrame implements Runnable {
     /**
      * Initialize Container tree.
      *
-     * @see src.view.JWrapper JWrapper
-     * @see src.view.components.JWButton JWButton
-     * @see src.view.components.JWPanel JWPanel
-     * @see src.view.components.JWSlider JWSlider
-     * @see src.view.components.JWSplitPane JWSplitPane
+     * @see app.view.JWrapper JWrapper
+     * @see app.view.components.JWButton JWButton
+     * @see app.view.components.JWPanel JWPanel
+     * @see app.view.components.JWSlider JWSlider
+     * @see app.view.components.JWSplitPane JWSplitPane
      * @return New tree
      */
     private final Container initTree() {

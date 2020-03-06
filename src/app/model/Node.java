@@ -1,4 +1,4 @@
-package src.model;
+package app.model;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -15,7 +15,7 @@ public final class Node<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Pointer to parent <code>src.model.Node<T></code>.
+     * Pointer to parent <code>app.model.Node<T></code>.
      */
     private Node<T> parent;
 
@@ -30,7 +30,7 @@ public final class Node<T> implements Serializable {
     private final T inner;
 
     /**
-     * Enclose <code>src.model.Node<T></code> <code>src.model.Node<T></code>, Point
+     * Enclose <code>app.model.Node<T></code> <code>app.model.Node<T></code>, Point
      * and T.
      *
      * @param parent Node<T>
@@ -44,7 +44,7 @@ public final class Node<T> implements Serializable {
     }
 
     /**
-     * Enclose <code>src.model.Node<T></code> <code>src.model.Node<T></code> and
+     * Enclose <code>app.model.Node<T></code> <code>app.model.Node<T></code> and
      * Point.
      *
      * @param seed  Point

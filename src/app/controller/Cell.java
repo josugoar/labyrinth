@@ -1,4 +1,4 @@
-package src.controller;
+package app.controller;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -10,18 +10,18 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import src.MazeApp;
+import app.MazeApp;
 
 /**
- * Internal <code>src.controller.JWGrid</code>
- * <code>src.view.components.JPanel</code>.
+ * Internal <code>app.controller.JWGrid</code>
+ * <code>app.view.components.JPanel</code>.
  *
  * @see javax.swing.JPanel JPanel
  */
 public final class Cell extends JPanel {
 
     /**
-     * Enum of <code>src.controller.Cell</code> states: <code>START</code>,
+     * Enum of <code>app.controller.Cell</code> states: <code>START</code>,
      * <code>END</code>, <code>OBSTACLE</code>, <code>EMPTY</code>,
      * <code>VISITED</code>, <code>GERMINATED</code>, <code>PATH</code>.
      */
@@ -32,7 +32,7 @@ public final class Cell extends JPanel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * <code>src.controller.Cell</code> <code>src.controller.Cell.State</code>
+     * <code>app.controller.Cell</code> <code>app.controller.Cell.State</code>
      * selection.
      */
     private State state = State.EMPTY;
@@ -90,7 +90,7 @@ public final class Cell extends JPanel {
 
     /**
      * An extended <code>java.awt.event.MouseAdapter</code> implementation for
-     * <code>src.controller.Cell</code>.
+     * <code>app.controller.Cell</code>.
      */
     private final class CellListener extends MouseAdapter {
 

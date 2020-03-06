@@ -1,4 +1,4 @@
-package src.utils;
+package app.utils;
 
 /**
  * Cell.

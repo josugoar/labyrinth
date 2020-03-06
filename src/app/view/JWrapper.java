@@ -1,4 +1,4 @@
-package src.view;
+package app.view;
 
 import java.awt.Component;
 import java.io.Serializable;

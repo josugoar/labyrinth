@@ -1,4 +1,4 @@
-package src.model;
+package app.model;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -9,10 +9,10 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import src.MazeApp;
-import src.controller.Cell;
-import src.controller.Cell.State;
-import src.controller.JWGrid;
+import app.MazeApp;
+import app.controller.Cell;
+import app.controller.Cell.State;
+import app.controller.JWGrid;
 
 /**
  * A <code>java.io.Serializable</code> abstract class containing common
@@ -25,7 +25,7 @@ public abstract class PathFinder implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Enum of <code>src.model.PathFinder</code> algorithms.
+     * Enum of <code>app.model.PathFinder</code> algorithms.
      */
     public enum Algorithm {
         DIJKSTRA, A_STAR
@@ -37,7 +37,7 @@ public abstract class PathFinder implements Serializable {
     protected boolean isRunning = false;
 
     /**
-     * Run given algorithm to find last child <code>src.model.Node<Cell></code>.
+     * Run given algorithm to find last child <code>app.model.Node<Cell></code>.
      *
      * @param arrayList List<Node>
      * @throws StackOverflowError
@@ -46,7 +46,7 @@ public abstract class PathFinder implements Serializable {
 
     /**
      * Traverse through child nodes until no parent
-     * <code>src.model.Node<Cell></code> is reached.
+     * <code>app.model.Node<Cell></code> is reached.
      *
      * @param child Node
      */
@@ -115,10 +115,10 @@ public abstract class PathFinder implements Serializable {
     }
 
     /**
-     * Self-made recursive <code>src.model.PathFinder</code> algorithm resembling
-     * Dijkstra's from scratch and extending <code>src.model.PathFinder</code>.
+     * Self-made recursive <code>app.model.PathFinder</code> algorithm resembling
+     * Dijkstra's from scratch and extending <code>app.model.PathFinder</code>.
      *
-     * @see src.model.PathFinder PathFinder
+     * @see app.model.PathFinder PathFinder
      */
     public static final class Dijkstra extends PathFinder {
 

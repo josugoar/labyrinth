@@ -1,4 +1,4 @@
-package src.controller;
+package app.controller;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -10,34 +10,34 @@ import java.util.Objects;
 import javax.swing.JPanel;
 
 /**
- * A <code>src.view.components.JWPanel</code> <code>java.awt.GridLayout</code>
- * <code>src.controller.Cell</code> controller.
+ * A <code>app.view.components.JWPanel</code> <code>java.awt.GridLayout</code>
+ * <code>app.controller.Cell</code> controller.
  *
- * @see src.view.components.JWPanel JWPanel
+ * @see app.view.components.JWPanel JWPanel
  */
 public final class JWGrid extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * <code>src.controller.JWGrid</code> <code>src.controller.Cell</code> storage.
+     * <code>app.controller.JWGrid</code> <code>app.controller.Cell</code> storage.
      */
     private Map<Point, Cell> grid;
 
     /**
-     * <code>src.controller.Cell</code> starting pointer.
+     * <code>app.controller.Cell</code> starting pointer.
      */
     private Cell start = null;
 
     /**
-     * <code>src.controller.Cell</code> endpoint pointer.
+     * <code>app.controller.Cell</code> endpoint pointer.
      */
     private Cell end = null;
 
     /**
      * Create <code>java.awt.GridLayout</code>
-     * <code>src.view.components.JWPanel</code> of given shape filled with
-     * <code>src.controller.Cell</code>.
+     * <code>app.view.components.JWPanel</code> of given shape filled with
+     * <code>app.controller.Cell</code>.
      *
      * @param rows          int
      * @param cols          int
