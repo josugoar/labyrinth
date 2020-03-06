@@ -103,9 +103,8 @@ public abstract class PathFinder implements Serializable {
                     }
                 }
             });
-        } catch (final Exception e) {
+        } catch (final StackOverflowError e) {
             // Redirect running
-            this.isRunning = false;
             System.err.println(e.toString());
         }
     }
@@ -154,7 +153,6 @@ public abstract class PathFinder implements Serializable {
                                 case END:
                                     // Endpoint found
                                     endpoint = newNode;
-                                    this.isRunning = false;
                                     break;
                                 default:
                             }
@@ -163,26 +161,28 @@ public abstract class PathFinder implements Serializable {
                 }
             }
             // Handle no solution grid
-            if (currGen.equals(newGen))
+            if (newGen.size() == 0) {
+                this.isRunning = false;
                 throw new StackOverflowError("No solution...");
+            }
             // Draw entire generation before returning
             if (endpoint != null) {
                 PathFinder.traverse(endpoint.getParent());
+                this.isRunning = false;
                 return;
                 // Check for final generation
-            } else if (newGen.size() != 0) {
-                // Invert speed parameter
-                new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
-                        e -> {
-                            // Change Cell State to visited
-                            for (final Node<Cell> node : newGen) {
-                                grid.get(node.getSeed()).setState(State.VISITED);
-                            }
-                            // Call method recursively until convergence
-                            this.find(grid, newGen);
-                            ((Timer) e.getSource()).stop();
-                        }).start();
             }
+            // Invert speed parameter
+            new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
+                    e -> {
+                        // Change Cell State to visited
+                        for (final Node<Cell> node : newGen) {
+                            grid.get(node.getSeed()).setState(State.VISITED);
+                        }
+                        // Call method recursively until convergence
+                        this.find(grid, newGen);
+                        ((Timer) e.getSource()).stop();
+                    }).start();
         }
 
     }

@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 import app.controller.Cell;
 import app.controller.Cell.State;
 import app.controller.JWGrid;
+import app.model.Generator;
 import app.model.PathFinder;
 import app.model.PathFinder.Dijkstra;
 import app.view.JWrapper;
@@ -131,7 +132,10 @@ public class MazeApp extends JFrame implements Runnable {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             // Generate random obstacle pattern
-                                            this.add(new JWButton("Generate", null, new Dimension(87, 30)));
+                                            this.add(new JWButton("Generate",
+                                                    e -> new Generator().generate(MazeApp.this.layout.getGrid()),
+                                                    new Dimension(87, 30)
+                                            ));
                                             // Awake PathFinder
                                             this.add(new JWButton("Awake",
                                                     e -> MazeApp.this.pathfinder.awake(MazeApp.this.layout.getGrid()),

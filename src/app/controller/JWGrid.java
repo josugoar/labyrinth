@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.swing.JPanel;
 
@@ -79,7 +78,7 @@ public final class JWGrid extends JPanel {
     }
 
     public final void setStart(final Cell start) {
-        this.start = Objects.requireNonNull(start, "'start' must not be null");
+        this.start = start;
     }
 
     public final Cell getEnd() {
@@ -87,7 +86,7 @@ public final class JWGrid extends JPanel {
     }
 
     public final void setEnd(final Cell end) {
-        this.end = Objects.requireNonNull(end, "'end' must not be null");
+        this.end = end;
     }
 
 }
