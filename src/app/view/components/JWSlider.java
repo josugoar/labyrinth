@@ -8,7 +8,7 @@ import javax.swing.event.ChangeListener;
  *
  * @see javax.swing.JSlider JSlider
  */
-public class JWSlider extends JSlider {
+public final class JWSlider extends JSlider {
 
     private static final long serialVersionUID = 1L;
 

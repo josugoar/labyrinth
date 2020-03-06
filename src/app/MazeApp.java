@@ -9,7 +9,6 @@ import java.util.Objects;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -22,6 +21,7 @@ import app.model.PathFinder;
 import app.model.PathFinder.Dijkstra;
 import app.view.JWrapper;
 import app.view.components.JWButton;
+import app.view.components.JWComboBox;
 import app.view.components.JWPanel;
 import app.view.components.JWSlider;
 import app.view.components.JWSplitPane;
@@ -83,6 +83,14 @@ public class MazeApp extends JFrame implements Runnable {
     private PathFinder pathfinder = new Dijkstra();
 
     /**
+     * <code>app.controller.JWGrid</code> feature modifier:
+     * <code>app.model.Generator</code> algorithm selector.
+     *
+     * @see app.model.Generator Generator
+     */
+    private Generator generator = new Generator();
+
+    /**
      * A <code>app.controller.JWGrid</code> containing
      * <code>app.controller.Cell</code>.
      *
@@ -133,7 +141,7 @@ public class MazeApp extends JFrame implements Runnable {
                                         {
                                             // Generate random obstacle pattern
                                             this.add(new JWButton("Generate",
-                                                    e -> new Generator().generate(MazeApp.this.layout.getGrid()),
+                                                    e -> generator.generate(MazeApp.this.layout.getGrid()),
                                                     new Dimension(87, 30)
                                             ));
                                             // Awake PathFinder
@@ -191,14 +199,23 @@ public class MazeApp extends JFrame implements Runnable {
                                     }
                             ));
                             // Algorithm selectors
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 0),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 0),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
+                                            // TODO: Add Component in separate JWPanel with set
+                                            // Dimension to preserve FlowLayout in horizontal
+                                            // alignment
+                                            this.add(new JLabel("PathFinder"));
+                                            this.add(new JLabel("         Generator"));
                                             // PathFinder selector
-                                            this.add(new JComboBox());
+                                            this.add(new JWComboBox<String>(new String[] {"Dijkstra", "AStar"},
+                                                    new Dimension(87, 30)
+                                            ));
                                             // MazeGenerator selector
-                                            this.add(new JComboBox());
+                                            this.add(new JWComboBox<String>(new String[] {"Random", "AldousBroder"},
+                                                    new Dimension(87, 30)
+                                            ));
                                         }
                                     }
                             ));
