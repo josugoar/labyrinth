@@ -2,6 +2,7 @@ package app.controller;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
@@ -19,6 +20,7 @@ import app.MazeApp;
  * @see javax.swing.JPanel JPanel
  */
 public final class Cell extends JPanel {
+    // TODO: Draw Empty Cell bigger to overlap them with Obstacle Cell and resemble walls
 
     /**
      * Enum of <code>app.controller.Cell</code> states: <code>START</code>,
@@ -37,10 +39,19 @@ public final class Cell extends JPanel {
      */
     private State state = State.EMPTY;
 
+    private final Point north, east, south, west;
+
     {
         // Initialize Cell with BorderFactory and CellListener
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         this.addMouseListener(new CellListener());
+    }
+
+    public Cell(final Point north, final Point east, final Point south, final Point west) {
+        this.north = north;
+        this.east = east;
+        this.south = south;
+        this.west = west;
     }
 
     @Override
@@ -86,6 +97,22 @@ public final class Cell extends JPanel {
         // Refresh Cell Color on State change
         this.state = Objects.requireNonNull(state, "'state' must not be null");
         this.repaint();
+    }
+
+    public final Point getNorth() {
+        return this.north;
+    }
+
+    public final Point getEast() {
+        return this.east;
+    }
+
+    public final Point getSouth() {
+        return this.south;
+    }
+
+    public final Point getWest() {
+        return this.west;
     }
 
     /**

@@ -62,7 +62,11 @@ public final class JWGrid extends JPanel {
             {
                 for (int row = 0; row < rows; row++) {
                     for (int col = 0; col < cols; col++) {
-                        final Cell cell = new Cell();
+                        final Cell cell = new Cell(
+                            (row - 1 >= 0 && row < rows) ? new Point(row - 1, col) : null,
+                            (col + 1 >= 0 && col < cols) ? new Point(row, col + 1) : null,
+                            (row + 1 >= 0 && row < rows) ? new Point(row + 1, col) : null,
+                            (col - 1 >= 0 && col < cols) ? new Point(row, col - 1) : null);
                         this.put(new Point(row, col), cell);
                         JWGrid.this.add(cell);
                     }

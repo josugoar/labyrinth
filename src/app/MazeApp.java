@@ -88,7 +88,7 @@ public class MazeApp extends JFrame implements Runnable {
      *
      * @see app.model.Generator Generator
      */
-    private Generator generator = new Generator();
+    private final Generator generator = new Generator();
 
     /**
      * A <code>app.controller.JWGrid</code> containing
@@ -97,7 +97,7 @@ public class MazeApp extends JFrame implements Runnable {
      * @see app.controller.JWGrid JWGrid
      * @see app.controller.Cell Cell
      */
-    private final JWGrid layout = new JWGrid(dimension, dimension, new Dimension(500, 500));
+    private final JWGrid panelLayout = new JWGrid(dimension, dimension, new Dimension(500, 500));
 
     /**
      * Invoke Runnable in system EventQueue dispatch Thread.
@@ -141,12 +141,15 @@ public class MazeApp extends JFrame implements Runnable {
                                         {
                                             // Generate random obstacle pattern
                                             this.add(new JWButton("Generate",
-                                                    e -> generator.generate(MazeApp.this.layout.getGrid()),
+                                                    e -> generator.generate(MazeApp.this.panelLayout.getGrid()),
                                                     new Dimension(87, 30)
                                             ));
                                             // Awake PathFinder
                                             this.add(new JWButton("Awake",
-                                                    e -> MazeApp.this.pathfinder.awake(MazeApp.this.layout.getGrid()),
+                                                    e -> {
+                                                        MazeApp.this.reset();
+                                                        MazeApp.this.pathfinder.awake(MazeApp.this.panelLayout.getGrid());
+                                                    },
                                                     new Dimension(87, 30)
                                             ));
                                         }
@@ -199,21 +202,20 @@ public class MazeApp extends JFrame implements Runnable {
                                     }
                             ));
                             // Algorithm selectors
-                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 0),
+                            this.add(new JWPanel(new FlowLayout(FlowLayout.CENTER, 20, 10),
                                     new ArrayList<Component>() {
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            // TODO: Add Component in separate JWPanel with set
-                                            // Dimension to preserve FlowLayout in horizontal
+                                            // TODO: Add Component in separate JWPanel with set Dimension to preserve FlowLayout in horizontal
                                             // alignment
-                                            this.add(new JLabel("PathFinder"));
-                                            this.add(new JLabel("         Generator"));
-                                            // PathFinder selector
-                                            this.add(new JWComboBox<String>(new String[] {"Dijkstra", "AStar"},
-                                                    new Dimension(87, 30)
-                                            ));
+                                            this.add(new JLabel("Generator"));
+                                            this.add(new JLabel("         PathFinder"));
                                             // MazeGenerator selector
                                             this.add(new JWComboBox<String>(new String[] {"Random", "AldousBroder"},
+                                                    new Dimension(87, 30)
+                                            ));
+                                            // PathFinder selector
+                                            this.add(new JWComboBox<String>(new String[] {"Dijkstra", "AStar"},
                                                     new Dimension(87, 30)
                                             ));
                                         }
@@ -239,21 +241,15 @@ public class MazeApp extends JFrame implements Runnable {
                                             // Reset entire JWGrid
                                             this.add(new JWButton("Reset",
                                                     e -> {
-                                                        MazeApp.this.layout.setStart(null);
-                                                        MazeApp.this.layout.setEnd(null);
-                                                        MazeApp.this.layout.setGrid(MazeApp.this.dimension, MazeApp.this.dimension);
+                                                        MazeApp.this.panelLayout.setStart(null);
+                                                        MazeApp.this.panelLayout.setEnd(null);
+                                                        MazeApp.this.panelLayout.setGrid(MazeApp.this.dimension, MazeApp.this.dimension);
                                                     },
                                                     new Dimension(87, 30)
                                             ));
                                             // Reset JWGrid
                                             this.add(new JWButton("Clear",
-                                                    e -> {
-                                                        for (final Cell cell : MazeApp.this.layout.getGrid().values()) {
-                                                            final State state = cell.getState();
-                                                            if (state == State.VISITED || state == State.GERMINATED || state == State.PATH)
-                                                                cell.setState(State.EMPTY);
-                                                        }
-                                                    },
+                                                    e -> MazeApp.this.reset(),
                                                     new Dimension(87, 30)
                                             ));
                                         }
@@ -266,7 +262,7 @@ public class MazeApp extends JFrame implements Runnable {
             // Right JWSplitPane
             new JWSplitPane(JWSplitPane.VERTICAL_SPLIT,
                 // Top Right JWGridLayout
-                this.layout,
+                this.panelLayout,
                 // Bottom Right JWPanel
                 new JWPanel(new FlowLayout(FlowLayout.CENTER, 10, 10),
                     // Bottom Right JWPanel Component
@@ -300,6 +296,14 @@ public class MazeApp extends JFrame implements Runnable {
         );
     }
 
+    private final void reset() {
+        for (final Cell cell : this.panelLayout.getGrid().values()) {
+            final State state = cell.getState();
+            if (state == State.VISITED || state == State.GERMINATED || state == State.PATH)
+                cell.setState(State.EMPTY);
+        }
+    }
+
     @Override
     public final void run() {
         this.setContentPane(initTree());
@@ -321,11 +325,11 @@ public class MazeApp extends JFrame implements Runnable {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + density;
-        result = prime * result + ((layout == null) ? 0 : layout.hashCode());
-        result = prime * result + ((mode == null) ? 0 : mode.hashCode());
-        result = prime * result + dimension;
-        result = prime * result + speed;
+        result = prime * result + this.density;
+        result = prime * result + ((this.panelLayout == null) ? 0 : this.panelLayout.hashCode());
+        result = prime * result + ((this.mode == null) ? 0 : this.mode.hashCode());
+        result = prime * result + this.dimension;
+        result = prime * result + this.speed;
         return result;
     }
 
@@ -335,21 +339,21 @@ public class MazeApp extends JFrame implements Runnable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (this.getClass() != obj.getClass())
             return false;
         final MazeApp other = (MazeApp) obj;
-        if (density != other.density)
+        if (this.density != other.density)
             return false;
-        if (layout == null) {
-            if (other.layout != null)
+        if (this.panelLayout == null) {
+            if (other.panelLayout != null)
                 return false;
-        } else if (!layout.equals(other.layout))
+        } else if (!this.panelLayout.equals(other.panelLayout))
             return false;
-        if (mode != other.mode)
+        if (this.mode != other.mode)
             return false;
-        if (dimension != other.dimension)
+        if (this.dimension != other.dimension)
             return false;
-        if (speed != other.speed)
+        if (this.speed != other.speed)
             return false;
         return true;
     }
@@ -364,7 +368,7 @@ public class MazeApp extends JFrame implements Runnable {
 
     public final void setDimension(final int dimension) {
         this.dimension = dimension;
-        MazeApp.this.layout.setGrid(this.dimension, this.dimension);
+        MazeApp.this.panelLayout.setGrid(this.dimension, this.dimension);
     }
 
     public final int getSpeed() {
@@ -389,6 +393,10 @@ public class MazeApp extends JFrame implements Runnable {
 
     public final void setPathFinder(final PathFinder pathfinder) {
         this.pathfinder = Objects.requireNonNull(pathfinder, "'pathfinder' must not be null");
+    }
+
+    public final JWGrid getPanelLayout() {
+        return this.panelLayout;
     }
 
 }

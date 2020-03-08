@@ -13,7 +13,7 @@ public final class JWSlider extends JSlider {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Enclose minimum, maximum, n and ChangeListener
+     * Enclose minimum, maximum, n and ChangeListener.
      *
      * @param minimum int
      * @param maximum int

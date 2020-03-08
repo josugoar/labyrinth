@@ -73,7 +73,7 @@ public abstract class PathFinder implements Serializable {
                     // Find starting Point
                     if (directAccess) {
                         // Get starting Cell
-                        final Cell start = ((JWGrid) grid.get(new Point(0, 0)).getParent()).getStart();
+                        final Cell start = ((JWGrid) grid.values().iterator().next().getParent()).getStart();
                         // No starting Cell
                         if (start == null)
                             throw new NullPointerException("No starting node found...");
@@ -160,17 +160,17 @@ public abstract class PathFinder implements Serializable {
                     }
                 }
             }
-            // Handle no solution grid
-            if (newGen.size() == 0) {
-                this.isRunning = false;
-                throw new StackOverflowError("No solution...");
-            }
             // Draw entire generation before returning
             if (endpoint != null) {
                 PathFinder.traverse(endpoint.getParent());
                 this.isRunning = false;
                 return;
                 // Check for final generation
+            }
+            // Handle no solution grid
+            if (newGen.size() == 0) {
+                this.isRunning = false;
+                throw new StackOverflowError("No solution...");
             }
             // Invert speed parameter
             new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
