@@ -96,7 +96,7 @@ public abstract class PathFinder implements Serializable {
             if (!this.isRunning) {
                 return;
             }
-            new Timer(((MazeView) SwingUtilities.getWindowAncestor(newGen.iterator().next().getOuter())).getController().getSpeed(),
+            new Timer(((MazeView) SwingUtilities.getWindowAncestor(newGen.iterator().next().getOuter())).getController().getDelay().getValue(),
                     e -> {
                         for (final Node node : newGen) {
                             node.setState(Node.State.VISITED);

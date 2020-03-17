@@ -1,8 +1,10 @@
 package app.model;
 
+import app.controller.Cell;
+
 public abstract class Generator {
 
-    public final void awake() {
+    public final void awake(final Cell[][] grid) {
 
     }
 

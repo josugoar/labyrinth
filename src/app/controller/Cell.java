@@ -34,8 +34,6 @@ public class Cell extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private final MazeView ancestor = (MazeView) SwingUtilities.getWindowAncestor(this);
-
     private State state = State.EMPTY;
 
     private Node inner = null;
@@ -107,12 +105,11 @@ public class Cell extends JPanel {
         public final void mousePressed(final MouseEvent e) throws NullPointerException {
             if (e.isShiftDown() && ((e.getModifiersEx() & (MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK
                     | MouseEvent.BUTTON3_DOWN_MASK)) != 0)) {
-                final MazeView mazeView = (MazeView) SwingUtilities.getWindowAncestor(Cell.this);
-                if ((mazeView.getController().getPathFinder().getIsRunning())) {
+                if ((((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getPathFinder().getIsRunning())) {
                     throw new NullPointerException("Invalid input while running...");
                 }
                 final MazeModel gridPanel = (MazeModel) Cell.this.getParent();
-                switch (mazeView.getController().getMode()) {
+                switch (((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getMode()) {
                     case START:
                         if (gridPanel.getStart() != null && !Cell.this.equals(gridPanel.getStart())) {
                             gridPanel.getStart().setState(State.EMPTY);
@@ -156,11 +153,10 @@ public class Cell extends JPanel {
         @Override
         public final void mouseEntered(final MouseEvent e) throws NullPointerException {
             if (e.isShiftDown() && (e.getModifiersEx() & (MouseEvent.BUTTON1_DOWN_MASK | MouseEvent.BUTTON2_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK)) != 0) {
-                final MazeView mazeView = (MazeView) SwingUtilities.getWindowAncestor(Cell.this);
-                if (mazeView.getController().getPathFinder().getIsRunning()) {
+                if (((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getPathFinder().getIsRunning()) {
                     throw new NullPointerException("Invalid input while running...");
                 }
-                switch (mazeView.getController().getMode()) {
+                switch (((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getMode()) {
                     case OBSTACLE:
                         Cell.this.setState(State.OBSTACLE);
                         break;

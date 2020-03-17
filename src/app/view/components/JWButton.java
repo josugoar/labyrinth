@@ -1,7 +1,6 @@
 package app.view.components;
 
 import java.awt.Cursor;
-import java.awt.event.ActionListener;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -18,10 +17,9 @@ public class JWButton extends JButton {
         this.setFocusPainted(false);
     }
 
-    public JWButton(final Icon icon, final String toolTipText, final ActionListener l) {
+    public JWButton(final Icon icon, final String toolTipText) {
         super("", icon);
         this.setToolTipText(toolTipText);
-        this.addActionListener(l);
     }
 
 }

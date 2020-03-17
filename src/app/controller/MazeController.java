@@ -12,9 +12,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
 import app.model.Generator;
-import app.model.Generator.BackTracker;
 import app.model.PathFinder;
 import app.view.MazeView;
+import app.view.components.Range;
 
 public class MazeController {
 
@@ -29,10 +29,10 @@ public class MazeController {
 
     private boolean diagonals = true, arrows = false;
 
-    private int dimension = 20, speed = 20, density = 20;
+    private Range dimension = new Range(10, 100, 20), speed = new Range(0, 100, 10), density = new Range(1, 100, 10);
 
     private PathFinder pathfinder = new PathFinder.Dijkstra();
-    private Generator generator = new BackTracker();
+    private Generator generator = new Generator.BackTracker();
 
     public MazeController(final MazeView mazeView) {
         this.view = mazeView;
@@ -72,8 +72,12 @@ public class MazeController {
         this.gridPanel = Objects.requireNonNull(gridPanel, "'gridPanel' must not be null");
     }
 
+    public final void clearGridPanel() {
+
+    }
+
     public final void resetGridPanel() {
-        this.gridPanel.setGrid(this.dimension, this.dimension);
+        this.gridPanel.setGrid(this.dimension.getValue(), this.dimension.getValue());
     }
 
     public final JTree getNodeTree() {
@@ -92,12 +96,22 @@ public class MazeController {
         this.statusLabel = Objects.requireNonNull(statusLabel, "'statusLabel' must not be null");
     }
 
+    public final void cycleStatusLabel() {
+        this.statusLabel.setVisible(!this.statusLabel.isVisible());
+    }
+
     public final JSplitPane getViewWrapper() {
         return this.viewWrapper;
     }
 
     public final void setViewWrapper(final JSplitPane viewWrapper) {
         this.viewWrapper = Objects.requireNonNull(viewWrapper, "'viewWrapper' must not be null");
+    }
+
+    public final void cycleViewWrapper() {
+        this.viewWrapper.setDividerLocation(-1);
+        this.viewWrapper.setEnabled(!this.viewWrapper.isEnabled());
+        this.viewWrapper.getLeftComponent().setVisible(!this.viewWrapper.getLeftComponent().isVisible());
     }
 
     public final PathFinder getPathFinder() {
@@ -116,12 +130,12 @@ public class MazeController {
         return this.generator;
     }
 
-    private final void setGenerator(final Generator generator) {
+    public final void setGenerator(final Generator generator) {
         this.generator = Objects.requireNonNull(generator, "'generator' must not be null");
     }
 
     public final void awakeGenerator() {
-        this.generator.awake();
+        this.generator.awake(this.gridPanel.getGrid());
     }
 
     public final Cell.State getMode() {
@@ -140,6 +154,10 @@ public class MazeController {
         this.diagonals = diagonals;
     }
 
+    public final void cycleDiagonals() {
+        this.setDiagonals(!this.diagonals);
+    }
+
     public final boolean isArrows() {
         return this.arrows;
     }
@@ -148,29 +166,33 @@ public class MazeController {
         this.arrows = arrows;
     }
 
-    public final int getDimension() {
+    public final void cycleArrows() {
+        this.setArrows(!this.arrows);
+    }
+
+    public final Range getDimension() {
         return this.dimension;
     }
 
-    public final void setDimension(final int dimension) {
-        this.dimension = dimension;
+    public final void setDimension(final int val) {
+        this.dimension.setValue(val);
         this.resetGridPanel();
     }
 
-    public final int getSpeed() {
+    public final Range getDelay() {
         return this.speed;
     }
 
-    public final void setSpeed(final int speed) {
-        this.speed = speed;
+    public final void setDelay(final int val) {
+        this.speed.setValue(val);
     }
 
-    public final int getDensity() {
+    public final Range getDensity() {
         return this.density;
     }
 
-    public final void setDensity(final int density) {
-        this.density = density;
+    public final void setDensity(final int val) {
+        this.density.setValue(val);
     }
 
 }

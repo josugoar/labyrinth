@@ -2,12 +2,10 @@ package app.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.InputEvent;
-import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 
@@ -15,7 +13,6 @@ import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,22 +24,22 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import app.controller.Cell;
 import app.controller.MazeController;
 import app.controller.MazeModel;
+import app.model.Generator;
 import app.model.PathFinder;
 import app.view.components.JWButton;
+import app.view.components.JWSlider;
 
 public class MazeView extends JFrame implements Runnable {
 
@@ -90,7 +87,8 @@ public class MazeView extends JFrame implements Runnable {
                     // pnl_gridPanelWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        this.add(new MazeModel(controller.getDimension(), controller.getDimension()) {
+                        this.add(new MazeModel(controller.getDimension().getValue(),
+                                controller.getDimension().getValue()) {
                             // pnl_gridPanel
                             private static final long serialVersionUID = 1L;
                             {
@@ -135,112 +133,82 @@ public class MazeView extends JFrame implements Runnable {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-                                // TODO: Add JWToolBar
                                 this.add(new JToolBar(SwingConstants.VERTICAL) {
                                     // tlb_featureBar
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setFloatable(true);
-                                        this.add(new JPanel(new GridLayout(3, 1)) {
+                                        this.add(new JPanel(new GridLayout(3, 1, 0, 0)) {
                                             // pnl_featuresBar
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-                                                this.add(new JButton("", new ImageIcon(
-                                                        MazeView.class.getResource("assets/dimensionIcon.gif"))) {
+                                                this.add(new JWButton(new ImageIcon(
+                                                        MazeView.class.getResource("assets/dimensionIcon.gif")), "Dimension") {
                                                     // btn_dimensionSelector
                                                     private static final long serialVersionUID = 1L;
-                                                    private final JSlider dimensionSelector = new JSlider(
-                                                            JSlider.HORIZONTAL, 1, 100, controller.getDimension()) {
-                                                        // sld_dimensionSelector
-                                                        private static final long serialVersionUID = 1L;
-                                                        {
-                                                            this.setPreferredSize(
-                                                                    new Dimension(100, this.getPreferredSize().height));
-                                                            this.addChangeListener(
-                                                                    e -> controller.setDimension(this.getValue()));
-                                                        }
-                                                    };
                                                     {
-                                                        this.setBorder(new EmptyBorder(5, 5, 5, 5));
-                                                        this.setContentAreaFilled(false);
-                                                        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                                        this.setFocusPainted(false);
-                                                        this.setToolTipText("Dimension");
                                                         this.addActionListener(e -> new JPopupMenu("") {
                                                             // pmn_dimensionSelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(dimensionSelector);
+                                                                this.add(new JWSlider(controller.getDimension()) {
+                                                                    // sld_dimensionSelector
+                                                                    private static final long serialVersionUID = 1L;
+                                                                    {
+                                                                        this.addChangeListener(e -> controller.setDimension(this.getValue()));
+                                                                    }
+                                                                });
                                                             }
-                                                        }.show(this, -this.dimensionSelector.getPreferredSize().width,
-                                                                (this.getPreferredSize().height - this.dimensionSelector
-                                                                        .getPreferredSize().height) / 5));
+                                                        }.show(this,
+                                                                -JWSlider.getPreferredSliderSize().width,
+                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
                                                     }
                                                 });
-                                                this.add(new JButton("", new ImageIcon(
-                                                        MazeView.class.getResource("assets/speedIcon.gif"))) {
-                                                    // btn_speedSlector
+                                                this.add(new JWButton(new ImageIcon(
+                                                        MazeView.class.getResource("assets/delayIcon.gif")), "Delay") {
+                                                    // btn_delaySlector
                                                     private static final long serialVersionUID = 1L;
-                                                    private final JSlider speedSlector = new JSlider(JSlider.HORIZONTAL,
-                                                            1, 100, 100 - controller.getSpeed()) {
-                                                        // sld_speedSlector
-                                                        private static final long serialVersionUID = 1L;
-                                                        {
-                                                            this.setPreferredSize(
-                                                                    new Dimension(100, this.getPreferredSize().height));
-                                                            this.addChangeListener(e -> controller
-                                                                    .setSpeed(this.getMaximum() - this.getValue()));
-                                                        }
-                                                    };
                                                     {
-                                                        this.setBorder(new EmptyBorder(5, 5, 5, 5));
-                                                        this.setContentAreaFilled(false);
-                                                        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                                        this.setFocusPainted(false);
-                                                        this.setToolTipText("Speed");
                                                         this.addActionListener(e -> new JPopupMenu("") {
-                                                            // pmn_speedSlector
+                                                            // pmn_delaySlector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(speedSlector);
+                                                                this.add(new JWSlider(controller.getDelay()) {
+                                                                    // sld_delaySlector
+                                                                    private static final long serialVersionUID = 1L;
+
+                                                                    {
+                                                                        this.addChangeListener(e -> controller.setDelay(this.getValue()));
+                                                                    }
+                                                                });
                                                             }
-                                                        }.show(this, -this.speedSlector.getPreferredSize().width,
-                                                                (this.getPreferredSize().height
-                                                                        - this.speedSlector.getPreferredSize().height)
-                                                                        / 5));
+                                                        }.show(this,
+                                                                -JWSlider.getPreferredSliderSize().width,
+                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
                                                     }
                                                 });
-                                                this.add(new JButton("", new ImageIcon(
-                                                        MazeView.class.getResource("assets/densityIcon.gif"))) {
+                                                this.add(new JWButton(new ImageIcon(
+                                                        MazeView.class.getResource("assets/densityIcon.gif")), "Density") {
                                                     // btn_densitySelector
                                                     private static final long serialVersionUID = 1L;
-                                                    private final JSlider densitySelector = new JSlider(
-                                                            JSlider.HORIZONTAL, 1, 100, controller.getDensity()) {
-                                                        // sld_densitySelector
-                                                        private static final long serialVersionUID = 1L;
-                                                        {
-                                                            this.setPreferredSize(
-                                                                    new Dimension(100, this.getPreferredSize().height));
-                                                            this.addChangeListener(
-                                                                    e -> controller.setDensity(this.getValue()));
-                                                        }
-                                                    };
                                                     {
-                                                        this.setBorder(new EmptyBorder(5, 5, 5, 5));
-                                                        this.setContentAreaFilled(false);
-                                                        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                                        this.setFocusPainted(false);
-                                                        this.setToolTipText("Speed");
                                                         this.addActionListener(e -> new JPopupMenu("") {
                                                             // pmn_densitySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(densitySelector);
+                                                                this.add(new JWSlider(controller.getDensity()) {
+                                                                    // sld_densitySlector
+                                                                    private static final long serialVersionUID = 1L;
+
+                                                                    {
+                                                                        this.addChangeListener(e -> controller.setDensity(this.getValue()));
+                                                                    }
+                                                                });
                                                             }
-                                                        }.show(this, -this.densitySelector.getPreferredSize().width,
-                                                                (this.getPreferredSize().height - this.densitySelector
-                                                                        .getPreferredSize().height) / 5));
+                                                        }.show(this,
+                                                                -JWSlider.getPreferredSliderSize().width,
+                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
                                                     }
                                                 });
                                             }
@@ -252,35 +220,25 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setFloatable(true);
-                                        this.add(new JPanel(new GridLayout(2, 1)) {
+                                        this.add(new JPanel(new GridLayout(2, 1, 0, 0)) {
                                             // pnl_runBar
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-                                                this.add(new JButton("", new ImageIcon(
-                                                        MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
+                                                this.add(new JWButton(new ImageIcon(
+                                                        MazeView.class.getResource("assets/pathfinderRunIcon.gif")), "Run PathFinder") {
                                                     // btn_runPathFinder
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.setBorder(new EmptyBorder(5, 5, 5, 5));
-                                                        this.setContentAreaFilled(false);
-                                                        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                                        this.setFocusPainted(false);
-                                                        this.setToolTipText("Run PathFinder");
                                                         this.addActionListener(e -> controller.awakePathFinder());
                                                     }
                                                 });
                                                 this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-                                                this.add(new JButton("", new ImageIcon(
-                                                        MazeView.class.getResource("assetsgeneratorRunIcon.gif"))) {
+                                                this.add(new JWButton(new ImageIcon(
+                                                        MazeView.class.getResource("assets/generatorRunIcon.gif")), "Run Generator") {
                                                     // btn_runGenerator
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.setBorder(new EmptyBorder(5, 5, 5, 5));
-                                                        this.setContentAreaFilled(false);
-                                                        this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                                                        this.setFocusPainted(false);
-                                                        this.setToolTipText("Run Generator");
                                                         this.addActionListener(e -> controller.awakeGenerator());
                                                     }
                                                 });
@@ -310,25 +268,21 @@ public class MazeView extends JFrame implements Runnable {
                                             // rd_btn_mni_pathfinderAStar
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e ->
-                                                // controller.setPathFinder(PathFinder.Algorithm.ASTAR));
+                                                // this.addItemListener(e -> controller.setPathFinder(new PathFinder.AStar()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("BFS") {
                                             // rd_btn_mni_pathfinderBFS
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e ->
-                                                // controller.setPathFinder(PathFinder.Algorithm.BFS));
+                                                // this.addItemListener(e -> controller.setPathFinder(new PathFinder.BFS()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("Dijkstra", true) {
                                             // rd_btn_mni_pathfinderDijkstra
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> controller
-                                                        // .setPathFinder(PathFinder.Algorithm.DIJKSTRA));
-                                                        .setPathFinder(new PathFinder.Dijkstra()));
+                                                this.addItemListener(e -> controller.setPathFinder(new PathFinder.Dijkstra()));
                                             }
                                         });
                                     }
@@ -351,24 +305,21 @@ public class MazeView extends JFrame implements Runnable {
                                             // rd_btn_mni_generatorBackTracker
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e ->
-                                                // controller.setGenerator(Generator.Algorithm.BACKTRACKER);
+                                                this.addItemListener(e -> controller.setGenerator(new Generator.BackTracker()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("DPS", true) {
                                             // rd_btn_mni_generatorDPS
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e ->
-                                                // controller.setGenerator(Generator.Algorithm.DPS);
+                                                // this.addItemListener(e -> controller.setGenerator(new Generator.DPS()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("Prim") {
                                             // rd_btn_mni_generatorPrim
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e ->
-                                                // controller.setGenerator(Generator.Algorithm.PRIM);
+                                                // this.addItemListener(e -> controller.setGenerator(new Generator.Prim()));
                                             }
                                         });
                                     }
@@ -422,8 +373,7 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setIcon(new ImageIcon(MazeView.class.getResource("assets/drawIcon.gif")));
-                                        for (final Enumeration<AbstractButton> e = modeGroup.getElements(); e
-                                                .hasMoreElements();) {
+                                        for (final Enumeration<AbstractButton> e = modeGroup.getElements(); e .hasMoreElements();) {
                                             this.add(e.nextElement());
                                         }
                                     }
@@ -434,8 +384,10 @@ public class MazeView extends JFrame implements Runnable {
                                     // rd_btn_mni_modeNode
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setIcon(new ImageIcon(MazeView.class.getResource("assets/nodeIcon.gif")));
                                         modeGroup.add(this);
+                                    }
+                                    {
+                                        this.setIcon(new ImageIcon(MazeView.class.getResource("assets/nodeIcon.gif")));
                                         this.addItemListener(e -> controller.setMode(null));
                                     }
                                 });
@@ -493,10 +445,9 @@ public class MazeView extends JFrame implements Runnable {
                                     // mni_gridClear
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setAccelerator(
-                                                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
                                         this.setMnemonic(KeyEvent.VK_C);
-                                        this.addActionListener(e -> System.out.println("Clear"));
+                                        this.addActionListener(e -> controller.clearGridPanel());
                                     }
                                 });
                                 this.add(new JMenuItem("Reset",
@@ -504,8 +455,7 @@ public class MazeView extends JFrame implements Runnable {
                                     // mni_gridReset
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setAccelerator(
-                                                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
                                         this.setMnemonic(KeyEvent.VK_Z);
                                         this.addActionListener(e -> controller.resetGridPanel());
                                     }
@@ -523,42 +473,28 @@ public class MazeView extends JFrame implements Runnable {
                                     // chb_mni_viewArrows
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addActionListener(e -> controller.setArrows(!controller.isArrows()));
+                                        this.addActionListener(e -> controller.cycleArrows());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Diagonals", true) {
                                     // chb_mni_viewDiagonals
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addActionListener(e -> controller.setDiagonals(!controller.isDiagonals()));
+                                        this.addActionListener(e -> controller.cycleDiagonals());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Status Bar", true) {
                                     // chb_mni_viewStatusBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addItemListener(e -> {
-                                            if (e.getStateChange() == ItemEvent.SELECTED)
-                                                controller.getStatusLabel().setVisible(true);
-                                            else
-                                                controller.getStatusLabel().setVisible(false);
-                                        });
+                                        this.addItemListener(e -> controller.cycleStatusLabel());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Node Tree") {
-                                    // chb_mni_viewNodeTree
+                                    // chb_mni_viewWrapper
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addItemListener(e -> {
-                                            if (e.getStateChange() == ItemEvent.SELECTED) {
-                                                controller.getViewWrapper().getLeftComponent().setVisible(true);
-                                                controller.getViewWrapper().setEnabled(true);
-                                            } else {
-                                                controller.getViewWrapper().getLeftComponent().setVisible(false);
-                                                controller.getViewWrapper().setEnabled(false);
-                                            }
-                                            controller.getViewWrapper().setDividerLocation(-1);
-                                        });
+                                        this.addItemListener(e -> controller.cycleViewWrapper());
                                     }
                                 });
                             }
