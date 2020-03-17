@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
+import app.model.Generator;
+import app.model.Generator.BackTracker;
 import app.model.PathFinder;
 import app.view.MazeView;
 
@@ -30,7 +32,7 @@ public class MazeController {
     private int dimension = 20, speed = 20, density = 20;
 
     private PathFinder pathfinder = new PathFinder.Dijkstra();
-    // private Generator generator = new BackTracker();
+    private Generator generator = new BackTracker();
 
     public MazeController(final MazeView mazeView) {
         this.view = mazeView;
@@ -110,18 +112,17 @@ public class MazeController {
         this.pathfinder.awake(this.gridPanel.getGrid());
     }
 
-    // public final Generator getGenerator() {
-    // return this.generator;
-    // }
+    public final Generator getGenerator() {
+        return this.generator;
+    }
 
-    // private final void setGenerator(final Generator generator) {
-    // this.generator = Objects.requireNonNull(generator, "'generator' must not be
-    // null");
-    // }
+    private final void setGenerator(final Generator generator) {
+        this.generator = Objects.requireNonNull(generator, "'generator' must not be null");
+    }
 
-    // public final void awakeGenerator() {
-    // this.generator.awake();
-    // }
+    public final void awakeGenerator() {
+        this.generator.awake();
+    }
 
     public final Cell.State getMode() {
         return this.mode;

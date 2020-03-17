@@ -30,7 +30,7 @@ public final class JWToolBar extends JToolBar {
                     this.setLayout(new GridLayout(1, JWToolBar.this.components));
                 }
                 for (int i = 0; i < JWToolBar.this.components; i++) {
-                    this.add(new JWIcon());
+                    this.add(new JWButton());
                 }
             }
         });
