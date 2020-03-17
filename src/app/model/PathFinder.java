@@ -1,110 +1,61 @@
 package app.model;
 
-import java.awt.Point;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import app.MazeApp;
 import app.controller.Cell;
-import app.controller.Cell.State;
-import app.controller.JWGrid;
+import app.controller.MazeModel;
+import app.view.MazeView;
 
-/**
- * A <code>java.io.Serializable</code> abstract class containing common
- * pathfinding algorithm algorithm methods.
- *
- * @see java.io.Serializable Serializable
- */
 public abstract class PathFinder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Enum of <code>app.model.PathFinder</code> algorithms.
-     */
-    public enum Algorithm {
-        DIJKSTRA, A_STAR
-    }
-
-    /**
-     * Running flag for draw loops.
-     */
     protected boolean isRunning = false;
 
-    /**
-     * Run given algorithm to find last child <code>app.model.Node<Cell></code>.
-     *
-     * @param arrayList List<Node>
-     * @throws StackOverflowError
-     */
-    protected abstract void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen) throws StackOverflowError;
+    public abstract void setIsRunning(final boolean isRunning);
 
-    /**
-     * Traverse through child nodes until no parent
-     * <code>app.model.Node<Cell></code> is reached.
-     *
-     * @param child Node
-     */
-    private static final void traverse(final Node<Cell> child) {
+    protected abstract void find(final Cell[][] grid, final Set<Node> currGen) throws StackOverflowError;
+
+    private static final void traverse(final Node child) {
         if (child.getParent() != null) {
-            child.getInner().setState(State.PATH);
+            child.setState(Node.State.PATH);
             PathFinder.traverse(child.getParent());
         }
     }
 
-    /**
-     * Wrapper for finding and traversing shortest path.
-     *
-     * @param grid
-     */
-    public final void awake(final Map<Point, Cell> grid) {
+    public final void awake(final Cell[][] grid) {
         try {
-            // Set running
-            this.isRunning = true;
-            this.find(grid, new HashSet<Node<Cell>>() {
+            this.setIsRunning(true);
+            this.find(grid, new HashSet<Node>() {
                 private static final long serialVersionUID = 1L;
                 {
                     final boolean directAccess = true;
-                    // Find starting Point
                     if (directAccess) {
-                        // Get starting Cell
-                        final Cell start = ((JWGrid) grid.values().iterator().next().getParent()).getStart();
-                        // No starting Cell
+                        final Cell start = ((MazeModel) grid[0][0].getParent()).getStart();
                         if (start == null)
                             throw new NullPointerException("No starting node found...");
-                        // Get starting Point
-                        for (final Point seed : grid.keySet()) {
-                            if (grid.get(seed) == start) {
-                                this.add(new Node<Cell>(seed, start));
-                                break;
-                            }
-                        }
+                        this.add(new Node(null, start));
                     } else {
-                        // Get starting Cell
-                        outer: for (final Cell cell : grid.values()) {
-                            if (cell.getState() == State.START) {
-                                // Get starting Point
-                                for (final Point seed : grid.keySet()) {
-                                    if (grid.get(seed) == cell) {
-                                        this.add(new Node<Cell>(seed, cell));
-                                        break outer;
-                                    }
+                        outer: for (int row = 0; row < grid.length; row++) {
+                            for (int col = 0; col < grid.length; col++) {
+                                final Cell cell = grid[row][col];
+                                if (cell.getState() == Cell.State.START) {
+                                    this.add(new Node(null, cell));
+                                    break outer;
                                 }
                             }
                         }
-                        // No starting Cell
                         if (this.size() == 0)
                             throw new NullPointerException("No starting node found...");
                     }
                 }
             });
         } catch (final StackOverflowError e) {
-            // Redirect running
             System.err.println(e.toString());
         }
     }
@@ -113,76 +64,52 @@ public abstract class PathFinder implements Serializable {
         return this.isRunning;
     }
 
-    /**
-     * Self-made recursive <code>app.model.PathFinder</code> algorithm resembling
-     * Dijkstra's from scratch and extending <code>app.model.PathFinder</code>.
-     *
-     * @see app.model.PathFinder PathFinder
-     */
     public static final class Dijkstra extends PathFinder {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected final void find(final Map<Point, Cell> grid, final Set<Node<Cell>> currGen)
-                throws StackOverflowError {
-            // Endpoint flag
-            Node<Cell> endpoint = null;
-            // Initialize empty new generation HashSet
-            // for enhanced speed in non-duplicate Node
-            final Set<Node<Cell>> newGen = new HashSet<Node<Cell>>();
-            // Range through neighbors
-            for (final Node<Cell> node : currGen) {
-                for (int row = node.getSeed().x - 1; row < node.getSeed().x + 2; row++) {
-                    for (int col = node.getSeed().y - 1; col < node.getSeed().y + 2; col++) {
-                        // Check if neighbor exists
-                        if ((row < Math.sqrt(grid.size())) && (row >= 0) && (col < Math.sqrt(grid.size()))
-                                && (col >= 0)) {
-                            // Get Point coordinates
-                            final Point point = new Point(row, col);
-                            // Get Cell to check its State
-                            final Cell cell = grid.get(point);
-                            // Create new Node pointing to parent and Cell
-                            final Node<Cell> newNode = new Node<Cell>(node, point, cell);
-                            switch (cell.getState()) {
-                                case EMPTY:
-                                    // Store node in generation
-                                    cell.setState(State.GERMINATED);
-                                    newGen.add(newNode);
-                                    break;
-                                case END:
-                                    // Endpoint found
-                                    endpoint = newNode;
-                                    break;
-                                default:
+        protected final void find(final Cell[][] grid, final Set<Node> currGen) throws StackOverflowError {
+            final Set<Node> newGen = new HashSet<Node>();
+            for (final Node node : currGen) {
+                for (Cell cell : node.getOuter().getNeighbors().keySet()) {
+                    if (cell.getInner() == null)
+                        cell.setInner(new Node(node, cell));
+                    switch (cell.getState()) {
+                        case EMPTY:
+                            if (cell.getInner().getState() != Node.State.VISITED) {
+                                newGen.add(cell.getInner());
                             }
-                        }
+                            break;
+                        case END:
+                            this.setIsRunning(false);
+                            PathFinder.traverse(cell.getInner().getParent());
+                            break;
+                        default:
                     }
                 }
             }
-            // Draw entire generation before returning
-            if (endpoint != null) {
-                PathFinder.traverse(endpoint.getParent());
-                this.isRunning = false;
-                return;
-                // Check for final generation
-            }
-            // Handle no solution grid
             if (newGen.size() == 0) {
-                this.isRunning = false;
+                this.setIsRunning(false);
                 throw new StackOverflowError("No solution...");
             }
-            // Invert speed parameter
-            new Timer(((MazeApp) SwingUtilities.getWindowAncestor(newGen.iterator().next().getInner())).getSpeed(),
+            if (!this.isRunning) {
+                return;
+            }
+            new Timer(((MazeView) SwingUtilities.getWindowAncestor(newGen.iterator().next().getOuter())).getController().getSpeed(),
                     e -> {
-                        // Change Cell State to visited
-                        for (final Node<Cell> node : newGen) {
-                            grid.get(node.getSeed()).setState(State.VISITED);
+                        for (final Node node : newGen) {
+                            node.setState(Node.State.VISITED);
                         }
-                        // Call method recursively until convergence
                         this.find(grid, newGen);
                         ((Timer) e.getSource()).stop();
                     }).start();
+        }
+
+        @Override
+        public final void setIsRunning(final boolean isRunning) {
+            // TODO: Glass pane
+            this.isRunning = isRunning;
         }
 
     }

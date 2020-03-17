@@ -1,74 +1,59 @@
 package app.model;
 
-import java.awt.Point;
+import java.awt.Color;
 import java.io.Serializable;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
 
-/**
- * <code>java.io.Serializable</code> element containing given reference pointing
- * to parent.
- *
- * @param <T> Reference
- * @see java.io.Serializable Serializable
- */
-public final class Node<T> implements Serializable {
+import app.controller.Cell;
+
+public final class Node implements Serializable {
+
+    public static enum State {
+        VISITED, GERMINATED, PATH;
+
+        public static final Map<State, Color> COLOR = new EnumMap<State, Color>(State.class) {
+            private static final long serialVersionUID = 1L;
+            {
+                this.put(State.VISITED, Color.CYAN);
+                this.put(State.GERMINATED, Color.BLUE);
+                this.put(State.PATH, Color.YELLOW);
+            }
+        };
+    }
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Pointer to parent <code>app.model.Node<T></code>.
-     */
-    private Node<T> parent;
+    private final Node parent;
+    private final Cell outer;
 
-    /**
-     * Euclidean coordinates.
-     */
-    private final Point seed;
+    private State state = State.GERMINATED;
 
-    /**
-     * Inner reference.
-     */
-    private final T inner;
-
-    /**
-     * Enclose <code>app.model.Node<T></code> <code>app.model.Node<T></code>, Point
-     * and T.
-     *
-     * @param parent Node<T>
-     * @param seed   Point
-     * @param inner  T
-     */
-    public Node(final Node<T> parent, final Point seed, final T inner) {
+    public Node(final Node parent, final Cell outer) {
         this.parent = parent;
-        this.seed = seed;
-        this.inner = inner;
+        this.outer = outer;
     }
 
-    /**
-     * Enclose <code>app.model.Node<T></code> <code>app.model.Node<T></code> and
-     * Point.
-     *
-     * @param seed  Point
-     * @param inner T
-     */
-    public Node(final Point seed, final T inner) {
-        this(null, seed, inner);
+    public Node(final Cell outer) {
+        this(null, outer);
     }
 
-    @Override
-    public String toString() {
-        return String.format("Node(seed: %s)", this.getSeed());
-    }
-
-    protected T getInner() {
-        return this.inner;
-    }
-
-    protected Point getSeed() {
-        return this.seed;
-    }
-
-    protected Node<T> getParent() {
+    public Node getParent() {
         return this.parent;
+    }
+
+    public Cell getOuter() {
+        return this.outer;
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
+        this.state = Objects.requireNonNull(state, "'state' must not be null");
+        this.outer.repaint();
     }
 
 }

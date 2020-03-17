@@ -1,0 +1,2 @@
+When changing Cell state to State.OBSTACLE check Cell neighbors and color it accordingly.
+For each State.OBSTACLE neighbor, check their neighbors and redraw Cell.
