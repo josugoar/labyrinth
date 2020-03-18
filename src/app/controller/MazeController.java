@@ -19,12 +19,12 @@ import app.view.components.JWSlider.JWRange;
 
 public class MazeController {
 
-    private MazeModel model;
+    private final MazeModel model;
     private final MazeView view;
 
-    private JTree nodeTree;
-    private JLabel statusLabel;
-    private JSplitPane viewWrapper;
+    private JTree treeComponent;
+    private JLabel statusComponent;
+    private JSplitPane splitComponent;
 
     private Cell.State mode = Cell.State.OBSTACLE;
 
@@ -46,13 +46,13 @@ public class MazeController {
 
     private final void initController() {
         // TODO: Add Menu PopUp to Model
-        view.addFocusListener(new FocusAdapter() {
+        this.view.addFocusListener(new FocusAdapter() {
             @Override
             public final void focusLost(final FocusEvent e) {
                 view.requestFocus();
             }
         });
-        view.addKeyListener(new KeyAdapter() {
+        this.view.addKeyListener(new KeyAdapter() {
             @Override
             public final void keyPressed(final KeyEvent e) {
                 if (e.isShiftDown()) {
@@ -78,47 +78,50 @@ public class MazeController {
         return this.model;
     }
 
-    // TODO: In model
-    public final void clearGridPanel() {
-
+    public final void clearModel() {
+        this.model.clear(this.model.getStart());
     }
 
-    public final void resetGridPanel() {
-        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
+    public final void resetModel() {
+        this.model.reset();
     }
 
-    public final JTree getNodeTree() {
-        return this.nodeTree;
+    public final MazeView getView() {
+        return this.view;
     }
 
-    public final void setNodeTree(final JTree nodeTree) {
-        this.nodeTree = Objects.requireNonNull(nodeTree, "'nodeTree' must not be null");
+    public final JTree getTreeComponent() {
+        return this.treeComponent;
     }
 
-    public final JLabel getStatusLabel() {
-        return this.statusLabel;
+    public final void setTreeComponent(final JTree treeComponent) {
+        this.treeComponent = Objects.requireNonNull(treeComponent, "'treeComponent' must not be null");
     }
 
-    public final void setStatusLabel(final JLabel statusLabel) {
-        this.statusLabel = Objects.requireNonNull(statusLabel, "'statusLabel' must not be null");
+    public final JLabel getStatusComponent() {
+        return this.statusComponent;
     }
 
-    public final void cycleStatusLabel() {
-        this.statusLabel.setVisible(!this.statusLabel.isVisible());
+    public final void setStatusComponent(final JLabel statusComponent) {
+        this.statusComponent = Objects.requireNonNull(statusComponent, "'statusComponent' must not be null");
     }
 
-    public final JSplitPane getViewWrapper() {
-        return this.viewWrapper;
+    public final void cycleStatusComponent() {
+        this.statusComponent.setVisible(!this.statusComponent.isVisible());
     }
 
-    public final void setViewWrapper(final JSplitPane viewWrapper) {
-        this.viewWrapper = Objects.requireNonNull(viewWrapper, "'viewWrapper' must not be null");
+    public final JSplitPane getSplitComponent() {
+        return this.splitComponent;
     }
 
-    public final void cycleViewWrapper() {
-        this.viewWrapper.getLeftComponent().setVisible(!this.viewWrapper.getLeftComponent().isVisible());
-        this.viewWrapper.setDividerLocation(-1);
-        this.viewWrapper.setEnabled(!this.viewWrapper.isEnabled());
+    public final void setSplitComponent(final JSplitPane splitComponent) {
+        this.splitComponent = Objects.requireNonNull(splitComponent, "'splitComponent' must not be null");
+    }
+
+    public final void cycleSplitComponent() {
+        this.splitComponent.getLeftComponent().setVisible(!this.splitComponent.getLeftComponent().isVisible());
+        this.splitComponent.setDividerLocation(-1);
+        this.splitComponent.setEnabled(!this.splitComponent.isEnabled());
     }
 
     public final PathFinder getPathFinder() {
@@ -183,7 +186,7 @@ public class MazeController {
 
     public final void setDimension(final int val) {
         this.dimension.setValue(val);
-        this.resetGridPanel();
+        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
     }
 
     public final JWRange getDelay() {

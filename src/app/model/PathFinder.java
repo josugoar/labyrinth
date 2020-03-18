@@ -72,7 +72,7 @@ public abstract class PathFinder implements Serializable {
         protected final void find(final Cell[][] grid, final Set<Node> currGen) throws StackOverflowError {
             final Set<Node> newGen = new HashSet<Node>();
             for (final Node node : currGen) {
-                for (Cell cell : node.getOuter().getNeighbors().keySet()) {
+                for (Cell cell : node.getOuter().getNeighbors()) {
                     if (cell.getInner() == null)
                         cell.setInner(new Node(node, cell));
                     switch (cell.getState()) {

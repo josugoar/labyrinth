@@ -3,7 +3,7 @@ package app.controller;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
@@ -17,6 +17,7 @@ public class MazeModel extends JPanel {
     private Cell[][] grid;
 
     private Cell start = null;
+
     private Cell end = null;
 
     {
@@ -27,6 +28,19 @@ public class MazeModel extends JPanel {
     public MazeModel(final MazeController controller, final int rows, final int cols) {
         this.controller = controller;
         this.setGrid(rows, cols);
+    }
+
+    public final void clear(final Cell parent) {
+        if (parent.getInner() != null) {
+            parent.setInner(null);
+            for (Cell child : parent.getNeighbors()) {
+                this.clear(child);
+            }
+        }
+    }
+
+    public final void reset() {
+        this.setGrid(((GridLayout) this.getLayout()).getRows(), ((GridLayout) this.getLayout()).getColumns());
     }
 
     public final MazeController getController() {
@@ -52,17 +66,17 @@ public class MazeModel extends JPanel {
             for (int col = 0; col < cols; col++) {
                 final int cellRow = row;
                 final int cellCol = col;
-                this.grid[row][col].setNeighbors(new HashMap<Cell, Integer>() {
+                this.grid[row][col].setNeighbors(new HashSet<Cell>() {
                     private static final long serialVersionUID = 1L;
                     {
                         if (cellRow - 1 >= 0)
-                            this.put(grid[cellRow - 1][cellCol], new Integer(0));
+                            this.add(grid[cellRow - 1][cellCol]);
                         if (cellCol + 1 < cols)
-                            this.put(grid[cellRow][cellCol + 1], new Integer(0));
+                            this.add(grid[cellRow][cellCol + 1]);
                         if (cellRow + 1 < rows)
-                            this.put(grid[cellRow + 1][cellCol], new Integer(0));
+                            this.add(grid[cellRow + 1][cellCol]);
                         if (cellCol - 1 >= 0)
-                            this.put(grid[cellRow][cellCol - 1], new Integer(0));
+                            this.add(grid[cellRow][cellCol - 1]);
                     }
                 });
             }

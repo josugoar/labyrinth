@@ -39,13 +39,31 @@ import app.model.PathFinder;
 import app.view.components.JWButton;
 import app.view.components.JWSlider;
 
+/**
+ * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
+ * pivotal <code>app.view.MazeView</code> component, extending
+ * <code>java.awt.JFrame</code> and implementing
+ * <code>java.lang.Runnable</code>.
+ *
+ * @author JoshGoA
+ * @version 0.1
+ * @see java.lang.Runnable Runnable
+ * @see javax.swing.JFrame JFrame
+ */
 public class MazeView extends JFrame implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Two sided <code>app.controller.MazeController</code>
+     * <code>app.view.MazeView</code> interaction pipeline.
+     *
+     * @see app.controller.MazeController MazeController
+     */
     private final MazeController controller;
 
     {
+        // Set Cross-Platform Look-And-Feel
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
@@ -53,63 +71,74 @@ public class MazeView extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Create a new two sided <code>app.controller.MazeController</code> interaction
+     * <code>app.view.MazeView</code> component.
+     *
+     * @param controller MazeController instance to interact with
+     */
     public MazeView(final MazeController controller) {
         super("MazeApp");
         this.controller = controller;
         this.initView();
     }
 
+    /**
+     * Initialize entire <code>java.awt.Component</code> tree structure.
+     *
+     * @see java.awt.Component Component
+     */
     private final void initView() {
         this.add(new JPanel(new BorderLayout()) {
-            // pnl_viewWrapper
+            // pnl_splitComponentWrapper
             private static final long serialVersionUID = 1L;
             {
                 this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane() {
-                    // scr_nodeTree
+                    // scr_treeComponentWrapper
                     private static final long serialVersionUID = 1L;
                     {
                         this.setMinimumSize(new Dimension(100, this.getMinimumSize().height));
                         this.setVisible(false);
                         this.setViewportView(new JTree(new DefaultMutableTreeNode("Start")) {
-                            // tre_nodeTree
+                            // tre_treeComponent
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setShowsRootHandles(true);
                             }
                             {
-                                controller.setNodeTree(this);
+                                controller.setTreeComponent(this);
                             }
                         });
                     }
                 }, new JPanel(new BorderLayout()) {
-                    // pnl_modelPanelWrapper
+                    // pnl_mazeModelWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        // pnl_modelPanel
+                        // pnl_mazeModel
                         this.add(controller.getModel(), BorderLayout.CENTER);
                         this.add(new JPanel(new FlowLayout(FlowLayout.LEFT)) {
-                            // pnl_statusBar
+                            // pnl_statusComponentWrapper
                             private static final long serialVersionUID = 1L;
                             {
                                 this.add(new JLabel("MazeApp") {
-                                    // lbl_statusBar
+                                    // lbl_statusComponent
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        controller.setStatusLabel(this);
+                                        controller.setStatusComponent(this);
                                     }
                                 });
                             }
                         }, BorderLayout.SOUTH);
                     }
                 }) {
-                    // spl_viewWrapper
+                    // spl_splitComponent
                     private static final long serialVersionUID = 1L;
                     {
                         this.setEnabled(false);
                         this.setBorder(null);
                     }
                     {
-                        controller.setViewWrapper(this);
+                        controller.setSplitComponent(this);
                     }
                 }, BorderLayout.CENTER);
                 this.add(new JPanel() {
@@ -126,7 +155,7 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.add(new JPanel(new GridLayout(3, 1)) {
-                                            // pnl_featuresBar
+                                            // pnl_featuresBarWrapper
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder());
@@ -181,7 +210,7 @@ public class MazeView extends JFrame implements Runnable {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 this.add(new JWSlider(controller.getDensity()) {
-                                                                    // sld_densitySlector
+                                                                    // sld_densitySelector
                                                                     private static final long serialVersionUID = 1L;
 
                                                                     {
@@ -201,7 +230,7 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.add(new JPanel(new GridLayout(2, 1)) {
-                                            // pnl_runBar
+                                            // pnl_runBarWrapper
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder());
@@ -425,7 +454,7 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setMnemonic(KeyEvent.VK_C);
-                                        this.addActionListener(e -> controller.clearGridPanel());
+                                        this.addActionListener(e -> controller.clearModel());
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
                                     }
                                 });
@@ -435,7 +464,7 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setMnemonic(KeyEvent.VK_Z);
-                                        this.addActionListener(e -> controller.resetGridPanel());
+                                        this.addActionListener(e -> controller.resetModel());
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
                                     }
                                 });
@@ -466,14 +495,14 @@ public class MazeView extends JFrame implements Runnable {
                                     // chb_mni_viewStatusBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addItemListener(e -> controller.cycleStatusLabel());
+                                        this.addItemListener(e -> controller.cycleStatusComponent());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Node Tree") {
                                     // chb_mni_viewWrapper
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addItemListener(e -> controller.cycleViewWrapper());
+                                        this.addItemListener(e -> controller.cycleSplitComponent());
                                     }
                                 });
                             }
@@ -512,6 +541,11 @@ public class MazeView extends JFrame implements Runnable {
         this.initFrame();
     }
 
+    /**
+     * Initialize <code>javax.swing.JFrame</code> custom parameters.
+     *
+     * @see javax.swing.JFrame JFrame
+     */
     private final void initFrame() {
         this.setMinimumSize(new Dimension(450, 400));
         this.setLocationRelativeTo(null);
@@ -519,11 +553,23 @@ public class MazeView extends JFrame implements Runnable {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * <code>java.lang.Thread</code> invokation initializer.
+     *
+     * @see java.lang.Thread Thread
+     * @see javax.swing.SwingUtilities#invokeLater(Runnable doRun) invokeLater()
+     */
     @Override
     public final void run() {
         this.setVisible(true);
     }
 
+    /**
+     * Get <code>app.view.MazeView</code> <code>app.controller.MazeController</code>
+     * instance.
+     *
+     * @return MazeController
+     */
     public final MazeController getController() {
         return this.controller;
     }

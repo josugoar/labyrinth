@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -34,21 +35,21 @@ public class Cell extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
+    private Point seed;
+    private Set<Cell> neighbors;
+
     private State state = State.EMPTY;
 
     private Node inner = null;
-
-    private Map<Cell, Integer> neighbors;
-    private Point seed;
 
     {
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         this.addMouseListener(new CellListener());
     }
 
-    public Cell(final Point seed, final Map<Cell, Integer> neighbors) {
+    public Cell(final Point seed, final Set<Cell> neighbors) {
         this.seed = seed;
-        this.neighbors = neighbors;
+        this.setNeighbors(neighbors);
     }
 
     public Cell(final Point seed) {
@@ -57,20 +58,20 @@ public class Cell extends JPanel {
 
     @Override
     public final void paintComponent(final Graphics g) {
-        if (this.inner == null) {
-            g.setColor(Cell.State.COLOR.get(this.state));
-        } else {
+        if (this.inner != null && this.getState() == Cell.State.EMPTY) {
             g.setColor(Node.State.COLOR.get(this.inner.getState()));
+        } else {
+            g.setColor(Cell.State.COLOR.get(this.state));
         }
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
     @Override
     public final String toString() {
-        return String.format("Cell(state: %s)", this.state);
+        return String.format("Cell [state: %s, seed: (%d, %d)]", this.state, this.seed.x, this.seed.y);
     }
 
-    public void setNeighbors(final Map<Cell, Integer> neighbors) {
+    public void setNeighbors(final Set<Cell> neighbors) {
         this.neighbors = neighbors;
     }
 
@@ -89,9 +90,10 @@ public class Cell extends JPanel {
 
     public final void setInner(final Node inner) {
         this.inner = inner;
+        this.repaint();
     }
 
-    public final Map<Cell, Integer> getNeighbors() {
+    public final Set<Cell> getNeighbors() {
         return this.neighbors;
     }
 
