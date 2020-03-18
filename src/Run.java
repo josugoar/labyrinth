@@ -1,11 +1,9 @@
-import javax.swing.SwingUtilities;
-
-import app.view.MazeView;
+import app.controller.MazeController;
 
 public class Run {
 
     public static final void main(final String[] args) {
-        SwingUtilities.invokeLater(new MazeView());
+        new MazeController().run();
     }
 
 }

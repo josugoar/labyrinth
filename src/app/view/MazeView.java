@@ -1,7 +1,6 @@
 package app.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -35,7 +34,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import app.controller.Cell;
 import app.controller.MazeController;
-import app.controller.MazeModel;
 import app.model.Generator;
 import app.model.PathFinder;
 import app.view.components.JWButton;
@@ -45,24 +43,24 @@ public class MazeView extends JFrame implements Runnable {
 
     private static final long serialVersionUID = 1L;
 
-    private final MazeController controller = new MazeController(this);
+    private final MazeController controller;
 
     {
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
-            System.out.println("Non-supported look and feel...");
+            System.out.println("Unsupported look and feel...");
         }
     }
 
-    public MazeView() {
+    public MazeView(final MazeController controller) {
         super("MazeApp");
+        this.controller = controller;
         this.initView();
-        this.initFrame();
     }
 
     private final void initView() {
-        this.add(new JPanel(new BorderLayout(0, 0)) {
+        this.add(new JPanel(new BorderLayout()) {
             // pnl_viewWrapper
             private static final long serialVersionUID = 1L;
             {
@@ -76,30 +74,20 @@ public class MazeView extends JFrame implements Runnable {
                             // tre_nodeTree
                             private static final long serialVersionUID = 1L;
                             {
-                                controller.setNodeTree(this);
+                                this.setShowsRootHandles(true);
                             }
                             {
-                                this.setShowsRootHandles(true);
+                                controller.setNodeTree(this);
                             }
                         });
                     }
-                }, new JPanel(new BorderLayout(0, 0)) {
-                    // pnl_gridPanelWrapper
+                }, new JPanel(new BorderLayout()) {
+                    // pnl_modelPanelWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        this.add(new MazeModel(controller.getDimension().getValue(),
-                                controller.getDimension().getValue()) {
-                            // pnl_gridPanel
-                            private static final long serialVersionUID = 1L;
-                            {
-                                controller.setGridPanel(this);
-                            }
-                            {
-                                this.setBackground(Color.WHITE);
-                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-                            }
-                        }, BorderLayout.CENTER);
-                        this.add(new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5)) {
+                        // pnl_modelPanel
+                        this.add(controller.getModel(), BorderLayout.CENTER);
+                        this.add(new JPanel(new FlowLayout(FlowLayout.LEFT)) {
                             // pnl_statusBar
                             private static final long serialVersionUID = 1L;
                             {
@@ -117,14 +105,14 @@ public class MazeView extends JFrame implements Runnable {
                     // spl_viewWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        controller.setViewWrapper(this);
+                        this.setEnabled(false);
+                        this.setBorder(null);
                     }
                     {
-                        this.setBorder(null);
-                        this.setEnabled(false);
+                        controller.setViewWrapper(this);
                     }
                 }, BorderLayout.CENTER);
-                this.add(new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5)) {
+                this.add(new JPanel() {
                     // pnl_toolBarWrapper
                     private static final long serialVersionUID = 1L;
                     {
@@ -137,18 +125,17 @@ public class MazeView extends JFrame implements Runnable {
                                     // tlb_featureBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setFloatable(true);
-                                        this.add(new JPanel(new GridLayout(3, 1, 0, 0)) {
+                                        this.add(new JPanel(new GridLayout(3, 1)) {
                                             // pnl_featuresBar
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+                                                this.setBorder(new EtchedBorder());
                                                 this.add(new JWButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/dimensionIcon.gif")), "Dimension") {
                                                     // btn_dimensionSelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu("") {
+                                                        this.addActionListener(e -> new JPopupMenu() {
                                                             // pmn_dimensionSelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
@@ -160,22 +147,20 @@ public class MazeView extends JFrame implements Runnable {
                                                                     }
                                                                 });
                                                             }
-                                                        }.show(this,
-                                                                -JWSlider.getPreferredSliderSize().width,
-                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
+                                                        }.show(this, -100, 2));
                                                     }
                                                 });
                                                 this.add(new JWButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/delayIcon.gif")), "Delay") {
-                                                    // btn_delaySlector
+                                                    // btn_delaySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu("") {
-                                                            // pmn_delaySlector
+                                                        this.addActionListener(e -> new JPopupMenu() {
+                                                            // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 this.add(new JWSlider(controller.getDelay()) {
-                                                                    // sld_delaySlector
+                                                                    // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
 
                                                                     {
@@ -183,9 +168,7 @@ public class MazeView extends JFrame implements Runnable {
                                                                     }
                                                                 });
                                                             }
-                                                        }.show(this,
-                                                                -JWSlider.getPreferredSliderSize().width,
-                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
+                                                        }.show(this, -100, 2));
                                                     }
                                                 });
                                                 this.add(new JWButton(new ImageIcon(
@@ -193,7 +176,7 @@ public class MazeView extends JFrame implements Runnable {
                                                     // btn_densitySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu("") {
+                                                        this.addActionListener(e -> new JPopupMenu() {
                                                             // pmn_densitySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
@@ -206,9 +189,7 @@ public class MazeView extends JFrame implements Runnable {
                                                                     }
                                                                 });
                                                             }
-                                                        }.show(this,
-                                                                -JWSlider.getPreferredSliderSize().width,
-                                                                (this.getPreferredSize().height - JWSlider.getPreferredSliderSize().height) / 5));
+                                                        }.show(this, -100, 2));
                                                     }
                                                 });
                                             }
@@ -219,12 +200,11 @@ public class MazeView extends JFrame implements Runnable {
                                     // tlb_runBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setFloatable(true);
-                                        this.add(new JPanel(new GridLayout(2, 1, 0, 0)) {
+                                        this.add(new JPanel(new GridLayout(2, 1)) {
                                             // pnl_runBar
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+                                                this.setBorder(new EtchedBorder());
                                                 this.add(new JWButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/pathfinderRunIcon.gif")), "Run PathFinder") {
                                                     // btn_runPathFinder
@@ -233,7 +213,6 @@ public class MazeView extends JFrame implements Runnable {
                                                         this.addActionListener(e -> controller.awakePathFinder());
                                                     }
                                                 });
-                                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
                                                 this.add(new JWButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/generatorRunIcon.gif")), "Run Generator") {
                                                     // btn_runGenerator
@@ -258,8 +237,8 @@ public class MazeView extends JFrame implements Runnable {
                             // mn_pathfinderSelector
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/pathfinderIcon.gif")));
                                 this.setMnemonic(KeyEvent.VK_P);
+                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/pathfinderIcon.gif")));
                                 for (final Enumeration<AbstractButton> e = new ButtonGroup() {
                                     // btn_grp_pathfinderSelector
                                     private static final long serialVersionUID = 1L;
@@ -286,7 +265,7 @@ public class MazeView extends JFrame implements Runnable {
                                             }
                                         });
                                     }
-                                }.getElements();e.hasMoreElements();) {
+                                }.getElements(); e.hasMoreElements();) {
                                     this.add(e.nextElement());
                                 }
                             }
@@ -295,8 +274,8 @@ public class MazeView extends JFrame implements Runnable {
                             // mn_generatorSelector
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/generatorIcon.gif")));
                                 this.setMnemonic(KeyEvent.VK_G);
+                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/generatorIcon.gif")));
                                 for (final Enumeration<AbstractButton> e = new ButtonGroup() {
                                     // btn_grp_generatorSelector
                                     private static final long serialVersionUID = 1L;
@@ -323,7 +302,7 @@ public class MazeView extends JFrame implements Runnable {
                                             }
                                         });
                                     }
-                                }.getElements();e.hasMoreElements();) {
+                                }.getElements(); e.hasMoreElements();) {
                                     this.add(e.nextElement());
                                 }
                             }
@@ -366,8 +345,8 @@ public class MazeView extends JFrame implements Runnable {
                                 }
                             };
                             {
-                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/modeIcon.gif")));
                                 this.setMnemonic(KeyEvent.VK_M);
+                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/modeIcon.gif")));
                                 this.add(new JMenu("Draw") {
                                     // mn_drawSelector
                                     private static final long serialVersionUID = 1L;
@@ -411,9 +390,9 @@ public class MazeView extends JFrame implements Runnable {
                             // mni_fileOpen
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
                                 this.setMnemonic(KeyEvent.VK_O);
                                 this.addActionListener(e -> System.out.println("Open"));
+                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
                             }
                         });
                         // spr_menuFile
@@ -423,9 +402,9 @@ public class MazeView extends JFrame implements Runnable {
                             // mni_fileSave
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
                                 this.setMnemonic(KeyEvent.VK_S);
                                 this.addActionListener(e -> System.out.println("Save"));
+                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
                             }
                         });
                     }
@@ -445,9 +424,9 @@ public class MazeView extends JFrame implements Runnable {
                                     // mni_gridClear
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
                                         this.setMnemonic(KeyEvent.VK_C);
                                         this.addActionListener(e -> controller.clearGridPanel());
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
                                     }
                                 });
                                 this.add(new JMenuItem("Reset",
@@ -455,9 +434,9 @@ public class MazeView extends JFrame implements Runnable {
                                     // mni_gridReset
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
                                         this.setMnemonic(KeyEvent.VK_Z);
                                         this.addActionListener(e -> controller.resetGridPanel());
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
                                     }
                                 });
                             }
@@ -511,9 +490,9 @@ public class MazeView extends JFrame implements Runnable {
                             // mni_runPathFinder
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK));
                                 this.setMnemonic(KeyEvent.VK_1);
                                 this.addActionListener(e -> controller.awakePathFinder());
+                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK));
                             }
                         });
                         this.add(new JMenuItem("Generator",
@@ -521,22 +500,23 @@ public class MazeView extends JFrame implements Runnable {
                             // mni_runGenerator
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK));
                                 this.setMnemonic(KeyEvent.VK_2);
                                 this.addActionListener(e -> controller.awakeGenerator());
+                                this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK));
                             }
                         });
                     }
                 });
             }
         }, BorderLayout.NORTH);
+        this.initFrame();
     }
 
     private final void initFrame() {
-        this.setFocusable(true);
         this.setMinimumSize(new Dimension(450, 400));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
+        this.setFocusable(true);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     @Override

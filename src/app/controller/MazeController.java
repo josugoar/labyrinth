@@ -10,74 +10,81 @@ import java.util.Objects;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 
 import app.model.Generator;
 import app.model.PathFinder;
 import app.view.MazeView;
-import app.view.components.Range;
+import app.view.components.JWSlider.JWRange;
 
 public class MazeController {
 
+    private MazeModel model;
     private final MazeView view;
 
-    private MazeModel gridPanel;
     private JTree nodeTree;
     private JLabel statusLabel;
     private JSplitPane viewWrapper;
 
     private Cell.State mode = Cell.State.OBSTACLE;
 
-    private boolean diagonals = true, arrows = false;
+    private boolean diagonals = true;
+    private boolean arrows = false;
 
-    private Range dimension = new Range(10, 100, 20), speed = new Range(0, 100, 10), density = new Range(1, 100, 10);
+    private JWRange dimension = new JWRange(10, 100, 20);
+    private JWRange speed = new JWRange(0, 250, 100);
+    private JWRange density = new JWRange(1, 100, 10);
 
     private PathFinder pathfinder = new PathFinder.Dijkstra();
     private Generator generator = new Generator.BackTracker();
 
-    public MazeController(final MazeView mazeView) {
-        this.view = mazeView;
+    public MazeController() {
+        this.model = new MazeModel(this, this.dimension.getValue(), this.dimension.getValue());
+        this.view = new MazeView(this);
         this.initController();
     }
 
     private final void initController() {
-        this.view.addFocusListener(new FocusAdapter() {
+        // TODO: Add Menu PopUp to Model
+        view.addFocusListener(new FocusAdapter() {
             @Override
             public final void focusLost(final FocusEvent e) {
-                MazeController.this.view.requestFocus();
+                view.requestFocus();
             }
         });
-        this.view.addKeyListener(new KeyAdapter() {
+        view.addKeyListener(new KeyAdapter() {
             @Override
             public final void keyPressed(final KeyEvent e) {
                 if (e.isShiftDown()) {
-                    MazeController.this.view.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                    view.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 }
             }
 
             @Override
             public final void keyReleased(final KeyEvent e) {
                 if (!e.isShiftDown()) {
-                    MazeController.this.view.setCursor(Cursor.getDefaultCursor());
+                    view.setCursor(Cursor.getDefaultCursor());
                 }
 
             }
         });
     }
 
-    public final MazeModel getGridPanel() {
-        return this.gridPanel;
+    public final void run() {
+        SwingUtilities.invokeLater(view);
     }
 
-    public final void setGridPanel(final MazeModel gridPanel) {
-        this.gridPanel = Objects.requireNonNull(gridPanel, "'gridPanel' must not be null");
+    public final MazeModel getModel() {
+        return this.model;
     }
 
+    // TODO: In model
     public final void clearGridPanel() {
 
     }
 
     public final void resetGridPanel() {
-        this.gridPanel.setGrid(this.dimension.getValue(), this.dimension.getValue());
+        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
     }
 
     public final JTree getNodeTree() {
@@ -109,9 +116,9 @@ public class MazeController {
     }
 
     public final void cycleViewWrapper() {
+        this.viewWrapper.getLeftComponent().setVisible(!this.viewWrapper.getLeftComponent().isVisible());
         this.viewWrapper.setDividerLocation(-1);
         this.viewWrapper.setEnabled(!this.viewWrapper.isEnabled());
-        this.viewWrapper.getLeftComponent().setVisible(!this.viewWrapper.getLeftComponent().isVisible());
     }
 
     public final PathFinder getPathFinder() {
@@ -123,7 +130,7 @@ public class MazeController {
     }
 
     public final void awakePathFinder() {
-        this.pathfinder.awake(this.gridPanel.getGrid());
+        this.pathfinder.awake(this.model.getGrid());
     }
 
     public final Generator getGenerator() {
@@ -135,7 +142,7 @@ public class MazeController {
     }
 
     public final void awakeGenerator() {
-        this.generator.awake(this.gridPanel.getGrid());
+        this.generator.awake(this.model.getGrid());
     }
 
     public final Cell.State getMode() {
@@ -170,7 +177,7 @@ public class MazeController {
         this.setArrows(!this.arrows);
     }
 
-    public final Range getDimension() {
+    public final JWRange getDimension() {
         return this.dimension;
     }
 
@@ -179,7 +186,7 @@ public class MazeController {
         this.resetGridPanel();
     }
 
-    public final Range getDelay() {
+    public final JWRange getDelay() {
         return this.speed;
     }
 
@@ -187,7 +194,7 @@ public class MazeController {
         this.speed.setValue(val);
     }
 
-    public final Range getDensity() {
+    public final JWRange getDensity() {
         return this.density;
     }
 

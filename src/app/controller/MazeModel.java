@@ -1,23 +1,36 @@
 package app.controller;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.util.HashMap;
 
 import javax.swing.JPanel;
+import javax.swing.border.EtchedBorder;
 
 public class MazeModel extends JPanel {
 
     private static final long serialVersionUID = 1L;
+
+    private final MazeController controller;
 
     private Cell[][] grid;
 
     private Cell start = null;
     private Cell end = null;
 
-    public MazeModel(final int rows, final int cols) {
-        super(new GridLayout(rows, cols));
+    {
+        this.setBorder(new EtchedBorder());
+        this.setBackground(Color.WHITE);
+    }
+
+    public MazeModel(final MazeController controller, final int rows, final int cols) {
+        this.controller = controller;
         this.setGrid(rows, cols);
+    }
+
+    public final MazeController getController() {
+        return this.controller;
     }
 
     public final Cell[][] getGrid() {
