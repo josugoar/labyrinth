@@ -111,6 +111,11 @@ public abstract class PathFinder implements Serializable {
             this.isRunning = isRunning;
         }
 
+        @Override
+        public final String toString() {
+            return "Dijkstra";
+        }
+
     }
 
 }

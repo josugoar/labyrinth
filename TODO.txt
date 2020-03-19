@@ -1,2 +1,6 @@
 When changing Cell state to State.OBSTACLE check Cell neighbors and color it accordingly.
 For each State.OBSTACLE neighbor, check their neighbors and redraw Cell.
+
+When holding SHIFT and pressing RIGHT_MOUSE_BUTTON, set Cell state to State.OBSTACLE.
+When holding SHIFT and pressing LEFT_MOUSE_BUTTON, set Cell state to State.EMPTY.
+When not holding SHIFT and pressing LEFT_MOUSE_BUTTON, JPupUp apperas with Set State.START or Set State.END.

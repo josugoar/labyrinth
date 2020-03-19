@@ -147,7 +147,7 @@ public class MazeView extends JFrame implements Runnable {
                             // pnl_statusComponentWrapper
                             private static final long serialVersionUID = 1L;
                             {
-                                this.add(new JLabel("MazeApp") {
+                                this.add(new JLabel(controller.toString()) {
                                     // lbl_statusComponent
                                     private static final long serialVersionUID = 1L;
                                     {

@@ -10,6 +10,11 @@ public abstract class Generator {
 
     public static final class BackTracker extends Generator {
 
+        @Override
+        public final String toString() {
+            return "BackTracker";
+        }
+
     }
 
 }

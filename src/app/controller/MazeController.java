@@ -155,11 +155,10 @@ public class MazeController {
      * Fire <code>app.model.MazeModel.clear(Cell parent)</code> event.
      */
     public final void clearModel() {
-        if (this.model.getStart() != null) {
+        if (this.model.getStart() != null)
             MazeModel.clear(this.model.getStart());
-        } else {
+        else
             this.statusComponent.setText("No nodes to clear...");
-        }
     }
 
     /**
@@ -223,11 +222,9 @@ public class MazeController {
      * output message.
      */
     public final void resetStatusComponent() {
-        new Timer(2500, (e) -> {
-            // Override reset if text is present
-            if (this.statusComponent.getText() != " ")
-                // Set text to default state
-                this.statusComponent.setText(" ");
+        new Timer(2500, e -> {
+            // Set text to default state
+            this.statusComponent.setText(this.toString());
             ((Timer) e.getSource()).stop();
         }).start();
     }
@@ -431,6 +428,16 @@ public class MazeController {
      */
     public final void setDensity(final int val) {
         this.density.setValue(val);
+    }
+
+    /**
+     * Return a String representing the maze.
+     *
+     * @return String
+     */
+    @Override
+    public final String toString() {
+        return String.format("Maze");
     }
 
 }
