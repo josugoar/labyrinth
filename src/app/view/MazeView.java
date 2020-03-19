@@ -346,11 +346,11 @@ public class MazeView extends JFrame implements Runnable {
                                                 this.addItemListener(e -> controller.setGenerator(new Generator.BackTracker()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("DPS", true) {
-                                            // rd_btn_mni_generatorDPS
+                                        this.add(new JRadioButtonMenuItem("DFS", true) {
+                                            // rd_btn_mni_generatorDFS
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e -> controller.setGenerator(new Generator.DPS()));
+                                                // this.addItemListener(e -> controller.setGenerator(new Generator.DFS()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("Prim") {

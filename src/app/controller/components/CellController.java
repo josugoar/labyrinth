@@ -10,39 +10,31 @@ import app.model.components.Node;
  * Cell interface wrapper with inneer <code>app.model.components.Node</code>
  * pointer.
  *
+ * @param <T> CellController<T>
  * @see app.model.components.Node Node
  */
 public interface CellController<T extends CellController<T>> {
 
     /**
-     * Colored state interface.
+     * Enum representing state and implementing
+     * <code>app.controller.components.ColoredState</code>.
+     *
+     * @see app.controller.components.ColoredState ColoredState
      */
-    public interface ColoredState {
-
-        /**
-         * Return current associated <code>java.awt.Color</code>.
-         *
-         * @return Color
-         * @see java.awt.Color Color
-         */
-        public abstract Color getColor();
-
-        /**
-         * Set current associated <code>java.awt.Color</code>.
-         *
-         * @param color Color
-         * @see java.awt.Color Color
-         */
-        public abstract void setColor(final Color color);
-
-    }
-
     public static enum CellState implements ColoredState {
 
         START(Color.RED), END(Color.GREEN), OBSTACLE(Color.BLACK), EMPTY(Color.WHITE);
 
+        /**
+         * State <code>java.awt.Color</code> pointer.
+         */
         private Color color;
 
+        /**
+         * Create a new state.
+         *
+         * @param color Color
+         */
         private CellState(final Color color) {
             this.color = color;
         }
@@ -64,8 +56,18 @@ public interface CellController<T extends CellController<T>> {
      */
     public abstract void stateChange();
 
+    /**
+     * Return current
+     * <code>app.controller.components.CellController.CellState</code> instance.
+     */
     public CellState getState();
 
+    /**
+     * Set current <code>app.controller.components.CellController.CellState</code>
+     * instance.
+     *
+     * @param state CellState
+     */
     public void setState(final CellState state);
 
     /**

@@ -19,6 +19,7 @@ import app.model.components.Cell;
  * @author JoshGoA
  * @version 0.1
  * @see javax.swing.JPanel JPanel
+ * @see app.model.components.Cell Cell
  */
 public class MazeModel extends JPanel {
 
@@ -34,22 +35,16 @@ public class MazeModel extends JPanel {
 
     /**
      * Bi-dimensional <code>app.model.components.Cell</code> array.
-     *
-     * @see app.model.components.Cell Cell
      */
     private Cell[][] grid;
 
     /**
      * Grid starting <code>app.model.components.Cell</code> pointer.
-     *
-     * @see app.model.components.Cell Cell
      */
     private Cell start = null;
 
     /**
      * Grid ending <code>app.model.components.Cell</code> pointer.
-     *
-     * @see app.model.components.Cell Cell
      */
     private Cell end = null;
 

@@ -14,7 +14,7 @@ public abstract class AlgorithmController {
     public abstract <T extends CellController<T>> void awake(final T[][] grid);
 
     /**
-     * Return algorithm simple class name.
+     * Return algorithm simple Class name.
      */
     @Override
     public final String toString() {

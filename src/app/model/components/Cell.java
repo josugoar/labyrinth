@@ -5,8 +5,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -89,7 +87,7 @@ public class Cell extends JPanel implements CellController<Cell> {
     @Override
     public final void paintComponent(final Graphics g) {
         if (this.inner != null && this.getState() == Cell.CellState.EMPTY) {
-            g.setColor(Node.State.COLOR.get(this.inner.getState()));
+            g.setColor(this.inner.getState().getColor());
         } else {
             g.setColor(this.state.getColor());
         }
