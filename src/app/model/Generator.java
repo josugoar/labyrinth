@@ -1,6 +1,6 @@
 package app.model;
 
-import app.controller.Cell;
+import app.model.components.Cell;
 
 public abstract class Generator {
 

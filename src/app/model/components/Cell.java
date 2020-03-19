@@ -1,4 +1,4 @@
-package app.controller;
+package app.model.components;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,34 +14,21 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import app.controller.components.CellController;
 import app.model.MazeModel;
-import app.model.Node;
 import app.view.MazeView;
 
-public class Cell extends JPanel {
-
-    public static enum State {
-        START, END, OBSTACLE, EMPTY;
-
-        public static final Map<State, Color> COLOR = new EnumMap<State, Color>(State.class) {
-            private static final long serialVersionUID = 1L;
-            {
-                this.put(State.START, Color.RED);
-                this.put(State.END, Color.GREEN);
-                this.put(State.OBSTACLE, Color.BLACK);
-                this.put(State.EMPTY, Color.WHITE);
-            }
-        };
-    }
+public class Cell extends JPanel implements CellController<Cell> {
 
     private static final long serialVersionUID = 1L;
 
     private Point seed;
+
     private Set<Cell> neighbors;
 
-    private State state = State.EMPTY;
+    private CellState state = CellState.EMPTY;
 
-    private Node inner = null;
+    private Node<Cell> inner = null;
 
     {
         this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -57,12 +44,54 @@ public class Cell extends JPanel {
         this(seed, null);
     }
 
+    public final Point getSeed() {
+        return this.seed;
+    }
+
+    @Override
+    public final void setNeighbors(final Set<Cell> neighbors) {
+        this.neighbors = neighbors;
+    }
+
+    @Override
+    public final CellState getState() {
+        return this.state;
+    }
+
+    @Override
+    public final void setState(final CellState state) {
+        this.state = Objects.requireNonNull(state, "'state' must not be null");
+        this.stateChange();
+    }
+
+    @Override
+    public final Node<Cell> getInner() {
+        return this.inner;
+    }
+
+    @Override
+    public final void setInner(final Node<Cell> inner) {
+        this.inner = inner;
+        this.stateChange();
+    }
+
+    @Override
+    public final Set<Cell> getNeighbors() {
+        return this.neighbors;
+    }
+
+    @Override
+    public final void stateChange() {
+        this.revalidate();
+        this.repaint();
+    }
+
     @Override
     public final void paintComponent(final Graphics g) {
-        if (this.inner != null && this.getState() == Cell.State.EMPTY) {
+        if (this.inner != null && this.getState() == Cell.CellState.EMPTY) {
             g.setColor(Node.State.COLOR.get(this.inner.getState()));
         } else {
-            g.setColor(Cell.State.COLOR.get(this.state));
+            g.setColor(this.state.getColor());
         }
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
@@ -70,36 +99,6 @@ public class Cell extends JPanel {
     @Override
     public final String toString() {
         return String.format("Cell [state: %s, seed: (%d, %d)]", this.state, this.seed.x, this.seed.y);
-    }
-
-    public void setNeighbors(final Set<Cell> neighbors) {
-        this.neighbors = neighbors;
-    }
-
-    public final State getState() {
-        return this.state;
-    }
-
-    public final void setState(final State state) {
-        this.state = Objects.requireNonNull(state, "'state' must not be null");
-        this.repaint();
-    }
-
-    public final Node getInner() {
-        return this.inner;
-    }
-
-    public final void setInner(final Node inner) {
-        this.inner = inner;
-        this.repaint();
-    }
-
-    public final Set<Cell> getNeighbors() {
-        return this.neighbors;
-    }
-
-    public final Point getSeed() {
-        return this.seed;
     }
 
     private final class CellListener extends MouseAdapter {
@@ -115,39 +114,39 @@ public class Cell extends JPanel {
                 switch (((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getMode()) {
                     case START:
                         if (gridPanel.getStart() != null && !Cell.this.equals(gridPanel.getStart())) {
-                            gridPanel.getStart().setState(State.EMPTY);
-                            Cell.this.setState(State.START);
+                            gridPanel.getStart().setState(CellState.EMPTY);
+                            Cell.this.setState(CellState.START);
                             gridPanel.setStart(Cell.this);
                         } else {
-                            if (Cell.this.getState() == State.START) {
-                                Cell.this.setState(State.EMPTY);
+                            if (Cell.this.getState() == CellState.START) {
+                                Cell.this.setState(CellState.EMPTY);
                                 gridPanel.setStart(null);
                             } else {
-                                Cell.this.setState(State.START);
+                                Cell.this.setState(CellState.START);
                                 gridPanel.setStart(Cell.this);
                             }
                         }
                         break;
                     case END:
                         if (gridPanel.getEnd() != null && !Cell.this.equals(gridPanel.getEnd())) {
-                            gridPanel.getEnd().setState(State.EMPTY);
-                            Cell.this.setState(State.END);
+                            gridPanel.getEnd().setState(CellState.EMPTY);
+                            Cell.this.setState(CellState.END);
                             gridPanel.setEnd(Cell.this);
                         } else {
-                            if (Cell.this.getState() == State.END) {
-                                Cell.this.setState(State.EMPTY);
+                            if (Cell.this.getState() == CellState.END) {
+                                Cell.this.setState(CellState.EMPTY);
                                 gridPanel.setEnd(null);
                             } else {
-                                Cell.this.setState(State.END);
+                                Cell.this.setState(CellState.END);
                                 gridPanel.setEnd(Cell.this);
                             }
                         }
                         break;
                     case OBSTACLE:
-                        Cell.this.setState(State.OBSTACLE);
+                        Cell.this.setState(CellState.OBSTACLE);
                         break;
                     case EMPTY:
-                        Cell.this.setState(State.EMPTY);
+                        Cell.this.setState(CellState.EMPTY);
                         break;
                 }
             }
@@ -161,10 +160,10 @@ public class Cell extends JPanel {
                 }
                 switch (((MazeView) SwingUtilities.getWindowAncestor(Cell.this)).getController().getMode()) {
                     case OBSTACLE:
-                        Cell.this.setState(State.OBSTACLE);
+                        Cell.this.setState(CellState.OBSTACLE);
                         break;
                     case EMPTY:
-                        Cell.this.setState(State.EMPTY);
+                        Cell.this.setState(CellState.EMPTY);
                         break;
                     default:
                 }

@@ -1,20 +1,17 @@
-// package tests;
+package tests;
 
-// import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-// import org.junit.Test;
+import app.controller.MazeController;
 
-// import app.MazeApp;
+/**
+ * Tests.
+ */
+public final class Tests {
 
-// /**
-//  * Tests.
-//  */
-// public final class Tests {
+    @Test
+    public final void Test1() {
+        new MazeController().run();
+    }
 
-//     @Test
-//     public final void Test1() {
-//         final MazeApp app = new MazeApp();
-//         // assertEquals(String arg0, Object arg1, Object arg2);
-//     }
-
-// }
+}

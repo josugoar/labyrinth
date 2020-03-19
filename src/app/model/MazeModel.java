@@ -8,8 +8,8 @@ import java.util.HashSet;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-import app.controller.Cell;
 import app.controller.MazeController;
+import app.model.components.Cell;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -33,23 +33,23 @@ public class MazeModel extends JPanel {
     private final MazeController controller;
 
     /**
-     * Bi-dimensional <code>app.controller.Cell</code> array.
+     * Bi-dimensional <code>app.model.components.Cell</code> array.
      *
-     * @see app.controller.Cell Cell
+     * @see app.model.components.Cell Cell
      */
     private Cell[][] grid;
 
     /**
-     * Grid starting <code>app.controller.Cell</code> pointer.
+     * Grid starting <code>app.model.components.Cell</code> pointer.
      *
-     * @see app.controller.Cell Cell
+     * @see app.model.components.Cell Cell
      */
     private Cell start = null;
 
     /**
-     * Grid ending <code>app.controller.Cell</code> pointer.
+     * Grid ending <code>app.model.components.Cell</code> pointer.
      *
-     * @see app.controller.Cell Cell
+     * @see app.model.components.Cell Cell
      */
     private Cell end = null;
 
@@ -72,8 +72,8 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Recursively traverse entire <code>app.controller.Cell</code> and
-     * <code>app.model.Node</code> tree structure.
+     * Recursively traverse entire <code>app.model.components.Cell</code> and
+     * <code>app.model.components.Node</code> tree structure.
      *
      * @param parent Cell
      */
@@ -103,7 +103,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Return current grid <code>app.controller.Cell</code> structure.
+     * Return current grid <code>app.model.components.Cell</code> structure.
      *
      * @return Cell[][]
      */
@@ -112,7 +112,8 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Set current grid <code>app.controller.Cell</code> row and column structure
+     * Set current grid <code>app.model.components.Cell</code> row and column
+     * structure
      *
      * @param rows int
      * @param cols int
@@ -156,7 +157,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Return current grid starting <code>app.controller.Cell</code> pointer.
+     * Return current grid starting <code>app.model.components.Cell</code> pointer.
      *
      * @return Cell
      */
@@ -165,7 +166,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Set current grid starting <code>app.controller.Cell</code> pointer.
+     * Set current grid starting <code>app.model.components.Cell</code> pointer.
      *
      * @param start Cell
      */
@@ -174,7 +175,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Return current grid ending <code>app.controller.Cell</code> pointer.
+     * Return current grid ending <code>app.model.components.Cell</code> pointer.
      *
      * @return Cell
      */
@@ -183,7 +184,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Set current grid ending <code>app.controller.Cell</code> pointer.
+     * Set current grid ending <code>app.model.components.Cell</code> pointer.
      *
      * @param end Cell
      */

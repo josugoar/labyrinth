@@ -11,6 +11,7 @@ import javax.swing.Timer;
 import app.model.Generator;
 import app.model.MazeModel;
 import app.model.PathFinder;
+import app.model.components.Cell;
 import app.view.MazeView;
 import app.view.components.JWSlider.JWRange;
 
@@ -45,12 +46,12 @@ public class MazeController {
 
     /**
      * <code>javax.swing.JTree</code> component displaying
-     * <code>app.controller.Cell</code> and <code>app.model.Node</code> child
-     * generations.
+     * <code>app.model.components.Cell</code> and
+     * <code>app.model.components.Node</code> child generations.
      *
      * @see javax.swing.JTree JTree
-     * @see app.controller.Cell Cell
-     * @see app.model.Node Node
+     * @see app.model.components.Cell Cell
+     * @see app.model.components.Node Node
      */
     private JTree treeComponent;
 
@@ -73,9 +74,9 @@ public class MazeController {
     /**
      * Current user input mode selection.
      *
-     * @see app.controller.Cell.State State
+     * @see app.model.ColoredState.Cell.State State
      */
-    private Cell.State mode = Cell.State.OBSTACLE;
+    private Cell.CellState mode = Cell.CellState.OBSTACLE;
 
     /**
      * Diagonal tile trasversal flag.
@@ -103,8 +104,8 @@ public class MazeController {
     private JWRange delay = new JWRange(0, 250, 100);
 
     /**
-     * Maze <code>Cell.State.OBSTACLE</code> <code>app.model.Generator</code>
-     * density.
+     * Maze <code>app.model.components.Cell.State.OBSTACLE</code>
+     * <code>app.model.Generator</code> density.
      *
      * @see app.view.components.JWSlider.JWRange JWRange
      */
@@ -125,7 +126,7 @@ public class MazeController {
     private Generator generator = new Generator.BackTracker();
 
     /**
-     * Create a new two-sided <code>app.controller.MazeController</code> and
+     * Create a new two-sided <code>app.model.MazeModel</code> and
      * <code>app.view.MazeView</code> interaction
      * <code>app.controller.MazeController</code> component.
      */
@@ -304,22 +305,22 @@ public class MazeController {
     }
 
     /**
-     * Return current <code>app.controller.Cell</code>
-     * <code>app.controller.Cell.State</code>.
+     * Return current <code>app.model.components.Cell</code>
+     * <code>app.model.components.Cell.State</code>.
      *
      * @return Cell.State
      */
-    public final Cell.State getMode() {
+    public final Cell.CellState getMode() {
         return this.mode;
     }
 
     /**
-     * Set current <code>app.controller.Cell</code>
-     * <code>app.controller.Cell.State</code>.
+     * Set current <code>app.model.components.Cell</code>
+     * <code>app.model.components.Cell.State</code>.
      *
      * @param mode Cell.State
      */
-    public final void setMode(final Cell.State mode) {
+    public final void setMode(final Cell.CellState mode) {
         this.mode = mode;
     }
 
@@ -384,8 +385,7 @@ public class MazeController {
 
     /**
      * Set current dimension <code>app.view.components.JWSlider.JWRange</code> value
-     * and fire <code>app.controller.MazeModel.setGrid(int rows, int cols)</code>
-     * event.
+     * and fire <code>app.model.MazeModel.setGrid(int rows, int cols)</code> event.
      *
      * @param val int
      */

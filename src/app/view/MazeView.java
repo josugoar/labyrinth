@@ -36,10 +36,10 @@ import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import app.controller.Cell;
 import app.controller.MazeController;
 import app.model.Generator;
 import app.model.PathFinder;
+import app.model.components.Cell;
 import app.view.components.JWButton;
 import app.view.components.JWSlider;
 
@@ -51,8 +51,8 @@ import app.view.components.JWSlider;
  *
  * @author JoshGoA
  * @version 0.1
- * @see java.lang.Runnable Runnable
  * @see javax.swing.JFrame JFrame
+ * @see java.lang.Runnable Runnable
  */
 public class MazeView extends JFrame implements Runnable {
 
@@ -377,28 +377,28 @@ public class MazeView extends JFrame implements Runnable {
                                         // rd_btn_mni_modeStart
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.addItemListener(e -> controller.setMode(Cell.State.START));
+                                            this.addItemListener(e -> controller.setMode(Cell.CellState.START));
                                         }
                                     });
                                     this.add(new JRadioButtonMenuItem("End") {
                                         // rd_btn_mni_modeEnd
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.addItemListener(e -> controller.setMode(Cell.State.END));
+                                            this.addItemListener(e -> controller.setMode(Cell.CellState.END));
                                         }
                                     });
                                     this.add(new JRadioButtonMenuItem("Obstacle", true) {
                                         // rd_btn_mni_modeObstacle
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.addItemListener(e -> controller.setMode(Cell.State.OBSTACLE));
+                                            this.addItemListener(e -> controller.setMode(Cell.CellState.OBSTACLE));
                                         }
                                     });
                                     this.add(new JRadioButtonMenuItem("Empty") {
                                         // rd_btn_mni_modeEmpty
                                         private static final long serialVersionUID = 1L;
                                         {
-                                            this.addItemListener(e -> controller.setMode(Cell.State.EMPTY));
+                                            this.addItemListener(e -> controller.setMode(Cell.CellState.EMPTY));
                                         }
                                     });
                                 }
@@ -573,8 +573,6 @@ public class MazeView extends JFrame implements Runnable {
 
     /**
      * Initialize <code>javax.swing.JFrame</code> custom parameters.
-     *
-     * @see javax.swing.JFrame JFrame
      */
     private final void initFrame() {
         this.setMinimumSize(new Dimension(450, 400));
