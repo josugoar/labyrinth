@@ -14,6 +14,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import app.model.MazeModel;
 import app.model.Node;
 import app.view.MazeView;
 

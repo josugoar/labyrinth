@@ -3,7 +3,6 @@ package app.view.components;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
-import java.util.Objects;
 
 import javax.swing.JSlider;
 

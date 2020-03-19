@@ -8,7 +8,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import app.controller.Cell;
-import app.controller.MazeModel;
 import app.view.MazeView;
 
 public abstract class PathFinder implements Serializable {

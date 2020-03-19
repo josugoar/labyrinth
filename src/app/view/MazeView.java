@@ -1,10 +1,14 @@
 package app.view;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 
@@ -55,7 +59,7 @@ public class MazeView extends JFrame implements Runnable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Two sided <code>app.controller.MazeController</code>
+     * Two-sided <code>app.controller.MazeController</code>
      * <code>app.view.MazeView</code> interaction pipeline.
      *
      * @see app.controller.MazeController MazeController
@@ -63,19 +67,42 @@ public class MazeView extends JFrame implements Runnable {
     private final MazeController controller;
 
     {
+        this.addFocusListener(new FocusAdapter() {
+            // Ensure JFrame is always focused
+            public final void focusLost(final FocusEvent e) {
+                MazeView.this.requestFocus();
+            }
+        });
+        this.addKeyListener(new KeyAdapter() {
+            // Change cursor state depending on user input key
+            public final void keyPressed(final KeyEvent e) {
+                if (e.isShiftDown()) {
+                    MazeView.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                }
+            }
+
+            public final void keyReleased(final KeyEvent e) {
+                if (!e.isShiftDown()) {
+                    MazeView.this.setCursor(Cursor.getDefaultCursor());
+                }
+
+            }
+        });
+    }
+    {
         // Set Cross-Platform Look-And-Feel
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
-            System.out.println("Unsupported look and feel...");
+            System.err.println("Unsupported look and feel...");
         }
     }
 
     /**
-     * Create a new two sided <code>app.controller.MazeController</code> interaction
+     * Create a new two-sided <code>app.controller.MazeController</code> interaction
      * <code>app.view.MazeView</code> component.
      *
-     * @param controller MazeController instance to interact with
+     * @param controller MazeController
      */
     public MazeView(final MazeController controller) {
         super("MazeApp");
@@ -123,6 +150,9 @@ public class MazeView extends JFrame implements Runnable {
                                 this.add(new JLabel("MazeApp") {
                                     // lbl_statusComponent
                                     private static final long serialVersionUID = 1L;
+                                    {
+                                        this.addPropertyChangeListener("text", e -> controller.resetStatusComponent());
+                                    }
                                     {
                                         controller.setStatusComponent(this);
                                     }
@@ -420,8 +450,8 @@ public class MazeView extends JFrame implements Runnable {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_O);
-                                this.addActionListener(e -> System.out.println("Open"));
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+                                this.addActionListener(e -> System.out.println("Open"));
                             }
                         });
                         // spr_menuFile
@@ -432,8 +462,8 @@ public class MazeView extends JFrame implements Runnable {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_S);
-                                this.addActionListener(e -> System.out.println("Save"));
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+                                this.addActionListener(e -> System.out.println("Save"));
                             }
                         });
                     }
@@ -453,53 +483,53 @@ public class MazeView extends JFrame implements Runnable {
                                     // mni_gridClear
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setMnemonic(KeyEvent.VK_C);
-                                        this.addActionListener(e -> controller.clearModel());
-                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_MASK));
+                                        this.setMnemonic(KeyEvent.VK_Z);
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+                                        this.addActionListener(e -> controller.resetModel());
                                     }
                                 });
-                                this.add(new JMenuItem("Reset",
-                                        new ImageIcon(MazeView.class.getResource("assets/resetIcon.gif"))) {
-                                    // mni_gridReset
+                                this.add(new JMenuItem("Refresh",
+                                        new ImageIcon(MazeView.class.getResource("assets/refreshIcon.gif"))) {
+                                    // mni_gridRefresh
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setMnemonic(KeyEvent.VK_Z);
-                                        this.addActionListener(e -> controller.resetModel());
-                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
+                                        this.setMnemonic(KeyEvent.VK_R);
+                                        this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+                                        this.addActionListener(e -> controller.clearModel());
                                     }
                                 });
                             }
                         });
                         // spr_menuEdit
                         this.add(new JSeparator());
-                        this.add(new JMenu("View") {
-                            // mn_editView
+                        this.add(new JMenu("Preferences") {
+                            // mn_editPreferences
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setIcon(new ImageIcon(MazeView.class.getResource("assets/viewIcon.gif")));
                                 this.add(new JCheckBoxMenuItem("Arrows") {
-                                    // chb_mni_viewArrows
+                                    // chb_mni_preferencesArrows
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addActionListener(e -> controller.cycleArrows());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Diagonals", true) {
-                                    // chb_mni_viewDiagonals
+                                    // chb_mni_preferencesDiagonals
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addActionListener(e -> controller.cycleDiagonals());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Status Bar", true) {
-                                    // chb_mni_viewStatusBar
+                                    // chb_mni_preferencesStatusBar
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addItemListener(e -> controller.cycleStatusComponent());
                                     }
                                 });
                                 this.add(new JCheckBoxMenuItem("Node Tree") {
-                                    // chb_mni_viewWrapper
+                                    // chb_mni_preferencesWrapper
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addItemListener(e -> controller.cycleSplitComponent());
@@ -520,8 +550,8 @@ public class MazeView extends JFrame implements Runnable {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_1);
-                                this.addActionListener(e -> controller.awakePathFinder());
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_MASK));
+                                this.addActionListener(e -> controller.awakePathFinder());
                             }
                         });
                         this.add(new JMenuItem("Generator",
@@ -530,8 +560,8 @@ public class MazeView extends JFrame implements Runnable {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_2);
-                                this.addActionListener(e -> controller.awakeGenerator());
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_MASK));
+                                this.addActionListener(e -> controller.awakeGenerator());
                             }
                         });
                     }
@@ -554,6 +584,15 @@ public class MazeView extends JFrame implements Runnable {
     }
 
     /**
+     * Return current <code>app.controller.MazeController</code> instance.
+     *
+     * @return MazeController
+     */
+    public final MazeController getController() {
+        return this.controller;
+    }
+
+    /**
      * <code>java.lang.Thread</code> invokation initializer.
      *
      * @see java.lang.Thread Thread
@@ -562,16 +601,6 @@ public class MazeView extends JFrame implements Runnable {
     @Override
     public final void run() {
         this.setVisible(true);
-    }
-
-    /**
-     * Get <code>app.view.MazeView</code> <code>app.controller.MazeController</code>
-     * instance.
-     *
-     * @return MazeController
-     */
-    public final MazeController getController() {
-        return this.controller;
     }
 
 }
