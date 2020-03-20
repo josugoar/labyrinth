@@ -8,13 +8,13 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import app.controller.components.AlgorithmController;
-import app.controller.components.CellController;
+import app.controller.components.AbstractAlgorithm;
+import app.controller.components.AbstractCell;
 import app.model.components.Cell;
 import app.model.components.Node;
 import app.view.MazeView;
 
-public abstract class PathFinder extends AlgorithmController implements Serializable {
+public abstract class PathFinder extends AbstractAlgorithm implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,9 +24,9 @@ public abstract class PathFinder extends AlgorithmController implements Serializ
 
     public abstract void setIsRunning(final boolean isRunning);
 
-    protected abstract <T extends CellController<T>> void find(final T[][] grid, final Set<Node<T>> currGen) throws StackOverflowError;
+    protected abstract <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen) throws StackOverflowError;
 
-    private static final <T extends CellController<T>> void traverse(final Node<T> child) {
+    private static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
         if (child.getParent() != null) {
             child.setState(Node.NodeState.PATH);
             PathFinder.traverse(child.getParent());
@@ -34,7 +34,7 @@ public abstract class PathFinder extends AlgorithmController implements Serializ
     }
 
     @Override
-    public final <T extends CellController<T>> void awake(final T[][] grid) {
+    public final <T extends AbstractCell<T>> void awake(final T[][] grid) {
         try {
             this.setIsRunning(true);
             this.find(grid, new HashSet<Node<T>>() {
@@ -43,8 +43,10 @@ public abstract class PathFinder extends AlgorithmController implements Serializ
                     final boolean directAccess = true;
                     if (directAccess) {
                         final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
-                        if (start == null)
+                        if (start == null) {
+                            PathFinder.this.setIsRunning(false);
                             throw new NullPointerException("No starting node found...");
+                        }
                         this.add(new Node<T>(start));
                     } else {
                         outer: for (int row = 0; row < grid.length; row++) {
@@ -71,7 +73,7 @@ public abstract class PathFinder extends AlgorithmController implements Serializ
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected final <T extends CellController<T>> void find(final T[][] grid, final Set<Node<T>> currGen)
+        protected final <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen)
                 throws StackOverflowError {
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
             for (final Node<T> node : currGen) {

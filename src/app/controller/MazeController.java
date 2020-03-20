@@ -112,20 +112,6 @@ public class MazeController {
     private JWRange density = new JWRange(1, 100, 10);
 
     /**
-     * Current maze trasversal <code>app.model.PathFinder</code> algorithm.
-     *
-     * @see app.model.PathFinder PathFinder
-     */
-    private PathFinder pathfinder = new PathFinder.Dijkstra();
-
-    /**
-     * Current maze generation <code>app.model.Generator</code> algorithm.
-     *
-     * @see app.model.Generator Generator
-     */
-    private Generator generator = new Generator.BackTracker();
-
-    /**
      * Create a new two-sided <code>app.model.MazeModel</code> and
      * <code>app.view.MazeView</code> interaction
      * <code>app.controller.MazeController</code> component.
@@ -253,55 +239,9 @@ public class MazeController {
      * <code>javax.swing.JSplitPane.setDividerLocation(int location)</code>.
      */
     public final void cycleSplitComponent() {
-        this.splitComponent.getLeftComponent().setVisible(!this.splitComponent.getLeftComponent().isVisible());
         this.splitComponent.setDividerLocation(-1);
         this.splitComponent.setEnabled(!this.splitComponent.isEnabled());
-    }
-
-    /**
-     * Return current <code>app.model.PathFinder</code> instance.
-     *
-     * @return PathFinder
-     */
-    public final PathFinder getPathFinder() {
-        return this.pathfinder;
-    }
-
-    /**
-     * Set current <code>app.model.PathFinder</code> instance.
-     */
-    public final void setPathFinder(final PathFinder pathfinder) {
-        this.pathfinder = Objects.requireNonNull(pathfinder, "'pathfinder' must not be null");
-    }
-
-    /**
-     * Fire <code>app.model.PathFinder.awake(Cell[][] grid)</code> event.
-     */
-    public final void awakePathFinder() {
-        this.pathfinder.awake(this.model.getGrid());
-    }
-
-    /**
-     * Return current <code>app.model.Generator</code> instance.
-     *
-     * @return Generator
-     */
-    public final Generator getGenerator() {
-        return this.generator;
-    }
-
-    /**
-     * Set current <code>app.model.Generator</code> instance.
-     */
-    public final void setGenerator(final Generator generator) {
-        this.generator = Objects.requireNonNull(generator, "'generator' must not be null");
-    }
-
-    /**
-     * Fire <code>app.model.Generator.awake(Cell[][] grid)</code> event.
-     */
-    public final void awakeGenerator() {
-        this.generator.awake(this.model.getGrid());
+        this.splitComponent.getLeftComponent().setVisible(!this.splitComponent.getLeftComponent().isVisible());
     }
 
     /**
@@ -431,10 +371,51 @@ public class MazeController {
     }
 
     /**
-     * Return a String representing the maze.
+     * Request current <code>app.model.PathFinder</code> instance.
      *
-     * @return String
+     * @return PathFinder
      */
+    public final PathFinder requestPathFinder() {
+        return this.model.getPathFinder();
+    }
+
+    /**
+     * Update current <code>app.model.PathFinder</code> instance.
+     */
+    public final void updatePathFinder(final PathFinder pathfinder) {
+        this.model.setPathFinder(pathfinder);
+    }
+
+    /**
+     * Run current <code>app.model.PathFinder</code> instance.
+     */
+    public final void runPathFinder() {
+        this.model.awakePathFinder();
+    }
+
+    /**
+     * Request current <code>app.model.Generator</code> instance.
+     *
+     * @return Generator
+     */
+    public final Generator requestGenerator() {
+        return this.model.getGenerator();
+    }
+
+    /**
+     * Update current <code>app.model.Generator</code> instance.
+     */
+    public final void updateGenerator(final Generator generator) {
+        this.model.setGenerator(generator);
+    }
+
+    /**
+     * Run current <code>app.model.Generator</code> instance.
+     */
+    public final void runGenerator() {
+        this.model.awakeGenerator();
+    }
+
     @Override
     public final String toString() {
         return String.format("Maze");

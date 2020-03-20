@@ -4,19 +4,19 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.Objects;
 
-import app.controller.components.CellController;
+import app.controller.components.AbstractCell;
 import app.controller.components.ColoredState;
 
 /**
- * <code>app.controller.components.CellController</code> helper for
- * <code>app.controller.components.AlgorithmController</code> tasks, which
+ * <code>app.controller.components.AbstractCell</code> helper for
+ * <code>app.controller.components.AbstractAlgorithm</code> tasks, which
  * stores multiple parent and outer pointers of different iteration generations.
  *
- * @param <T> CellController<T>
- * @see app.controller.components.CellController CellController
- * @see app.controller.components.AlgorithmController AlgorithmController
+ * @param <T> AbstractCell<T>
+ * @see app.controller.components.AbstractCell AbstractCell
+ * @see app.controller.components.AbstractAlgorithm AbstractAlgorithm
  */
-public final class Node<T extends CellController<T>> implements Serializable {
+public final class Node<T extends AbstractCell<T>> implements Serializable {
 
     /**
      * Enum representing state and implementing
@@ -64,7 +64,7 @@ public final class Node<T extends CellController<T>> implements Serializable {
     private final Node<T> parent;
 
     /**
-     * Enclosing <code>app.controller.components.CellController</code> instance
+     * Enclosing <code>app.controller.components.AbstractCell</code> instance
      * outer pointer.
      */
     private final T outer;
@@ -77,8 +77,8 @@ public final class Node<T extends CellController<T>> implements Serializable {
     /**
      * Enclose <code>app.model.components.Node</code> parent and outer.
      *
-     * @param parent Node<T extends CellController<T>>
-     * @param outer  T extends CellController<T>
+     * @param parent Node<T extends AbstractCell<T>>
+     * @param outer  T extends AbstractCell<T>
      */
     public Node(final Node<T> parent, final T outer) {
         this.parent = parent;
@@ -88,7 +88,7 @@ public final class Node<T extends CellController<T>> implements Serializable {
     /**
      * No-parent ancestor <code>app.model.components.Node</code>.
      *
-     * @param outer T extends CellController<T>
+     * @param outer T extends AbstractCell<T>
      */
     public Node(final T outer) {
         this(null, outer);
@@ -98,19 +98,19 @@ public final class Node<T extends CellController<T>> implements Serializable {
      * Return previous generation <code>app.model.components.Node</code> parent
      * pointer.
      *
-     * @return Node<T extends CellController<T>>
+     * @return Node<T extends AbstractCell<T>>
      */
-    public Node<T> getParent() {
+    public final Node<T> getParent() {
         return this.parent;
     }
 
     /**
-     * Return enclosing <code>app.controller.components.CellController</code> instance
+     * Return enclosing <code>app.controller.components.AbstractCell</code> instance
      * outer pointer.
      *
-     * @return T extends CellController<T>
+     * @return T extends AbstractCell<T>
      */
-    public T getOuter() {
+    public final T getOuter() {
         return this.outer;
     }
 
@@ -119,7 +119,7 @@ public final class Node<T extends CellController<T>> implements Serializable {
      *
      * @return NodeState
      */
-    public NodeState getState() {
+    public final NodeState getState() {
         return this.state;
     }
 
@@ -128,9 +128,14 @@ public final class Node<T extends CellController<T>> implements Serializable {
      *
      * @param state NodeState
      */
-    public void setState(final NodeState state) {
+    public final void setState(final NodeState state) {
         this.state = Objects.requireNonNull(state, "'state' must not be null");
         this.outer.stateChange();
+    }
+
+    @Override
+    public final String toString() {
+        return String.format("Node [state: %s]", this.state);
     }
 
 }

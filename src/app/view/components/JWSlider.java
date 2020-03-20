@@ -23,8 +23,8 @@ public class JWSlider extends JSlider {
     }
 
     /**
-     * Create a new <code>javax.swing.JSlider</code> wrapper with given
-     * <code>app.view.components.JWSlider.JWRange</code>.
+     * Create a new <code>javax.swing.JSlider</code>
+     * <code>app.view.components.JWSlider.JWRange</code> wrapper.
      *
      * @param range app.view.components.JWSlider.JWRange JWRange
      */

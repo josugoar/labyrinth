@@ -3,19 +3,16 @@ package app.controller.components;
 /**
  * Abstract algorithm class wrapper.
  */
-public abstract class AlgorithmController {
+public abstract class AbstractAlgorithm {
 
     /**
      * Awake algorithm on given euclidean space.
      *
-     * @param <T>  CellController<T>
+     * @param <T>  AbstractCell<T>
      * @param grid T[][]
      */
-    public abstract <T extends CellController<T>> void awake(final T[][] grid);
+    public abstract <T extends AbstractCell<T>> void awake(final T[][] grid);
 
-    /**
-     * Return algorithm simple Class name.
-     */
     @Override
     public final String toString() {
         return this.getClass().getSimpleName();

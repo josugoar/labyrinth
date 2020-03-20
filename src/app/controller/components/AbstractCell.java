@@ -10,10 +10,10 @@ import app.model.components.Node;
  * Cell interface wrapper with inneer <code>app.model.components.Node</code>
  * pointer.
  *
- * @param <T> CellController<T>
+ * @param <T> AbstractCell<T>
  * @see app.model.components.Node Node
  */
-public interface CellController<T extends CellController<T>> {
+public interface AbstractCell<T extends AbstractCell<T>> {
 
     /**
      * Enum representing state and implementing
@@ -58,12 +58,12 @@ public interface CellController<T extends CellController<T>> {
 
     /**
      * Return current
-     * <code>app.controller.components.CellController.CellState</code> instance.
+     * <code>app.controller.components.AbstractCell.CellState</code> instance.
      */
     public CellState getState();
 
     /**
-     * Set current <code>app.controller.components.CellController.CellState</code>
+     * Set current <code>app.controller.components.AbstractCell.CellState</code>
      * instance.
      *
      * @param state CellState
@@ -71,32 +71,32 @@ public interface CellController<T extends CellController<T>> {
     public void setState(final CellState state);
 
     /**
-     * Return current <code>app.controller.components.CellController</code> neighbor
+     * Return current <code>app.controller.components.AbstractCell</code> neighbor
      * pointers.
      *
-     * @return Set<T extends CellController<T>>
+     * @return Set<T extends AbstractCell<T>>
      */
     public abstract Set<T> getNeighbors();
 
     /**
-     * Set current <code>app.controller.components.CellController</code> neighbor
+     * Set current <code>app.controller.components.AbstractCell</code> neighbor
      * pointers.
      *
-     * @param neighbors Set<T extends CellController<T>>
+     * @param neighbors Set<T extends AbstractCell<T>>
      */
     public abstract void setNeighbors(final Set<T> neighbors);
 
     /**
      * Return <code>app.model.components.Node</code> inner pointer.
      *
-     * @return Node<T extends CellController<T>>
+     * @return Node<T extends AbstractCell<T>>
      */
     public abstract Node<T> getInner();
 
     /**
      * Set <code>app.model.components.Node</code> inner pointer.
      *
-     * @param inner Node<T extends CellController<T>>
+     * @param inner Node<T extends AbstractCell<T>>
      */
     public abstract void setInner(final Node<T> inner);
 

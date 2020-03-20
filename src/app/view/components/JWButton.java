@@ -24,7 +24,7 @@ public class JWButton extends JButton {
     }
 
     /**
-     * Create a new iconified button.
+     * Create a new iconified <code>javax.swing.JButton</code>.
      *
      * @param icon        Icon
      * @param toolTipText String
