@@ -40,7 +40,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import app.controller.MazeController;
 import app.model.Generator;
 import app.model.PathFinder;
-import app.model.components.Cell;
 import app.view.components.JWButton;
 import app.view.components.JWSlider;
 

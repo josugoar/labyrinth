@@ -10,7 +10,7 @@ import javax.swing.Timer;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
-import app.model.components.Cell;
+import app.model.components.CellPanel;
 import app.model.components.Node;
 import app.view.MazeView;
 
@@ -51,9 +51,9 @@ public abstract class PathFinder extends AbstractAlgorithm implements Serializab
                     } else {
                         outer: for (int row = 0; row < grid.length; row++) {
                             for (int col = 0; col < grid.length; col++) {
-                                final T cell = grid[row][col];
-                                if (cell.getState() == Cell.CellState.START) {
-                                    this.add(new Node<T>(cell));
+                                final T CellPanel = grid[row][col];
+                                if (CellPanel.getState() == AbstractCell.CellState.START) {
+                                    this.add(new Node<T>(CellPanel));
                                     break outer;
                                 }
                             }
@@ -77,18 +77,18 @@ public abstract class PathFinder extends AbstractAlgorithm implements Serializab
                 throws StackOverflowError {
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
             for (final Node<T> node : currGen) {
-                for (T cell : node.getOuter().getNeighbors()) {
-                    if (cell.getInner() == null)
-                        cell.setInner(new Node<T>(node, cell));
-                    switch (cell.getState()) {
+                for (T CellPanel : node.getOuter().getNeighbors()) {
+                    if (CellPanel.getInner() == null)
+                        CellPanel.setInner(new Node<T>(node, CellPanel));
+                    switch (CellPanel.getState()) {
                         case EMPTY:
-                            if (cell.getInner().getState() != Node.NodeState.VISITED) {
-                                newGen.add(cell.getInner());
+                            if (CellPanel.getInner().getState() != Node.NodeState.VISITED) {
+                                newGen.add(CellPanel.getInner());
                             }
                             break;
                         case END:
                             this.setIsRunning(false);
-                            PathFinder.traverse(cell.getInner().getParent());
+                            PathFinder.traverse(CellPanel.getInner().getParent());
                             break;
                         default:
                     }

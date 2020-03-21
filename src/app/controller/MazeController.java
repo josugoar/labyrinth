@@ -11,7 +11,7 @@ import javax.swing.Timer;
 import app.model.Generator;
 import app.model.MazeModel;
 import app.model.PathFinder;
-import app.model.components.Cell;
+import app.model.components.CellPanel;
 import app.view.MazeView;
 import app.view.components.JWSlider.JWRange;
 
@@ -46,11 +46,11 @@ public class MazeController {
 
     /**
      * <code>javax.swing.JTree</code> component displaying
-     * <code>app.model.components.Cell</code> and
+     * <code>app.model.components.CellPanel</code> and
      * <code>app.model.components.Node</code> child generations.
      *
      * @see javax.swing.JTree JTree
-     * @see app.model.components.Cell Cell
+     * @see app.model.components.CellPanel CellPanel
      * @see app.model.components.Node Node
      */
     private JTree treeComponent;
@@ -74,9 +74,9 @@ public class MazeController {
     /**
      * Current user input mode selection.
      *
-     * @see app.model.ColoredState.Cell.State State
+     * @see app.model.ColoredState.CellPanel.State State
      */
-    private Cell.CellState mode = Cell.CellState.OBSTACLE;
+    private CellPanel.CellState mode = CellPanel.CellState.OBSTACLE;
 
     /**
      * Diagonal tile trasversal flag.
@@ -104,7 +104,7 @@ public class MazeController {
     private JWRange delay = new JWRange(0, 250, 100);
 
     /**
-     * Maze <code>app.model.components.Cell.State.OBSTACLE</code>
+     * Maze <code>app.model.components.CellPanel.State.OBSTACLE</code>
      * <code>app.model.Generator</code> density.
      *
      * @see app.view.components.JWSlider.JWRange JWRange
@@ -139,7 +139,7 @@ public class MazeController {
     }
 
     /**
-     * Fire <code>app.model.MazeModel.clear(Cell parent)</code> event.
+     * Fire <code>app.model.MazeModel.clear(CellPanel parent)</code> event.
      */
     public final void clearModel() {
         if (this.model.getStart() != null)
@@ -245,22 +245,22 @@ public class MazeController {
     }
 
     /**
-     * Return current <code>app.model.components.Cell</code>
-     * <code>app.model.components.Cell.State</code>.
+     * Return current <code>app.model.components.CellPanel</code>
+     * <code>app.model.components.CellPanel.State</code>.
      *
-     * @return Cell.State
+     * @return CellPanel.State
      */
-    public final Cell.CellState getMode() {
+    public final CellPanel.CellState getMode() {
         return this.mode;
     }
 
     /**
-     * Set current <code>app.model.components.Cell</code>
-     * <code>app.model.components.Cell.State</code>.
+     * Set current <code>app.model.components.CellPanel</code>
+     * <code>app.model.components.CellPanel.State</code>.
      *
-     * @param mode Cell.State
+     * @param mode CellPanel.State
      */
-    public final void setMode(final Cell.CellState mode) {
+    public final void setMode(final CellPanel.CellState mode) {
         this.mode = mode;
     }
 
@@ -390,6 +390,7 @@ public class MazeController {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void runPathFinder() {
+        this.clearModel();
         this.model.awakePathFinder();
     }
 

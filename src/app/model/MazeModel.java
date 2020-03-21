@@ -11,18 +11,18 @@ import javax.swing.border.EtchedBorder;
 
 import app.controller.MazeController;
 import app.controller.components.AbstractCell.CellState;
-import app.model.components.Cell;
+import app.model.components.CellPanel;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
  * pivotal <code>app.model.MazeModel</code> component, extending
  * <code>javax.swing.JPanel</code> and storing
- * <code>app.model.components.Cell</code>.
+ * <code>app.model.components.CellPanel</code>.
  *
  * @author JoshGoA
  * @version 0.1
  * @see javax.swing.JPanel JPanel
- * @see app.model.components.Cell Cell
+ * @see app.model.components.CellPanel CellPanel
  */
 public class MazeModel extends JPanel {
 
@@ -37,9 +37,9 @@ public class MazeModel extends JPanel {
     private final MazeController controller;
 
     /**
-     * Bi-dimensional <code>app.model.components.Cell</code> array.
+     * Bi-dimensional <code>app.model.components.CellPanel</code> array.
      */
-    private Cell[][] grid;
+    private CellPanel[][] grid;
 
     /**
      * Current maze trasversal <code>app.model.PathFinder</code> algorithm.
@@ -56,14 +56,14 @@ public class MazeModel extends JPanel {
     private Generator generator = new Generator.BackTracker();
 
     /**
-     * Grid starting <code>app.model.components.Cell</code> pointer.
+     * Grid starting <code>app.model.components.CellPanel</code> pointer.
      */
-    private Cell start = null;
+    private CellPanel start = null;
 
     /**
-     * Grid ending <code>app.model.components.Cell</code> pointer.
+     * Grid ending <code>app.model.components.CellPanel</code> pointer.
      */
-    private Cell end = null;
+    private CellPanel end = null;
 
     {
         this.setBorder(new EtchedBorder());
@@ -84,15 +84,15 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Recursively traverse entire <code>app.model.components.Cell</code> and
+     * Recursively traverse entire <code>app.model.components.CellPanel</code> and
      * <code>app.model.components.Node</code> tree structure.
      *
-     * @param parent Cell
+     * @param parent CellPanel
      */
-    public static final void clear(final Cell parent) {
+    public static final void clear(final CellPanel parent) {
         if (parent.getInner() != null) {
             parent.setInner(null);
-            for (Cell child : parent.getNeighbors()) {
+            for (CellPanel child : parent.getNeighbors()) {
                 MazeModel.clear(child);
             }
         }
@@ -115,16 +115,16 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Return current grid <code>app.model.components.Cell</code> structure.
+     * Return current grid <code>app.model.components.CellPanel</code> structure.
      *
-     * @return Cell[][]
+     * @return CellPanel[][]
      */
-    public final Cell[][] getGrid() {
+    public final CellPanel[][] getGrid() {
         return this.grid;
     }
 
     /**
-     * Set current grid <code>app.model.components.Cell</code> row and column
+     * Set current grid <code>app.model.components.CellPanel</code> row and column
      * structure.
      *
      * @param rows int
@@ -135,30 +135,30 @@ public class MazeModel extends JPanel {
         this.removeAll();
         // Update layout and grid
         this.setLayout(new GridLayout(rows, cols));
-        this.grid = new Cell[rows][cols];
-        // Initialize Cell with only seed
+        this.grid = new CellPanel[rows][cols];
+        // Initialize CellPanel with only seed
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                this.grid[row][col] = new Cell(new Point(row, col));
+                this.grid[row][col] = new CellPanel(new Point(row, col));
                 this.add(this.grid[row][col]);
             }
         }
-        // Set Cell neighbors
+        // Set CellPanel neighbors
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                final int cellRow = row;
-                final int cellCol = col;
-                this.grid[row][col].setNeighbors(new HashSet<Cell>() {
+                final int CellPanelRow = row;
+                final int CellPanelCol = col;
+                this.grid[row][col].setNeighbors(new HashSet<CellPanel>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        if (cellRow - 1 >= 0)
-                            this.add(grid[cellRow - 1][cellCol]);
-                        if (cellCol + 1 < cols)
-                            this.add(grid[cellRow][cellCol + 1]);
-                        if (cellRow + 1 < rows)
-                            this.add(grid[cellRow + 1][cellCol]);
-                        if (cellCol - 1 >= 0)
-                            this.add(grid[cellRow][cellCol - 1]);
+                        if (CellPanelRow - 1 >= 0)
+                            this.add(grid[CellPanelRow - 1][CellPanelCol]);
+                        if (CellPanelCol + 1 < cols)
+                            this.add(grid[CellPanelRow][CellPanelCol + 1]);
+                        if (CellPanelRow + 1 < rows)
+                            this.add(grid[CellPanelRow + 1][CellPanelCol]);
+                        if (CellPanelCol - 1 >= 0)
+                            this.add(grid[CellPanelRow][CellPanelCol - 1]);
                     }
                 });
             }
@@ -185,7 +185,7 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Fire <code>app.model.PathFinder.awake(Cell[][] grid)</code> event.
+     * Fire <code>app.model.PathFinder.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakePathFinder() {
         this.pathfinder.awake(this.getGrid());
@@ -208,27 +208,27 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Fire <code>app.model.Generator.awake(Cell[][] grid)</code> event.
+     * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakeGenerator() {
         this.generator.awake(this.getGrid());
     }
 
     /**
-     * Return current grid starting <code>app.model.components.Cell</code> pointer.
+     * Return current grid starting <code>app.model.components.CellPanel</code> pointer.
      *
-     * @return Cell
+     * @return CellPanel
      */
-    public final Cell getStart() {
+    public final CellPanel getStart() {
         return this.start;
     }
 
     /**
-     * Set current grid starting <code>app.model.components.Cell</code> pointer.
+     * Set current grid starting <code>app.model.components.CellPanel</code> pointer.
      *
-     * @param start Cell
+     * @param start CellPanel
      */
-    public final void setStart(final Cell start) {
+    public final void setStart(final CellPanel start) {
         if (start == null) {
             this.start = null;
         } else {
@@ -252,20 +252,20 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Return current grid ending <code>app.model.components.Cell</code> pointer.
+     * Return current grid ending <code>app.model.components.CellPanel</code> pointer.
      *
-     * @return Cell
+     * @return CellPanel
      */
-    public final Cell getEnd() {
+    public final CellPanel getEnd() {
         return this.end;
     }
 
     /**
-     * Set current grid ending <code>app.model.components.Cell</code> pointer.
+     * Set current grid ending <code>app.model.components.CellPanel</code> pointer.
      *
-     * @param end Cell
+     * @param end CellPanel
      */
-    public final void setEnd(final Cell end) {
+    public final void setEnd(final CellPanel end) {
         if (end == null) {
             this.end = null;
         } else {

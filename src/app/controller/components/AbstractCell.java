@@ -7,7 +7,7 @@ import java.util.Set;
 import app.model.components.Node;
 
 /**
- * Cell interface wrapper with inneer <code>app.model.components.Node</code>
+ * CellPanel interface wrapper with inneer <code>app.model.components.Node</code>
  * pointer.
  *
  * @param <T> AbstractCell<T>

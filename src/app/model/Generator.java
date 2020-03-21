@@ -1,10 +1,10 @@
 package app.model;
 
-import app.model.components.Cell;
+import app.model.components.CellPanel;
 
 public abstract class Generator {
 
-    public final void awake(final Cell[][] grid) {
+    public final void awake(final CellPanel[][] grid) {
 
     }
 
