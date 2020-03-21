@@ -145,7 +145,7 @@ public class MazeController {
         if (this.model.getStart() != null)
             MazeModel.clear(this.model.getStart());
         else
-            this.statusComponent.setText("No nodes to clear...");
+            System.err.println("No nodes to clear...");
     }
 
     /**

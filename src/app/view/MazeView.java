@@ -121,6 +121,7 @@ public class MazeView extends JFrame implements Runnable {
             private static final long serialVersionUID = 1L;
             {
                 this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane() {
+                    // TODO: Add TabbedPane
                     // scr_treeComponentWrapper
                     private static final long serialVersionUID = 1L;
                     {
@@ -202,7 +203,10 @@ public class MazeView extends JFrame implements Runnable {
                                                                     // sld_dimensionSelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
-                                                                        this.addChangeListener(e -> controller.setDimension(this.getValue()));
+                                                                        this.addChangeListener(e -> {
+                                                                            if (!((JWSlider) e.getSource()).getValueIsAdjusting())
+                                                                                controller.setDimension(this.getValue());
+                                                                        });
                                                                     }
                                                                 });
                                                             }

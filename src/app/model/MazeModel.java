@@ -139,7 +139,7 @@ public class MazeModel extends JPanel {
         // Initialize CellPanel with only seed
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                this.grid[row][col] = new CellPanel(new Point(row, col));
+                this.grid[row][col] = new CellPanel(this, new Point(row, col));
                 this.add(this.grid[row][col]);
             }
         }

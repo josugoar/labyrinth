@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -27,6 +29,11 @@ import app.model.MazeModel;
 public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Ancestor <code>app.model.MazeModel</code> pointer.
+     */
+    public final MazeModel ancestor;
 
     /**
      * Euclidean space coordinate <code>java.awt.Point</code>.
@@ -54,18 +61,25 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private Node<CellPanel> inner = null;
 
+    /**
+     * Selected flag for menu.
+     */
+    public static boolean selected = false;
+
     {
-        this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         this.addMouseListener(new CellPanelListener());
     }
 
     /**
-     * Create a new pointer storage enclosing seed and neighbors.
+     * Create a new pointer storage enclosing ancestor, seed and neighbors.
      *
+     * @param ancestor  MazeModel
      * @param seed      Point
      * @param neighbors Set<CellPanel>
      */
-    public CellPanel(final Point seed, final Set<CellPanel> neighbors) {
+    public CellPanel(final MazeModel ancestor, final Point seed, final Set<CellPanel> neighbors) {
+        this.ancestor = ancestor;
         this.seed = seed;
         this.setNeighbors(neighbors);
     }
@@ -73,10 +87,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     /**
      * Create a new isolated vertex.
      *
-     * @param seed Point
+     * @param ancestor MazeModel
+     * @param seed     Point
      */
-    public CellPanel(final Point seed) {
-        this(seed, null);
+    public CellPanel(final MazeModel ancestor, final Point seed) {
+        this(ancestor, seed, null);
     }
 
     /**
@@ -165,50 +180,70 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private final class CellPanelListener extends MouseAdapter {
 
+        // TODO: When selecting CellPanel check color and set same colored background
+
+        final JPopupMenu popup = new JPopupMenu() {
+            private static final long serialVersionUID = 1L;
+            {
+                // this.addPopupMenuListener(new PopupMenuListener() {
+                //     @Override
+                //     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                //         CellPanel.selected = true;
+                //     }
+                //     @Override
+                //     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                //         CellPanel.selected = false;
+                //     }
+                //     @Override
+                //     public void popupMenuCanceled(PopupMenuEvent e) {
+
+                //     }
+                // });
+                this.addPropertyChangeListener("visible", new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent e) {
+                        if ((boolean) e.getNewValue())
+                            CellPanel.selected = true;
+                        else {
+                            CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+                            CellPanel.selected = false;
+                        }
+                    }
+                });
+                this.add(new JMenuItem("Start") {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        this.addActionListener(e -> CellPanel.this.ancestor.setStart(CellPanel.this));
+                    }
+                });
+                this.add(new JMenuItem("End") {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        this.addActionListener(e -> CellPanel.this.ancestor.setEnd(CellPanel.this));
+                    }
+                });
+            }
+        };
+
         @Override
         public final void mousePressed(final MouseEvent e) {
-            // 'model' name collides with ButtonModel 'model'
-            final MazeModel ancestorModel = (MazeModel) CellPanel.this.getParent();
             // Check for draw state
             if (e.isShiftDown()) {
                 // Check for running action
-                if (!(ancestorModel.getPathFinder().getIsRunning())) {
-                    if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
+                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+                    if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
-                    } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
+                    else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.EMPTY);
-                    }
                 } else {
                     System.err.println("Invalid input while running...");
                 }
                 // Check for popup state
             } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
                 // Check for running action
-                if (!(ancestorModel.getPathFinder().getIsRunning())) {
-                    new JPopupMenu() {
-                        private static final long serialVersionUID = 1L;
-                        {
-                            this.addPropertyChangeListener("visible", e -> {
-                                // Select CellPanel
-                                if ((boolean) e.getNewValue())
-                                    CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                                else
-                                    CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                            });
-                            this.add(new JMenuItem("Start") {
-                                private static final long serialVersionUID = 1L;
-                                {
-                                    this.addActionListener(e -> ancestorModel.setStart(CellPanel.this));
-                                }
-                            });
-                            this.add(new JMenuItem("End") {
-                                private static final long serialVersionUID = 1L;
-                                {
-                                    this.addActionListener(e -> ancestorModel.setEnd(CellPanel.this));
-                                }
-                            });
-                        }
-                    }.show(CellPanel.this, e.getX(), e.getY());
+                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+                    CellPanel.selected = true;
+                    this.popup.show(CellPanel.this, e.getX(), e.getY());
                 } else {
                     System.err.println("Invalid input while running...");
                 }
@@ -217,10 +252,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
         @Override
         public final void mouseEntered(final MouseEvent e) {
-            // 'model' name collides with ButtonModel 'model'
-            final MazeModel ancestorModel = (MazeModel) CellPanel.this.getParent();
+            // Select Cell
+            if (!CellPanel.selected)
+                CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             if (e.isShiftDown()) {
-                if (!(ancestorModel.getPathFinder().getIsRunning())) {
+                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
 
                         CellPanel.this.setState(CellState.OBSTACLE);
@@ -232,6 +268,12 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                     System.err.println("Invalid input while running...");
                 }
             }
+        }
+
+        @Override
+        public final void mouseExited(final MouseEvent e) {
+            if (!CellPanel.selected)
+                CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         }
 
     }

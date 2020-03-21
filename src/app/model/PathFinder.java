@@ -10,7 +10,6 @@ import javax.swing.Timer;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
-import app.model.components.CellPanel;
 import app.model.components.Node;
 import app.view.MazeView;
 
@@ -20,6 +19,7 @@ public abstract class PathFinder extends AbstractAlgorithm implements Serializab
 
     protected boolean isRunning = false;
 
+    // TODO: Fix isRunning
     public abstract boolean getIsRunning();
 
     public abstract void setIsRunning(final boolean isRunning);
@@ -101,8 +101,7 @@ public abstract class PathFinder extends AbstractAlgorithm implements Serializab
             if (!this.isRunning) {
                 return;
             }
-            new Timer(((MazeView) SwingUtilities.getWindowAncestor((Component) newGen.iterator().next().getOuter()))
-                    .getController().getDelay().getValue(), e -> {
+            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()), e -> {
                         for (final Node<T> node : newGen) {
                             node.setState(Node.NodeState.VISITED);
                         }
