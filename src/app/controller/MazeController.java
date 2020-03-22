@@ -7,12 +7,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
+import app.controller.components.AbstractCell.CellState;
 import app.model.Generator;
 import app.model.MazeModel;
 import app.model.PathFinder;
 import app.model.components.CellPanel;
 import app.view.MazeView;
-import app.view.components.JWSlider.JWRange;
+import app.view.components.RangedSlider.BoundedRange;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -73,9 +74,10 @@ public class MazeController {
     /**
      * Current user input mode selection.
      *
-     * @see app.model.ColoredState.CellPanel.State State
+     * @see app.model.ColoredState.CellPanel.CellState CellState
+     * @deprecated Draw cycle made by mouse input
      */
-    private CellPanel.CellState mode = CellPanel.CellState.OBSTACLE;
+    private CellPanel.CellState mode = CellState.OBSTACLE;
 
     /**
      * Diagonal tile trasversal flag.
@@ -89,26 +91,26 @@ public class MazeController {
 
     /**
      * <code>app.model.MazeModel</code> dimension resizing
-     * <code>app.view.components.JWSlider.JWRange</code>.
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
-     * @see app.view.components.JWSlider.JWRange JWRange
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private JWRange dimension = new JWRange(10, 100, 20);
+    private BoundedRange dimension = new BoundedRange(10, 100, 20);
 
     /**
-     * Delay <code>app.view.components.JWSlider.JWRange</code> between draw cycles.
+     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw cycles.
      *
-     * @see app.view.components.JWSlider.JWRange JWRange
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private JWRange delay = new JWRange(0, 250, 100);
+    private BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
-     * Maze <code>app.model.components.CellPanel.State.OBSTACLE</code>
+     * Maze <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
      * <code>app.model.Generator</code> density.
      *
-     * @see app.view.components.JWSlider.JWRange JWRange
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private JWRange density = new JWRange(1, 100, 10);
+    private BoundedRange density = new BoundedRange(1, 100, 10);
 
     /**
      * Create a new isolated pipeline component.
@@ -272,21 +274,23 @@ public class MazeController {
 
     /**
      * Return current <code>app.model.components.CellPanel</code>
-     * <code>app.model.components.CellPanel.State</code>.
+     * <code>app.model.components.CellPanel.CellState</code>.
      *
-     * @return CellPanel.State
+     * @return CellPanel.CellState
+     * @deprecated Draw cycle made by mouse input
      */
-    public final CellPanel.CellState getMode() {
+    public final CellState getMode() {
         return this.mode;
     }
 
     /**
      * Set current <code>app.model.components.CellPanel</code>
-     * <code>app.model.components.CellPanel.State</code>.
+     * <code>app.model.components.CellPanel.CellState</code>.
      *
-     * @param mode CellPanel.State
+     * @param mode CellState
+     * @deprecated Draw cycle made by mouse input
      */
-    public final void setMode(final CellPanel.CellState mode) {
+    public final void setMode(final CellState mode) {
         this.mode = mode;
     }
 
@@ -341,16 +345,16 @@ public class MazeController {
     }
 
     /**
-     * Return current dimension <code>app.view.components.JWSlider.JWRange</code>.
+     * Return current dimension <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
-     * @return JWRange
+     * @return BoundedRange
      */
-    public final JWRange getDimension() {
+    public final BoundedRange getDimension() {
         return this.dimension;
     }
 
     /**
-     * Set current dimension <code>app.view.components.JWSlider.JWRange</code> value
+     * Set current dimension <code>app.view.components.RangedSlider.BoundedRange</code> value
      * and fire <code>app.model.MazeModel.setGrid(int rows, int cols)</code> event.
      *
      * @param val int
@@ -361,16 +365,16 @@ public class MazeController {
     }
 
     /**
-     * Return current delay <code>app.view.components.JWSlider.JWRange</code>.
+     * Return current delay <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
-     * @return JWRange
+     * @return BoundedRange
      */
-    public final JWRange getDelay() {
+    public final BoundedRange getDelay() {
         return this.delay;
     }
 
     /**
-     * Set current delay <code>app.view.components.JWSlider.JWRange</code> value.
+     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code> value.
      *
      * @param val int
      */
@@ -379,16 +383,16 @@ public class MazeController {
     }
 
     /**
-     * Return current density <code>app.view.components.JWSlider.JWRange</code>.
+     * Return current density <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
-     * @return JWRange
+     * @return BoundedRange
      */
-    public final JWRange getDensity() {
+    public final BoundedRange getDensity() {
         return this.density;
     }
 
     /**
-     * Set current density <code>app.view.components.JWSlider.JWRange</code> value.
+     * Set current density <code>app.view.components.RangedSlider.BoundedRange</code> value.
      *
      * @param val int
      */

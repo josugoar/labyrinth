@@ -130,7 +130,7 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
      */
     public final void setState(final NodeState state) {
         this.state = Objects.requireNonNull(state, "'state' must not be null");
-        this.outer.stateChange();
+        this.outer.notifyChange();
     }
 
     @Override

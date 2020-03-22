@@ -54,7 +54,7 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> {
     /**
      * Notify state change.
      */
-    public abstract void stateChange();
+    public abstract void notifyChange();
 
     /**
      * Return current

@@ -16,6 +16,7 @@ import javax.swing.event.PopupMenuListener;
 
 import app.controller.components.AbstractCell;
 import app.model.MazeModel;
+import app.view.components.FocusedPopup;
 
 /**
  * Component neighbor pointer responsible of self-reference via inner
@@ -69,7 +70,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
     {
         this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        this.addMouseListener(new CellPanelListener());
+        // this.addMouseListener(this.new CellPanelListener());
     }
 
     /**
@@ -83,6 +84,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         this.ancestor = ancestor;
         this.seed = seed;
         this.setNeighbors(neighbors);
+        this.addMouseListener(this.new CellPanelListener());
     }
 
     /**
@@ -165,7 +167,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         // Check override
         this.checkOverride();
         this.state = state;
-        this.stateChange();
+        this.notifyChange();
     }
 
     @Override
@@ -176,11 +178,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     @Override
     public final void setInner(final Node<CellPanel> inner) {
         this.inner = inner;
-        this.stateChange();
+        this.notifyChange();
     }
 
     @Override
-    public final void stateChange() {
+    public final void notifyChange() {
         this.revalidate();
         this.repaint();
     }
@@ -214,7 +216,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
          *
          * @see javax.swing.JPopupMenu JPopupMenu
          */
-        final JPopupMenu popup = new JPopupMenu() {
+        final JPopupMenu popup = new FocusedPopup(CellPanel.this.ancestor.getController().getView()) {
             private static final long serialVersionUID = 1L;
             {
                 this.addPopupMenuListener(new PopupMenuListener() {

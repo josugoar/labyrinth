@@ -5,8 +5,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -24,7 +22,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -41,8 +38,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import app.controller.MazeController;
 import app.model.Generator;
 import app.model.PathFinder;
-import app.view.components.JWButton;
-import app.view.components.JWSlider;
+import app.view.components.FocusedPopup;
+import app.view.components.IconifiedButton;
+import app.view.components.RangedSlider;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -75,27 +73,21 @@ public class MazeView extends JFrame {
     }
 
     {
-        this.addFocusListener(new FocusAdapter() {
-            // Ensure JFrame is always focused
-            public final void focusLost(final FocusEvent e) {
-                MazeView.this.requestFocus();
-            }
-        });
         this.addKeyListener(new KeyAdapter() {
             // Change cursor state depending on user input key
             @Override
             public final void keyPressed(final KeyEvent e) {
-                if (e.isShiftDown()) {
+                if (e.isShiftDown())
                     MazeView.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-                }
+                else
+                    MazeView.this.setCursor(Cursor.getDefaultCursor());
             }
-
             @Override
             public final void keyReleased(final KeyEvent e) {
-                if (!e.isShiftDown()) {
+                if (!e.isShiftDown())
                     MazeView.this.setCursor(Cursor.getDefaultCursor());
-                }
-
+                else
+                    MazeView.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             }
         });
     }
@@ -208,21 +200,21 @@ public class MazeView extends JFrame {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder());
-                                                this.add(new JWButton(new ImageIcon(
+                                                this.add(new IconifiedButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/dimensionIcon.gif")), "Dimension") {
                                                     // btn_dimensionSelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu() {
+                                                        this.addActionListener(e -> new FocusedPopup(MazeView.this) {
                                                             // pmn_dimensionSelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new JWSlider(controller.getDimension()) {
+                                                                this.add(new RangedSlider(controller.getDimension()) {
                                                                     // sld_dimensionSelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
                                                                         this.addChangeListener(e -> {
-                                                                            if (!((JWSlider) e.getSource()).getValueIsAdjusting())
+                                                                            if (!((RangedSlider) e.getSource()).getValueIsAdjusting())
                                                                                 controller.setDimension(this.getValue());
                                                                         });
                                                                     }
@@ -231,19 +223,18 @@ public class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new JWButton(new ImageIcon(
+                                                this.add(new IconifiedButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/delayIcon.gif")), "Delay") {
                                                     // btn_delaySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu() {
+                                                        this.addActionListener(e -> new FocusedPopup(MazeView.this) {
                                                             // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new JWSlider(controller.getDelay()) {
+                                                                this.add(new RangedSlider(controller.getDelay()) {
                                                                     // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
-
                                                                     {
                                                                         this.addChangeListener(e -> controller.setDelay(this.getValue()));
                                                                     }
@@ -252,19 +243,18 @@ public class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new JWButton(new ImageIcon(
+                                                this.add(new IconifiedButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/densityIcon.gif")), "Density") {
                                                     // btn_densitySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new JPopupMenu() {
+                                                        this.addActionListener(e -> new FocusedPopup(MazeView.this) {
                                                             // pmn_densitySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new JWSlider(controller.getDensity()) {
+                                                                this.add(new RangedSlider(controller.getDensity()) {
                                                                     // sld_densitySelector
                                                                     private static final long serialVersionUID = 1L;
-
                                                                     {
                                                                         this.addChangeListener(e -> controller.setDensity(this.getValue()));
                                                                     }
@@ -286,7 +276,7 @@ public class MazeView extends JFrame {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder());
-                                                this.add(new JWButton(new ImageIcon(
+                                                this.add(new IconifiedButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/pathfinderRunIcon.gif")), "Run PathFinder") {
                                                     // btn_runPathFinder
                                                     private static final long serialVersionUID = 1L;
@@ -294,7 +284,7 @@ public class MazeView extends JFrame {
                                                         this.addActionListener(e -> controller.runPathFinder());
                                                     }
                                                 });
-                                                this.add(new JWButton(new ImageIcon(
+                                                this.add(new IconifiedButton(new ImageIcon(
                                                         MazeView.class.getResource("assets/generatorRunIcon.gif")), "Run Generator") {
                                                     // btn_runGenerator
                                                     private static final long serialVersionUID = 1L;
