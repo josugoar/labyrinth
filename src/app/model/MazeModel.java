@@ -34,7 +34,7 @@ public class MazeModel extends JPanel {
      *
      * @see app.controller.MazeController MazeController
      */
-    private final MazeController controller;
+    private MazeController controller;
 
     /**
      * Bi-dimensional <code>app.model.components.CellPanel</code> array.
@@ -71,38 +71,37 @@ public class MazeModel extends JPanel {
     }
 
     /**
+     * Create a new isolated pipeline component.
+     */
+    public MazeModel() { }
+
+    /**
      * Create a new two-sided <code>app.controller.MazeController</code> interaction
      * <code>app.model.MazeModel</code> pipeline component.
      *
      * @param controller MazeController
-     * @param rows       int
-     * @param cols       int
      */
-    public MazeModel(final MazeController controller, final int rows, final int cols) {
-        this.controller = controller;
-        this.setGrid(rows, cols);
-    }
-
-    /**
-     * Recursively traverse entire <code>app.model.components.CellPanel</code> and
-     * <code>app.model.components.Node</code> tree structure.
-     *
-     * @param parent CellPanel
-     */
-    public static final void clear(final CellPanel parent) {
-        if (parent.getInner() != null) {
-            parent.setInner(null);
-            for (CellPanel child : parent.getNeighbors()) {
-                MazeModel.clear(child);
-            }
-        }
+    public MazeModel(final MazeController controller) {
+        this.setController(controller);
     }
 
     /**
      * Reset grid with identical row and column values.
+     *
+     * @throws ClassCastException Layout might not have been initialized
      */
-    public final void reset() {
+    public final void reset() throws ClassCastException {
+        this.pathfinder.setIsRunning(false);
         this.setGrid(((GridLayout) this.getLayout()).getRows(), ((GridLayout) this.getLayout()).getColumns());
+    }
+
+    /**
+     * Fire <code>app.model.components.CellPanel.clear()</code> event.
+     */
+    public final void fireClear() {
+        if (!this.pathfinder.getIsRunning() && this.start != null) {
+            this.start.clear();
+        }
     }
 
     /**
@@ -112,6 +111,15 @@ public class MazeModel extends JPanel {
      */
     public final MazeController getController() {
         return this.controller;
+    }
+
+    /**
+     * Set current <code>app.controller.MazeController</code> instance.
+     *
+     * @param controller MazeController
+     */
+    public final void setController(final MazeController controller) {
+        this.controller = Objects.requireNonNull(controller, "'controller' must not be null");
     }
 
     /**

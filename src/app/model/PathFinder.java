@@ -5,28 +5,21 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.model.components.Node;
-import app.view.MazeView;
 
-public abstract class PathFinder extends AbstractAlgorithm implements Serializable {
+public abstract class PathFinder implements AbstractAlgorithm, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     protected boolean isRunning = false;
 
-    // TODO: Fix isRunning
-    public abstract boolean getIsRunning();
-
-    public abstract void setIsRunning(final boolean isRunning);
-
     protected abstract <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen) throws StackOverflowError;
 
-    private static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
+    public static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
         if (child.getParent() != null) {
             child.setState(Node.NodeState.PATH);
             PathFinder.traverse(child.getParent());
@@ -66,6 +59,11 @@ public abstract class PathFinder extends AbstractAlgorithm implements Serializab
         } catch (final StackOverflowError e) {
             System.err.println(e.toString());
         }
+    }
+
+    @Override
+    public final String toString() {
+        return this.getClass().getSimpleName();
     }
 
     public static final class Dijkstra extends PathFinder {

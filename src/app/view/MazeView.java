@@ -29,6 +29,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -46,15 +47,13 @@ import app.view.components.JWSlider;
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
  * pivotal <code>app.view.MazeView</code> component, extending
- * <code>java.awt.JFrame</code> and implementing
- * <code>java.lang.Runnable</code>.
+ * <code>java.awt.JFrame</code>.
  *
  * @author JoshGoA
  * @version 0.1
  * @see javax.swing.JFrame JFrame
- * @see java.lang.Runnable Runnable
  */
-public class MazeView extends JFrame implements Runnable {
+public class MazeView extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
@@ -64,7 +63,16 @@ public class MazeView extends JFrame implements Runnable {
      *
      * @see app.controller.MazeController MazeController
      */
-    private final MazeController controller;
+    private MazeController controller;
+
+    {
+        // Set Cross-Platform Look-And-Feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (final Exception e) {
+            System.err.println("Unsupported look and feel...");
+        }
+    }
 
     {
         this.addFocusListener(new FocusAdapter() {
@@ -75,12 +83,14 @@ public class MazeView extends JFrame implements Runnable {
         });
         this.addKeyListener(new KeyAdapter() {
             // Change cursor state depending on user input key
+            @Override
             public final void keyPressed(final KeyEvent e) {
                 if (e.isShiftDown()) {
                     MazeView.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 }
             }
 
+            @Override
             public final void keyReleased(final KeyEvent e) {
                 if (!e.isShiftDown()) {
                     MazeView.this.setCursor(Cursor.getDefaultCursor());
@@ -89,13 +99,12 @@ public class MazeView extends JFrame implements Runnable {
             }
         });
     }
-    {
-        // Set Cross-Platform Look-And-Feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (final Exception e) {
-            System.err.println("Unsupported look and feel...");
-        }
+
+    /**
+     * Create a new isolated pipeline component.
+     */
+    public MazeView() {
+        super("MazeApp");
     }
 
     /**
@@ -106,35 +115,48 @@ public class MazeView extends JFrame implements Runnable {
      */
     public MazeView(final MazeController controller) {
         super("MazeApp");
-        this.controller = Objects.requireNonNull(controller, "'controller' must not be null");
-        this.initView();
+        this.setController(controller);
+    }
+
+    /**
+     * Initialize <code>javax.swing.JFrame</code> custom parameters.
+     */
+    private final void initFrame() {
+        this.setMinimumSize(new Dimension(450, 400));
+        this.setLocationRelativeTo(null);
+        this.setFocusable(true);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     /**
      * Initialize entire <code>java.awt.Component</code> tree structure.
      *
      * @see java.awt.Component Component
+     * @throws NullPointerException 'controller' might not have been initialized
      */
-    private final void initView() {
+    private final void initView() throws NullPointerException {
         this.add(new JPanel(new BorderLayout()) {
             // pnl_splitComponentWrapper
             private static final long serialVersionUID = 1L;
             {
-                this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane() {
-                    // TODO: Add TabbedPane
-                    // scr_treeComponentWrapper
+                this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JTabbedPane() {
+                    // tab_treeComponentWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        this.setMinimumSize(new Dimension(100, this.getMinimumSize().height));
                         this.setVisible(false);
-                        this.setViewportView(new JTree(new DefaultMutableTreeNode("Start")) {
-                            // tre_treeComponent
+                        this.addTab("Node Tree", new JScrollPane() {
+                            // scr_treeComponentScroll
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setShowsRootHandles(true);
-                            }
-                            {
-                                controller.setTreeComponent(this);
+                                this.setMinimumSize(new Dimension(100, this.getMinimumSize().height));
+                                this.setViewportView(new JTree(new DefaultMutableTreeNode("Start")) {
+                                    // tre_treeComponent
+                                    private static final long serialVersionUID = 1L;
+                                    {
+                                        this.setShowsRootHandles(true);
+                                        controller.setTreeComponent(this);
+                                    }
+                                });
                             }
                         });
                     }
@@ -153,8 +175,6 @@ public class MazeView extends JFrame implements Runnable {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addPropertyChangeListener("text", e -> controller.resetStatusComponent());
-                                    }
-                                    {
                                         controller.setStatusComponent(this);
                                     }
                                 });
@@ -167,8 +187,6 @@ public class MazeView extends JFrame implements Runnable {
                     {
                         this.setEnabled(false);
                         this.setBorder(null);
-                    }
-                    {
                         controller.setSplitComponent(this);
                     }
                 }, BorderLayout.CENTER);
@@ -424,7 +442,7 @@ public class MazeView extends JFrame implements Runnable {
                                     {
                                         this.setMnemonic(KeyEvent.VK_Z);
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
-                                        this.addActionListener(e -> controller.resetModel());
+                                        this.addActionListener(e -> controller.fireReset());
                                     }
                                 });
                                 this.add(new JMenuItem("Refresh",
@@ -434,7 +452,7 @@ public class MazeView extends JFrame implements Runnable {
                                     {
                                         this.setMnemonic(KeyEvent.VK_R);
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
-                                        this.addActionListener(e -> controller.clearModel());
+                                        this.addActionListener(e -> controller.requestClear());
                                     }
                                 });
                             }
@@ -511,13 +529,15 @@ public class MazeView extends JFrame implements Runnable {
     }
 
     /**
-     * Initialize <code>javax.swing.JFrame</code> custom parameters.
+     * Display frame on screen.
      */
-    private final void initFrame() {
-        this.setMinimumSize(new Dimension(450, 400));
-        this.setLocationRelativeTo(null);
-        this.setFocusable(true);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public final void display() {
+        try {
+            this.initView();
+            this.setVisible(true);
+        } catch (NullPointerException e) {
+            System.err.println("'controller' might not have been initialized...");
+        }
     }
 
     /**
@@ -530,14 +550,12 @@ public class MazeView extends JFrame implements Runnable {
     }
 
     /**
-     * <code>java.lang.Thread</code> invokation initializer.
+     * Set current <code>app.controller.MazeController</code> instance.
      *
-     * @see java.lang.Thread Thread
-     * @see javax.swing.SwingUtilities#invokeLater(Runnable doRun) invokeLater()
+     * @param controller MazeController
      */
-    @Override
-    public final void run() {
-        this.setVisible(true);
+    public final void setController(final MazeController controller) {
+        this.controller = Objects.requireNonNull(controller, "'controller' must not be null");
     }
 
 }

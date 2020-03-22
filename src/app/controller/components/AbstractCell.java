@@ -13,7 +13,7 @@ import app.model.components.Node;
  * @param <T> AbstractCell<T>
  * @see app.model.components.Node Node
  */
-public interface AbstractCell<T extends AbstractCell<T>> {
+public abstract interface AbstractCell<T extends AbstractCell<T>> {
 
     /**
      * Enum representing state and implementing

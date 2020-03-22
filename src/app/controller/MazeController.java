@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import app.model.Generator;
@@ -34,7 +33,7 @@ public class MazeController {
      *
      * @see app.model.MazeModel MazeModel
      */
-    private final MazeModel model;
+    private MazeModel model;
 
     /**
      * Two-sided <code>app.view.MazeView</code>
@@ -42,7 +41,7 @@ public class MazeController {
      *
      * @see app.view.MazeView MazeView
      */
-    private final MazeView view;
+    private MazeView view;
 
     /**
      * <code>javax.swing.JTree</code> component displaying
@@ -112,25 +111,33 @@ public class MazeController {
     private JWRange density = new JWRange(1, 100, 10);
 
     /**
+     * Create a new isolated pipeline component.
+     */
+    public MazeController() { }
+
+    /**
      * Create a new two-sided <code>app.model.MazeModel</code> and
      * <code>app.view.MazeView</code> interaction
      * <code>app.controller.MazeController</code> component.
+     *
+     * @param model MazeModel
+     * @param view MazeView
      */
-    public MazeController() {
-        this.model = new MazeModel(this, this.dimension.getValue(), this.dimension.getValue());
-        // Always initialize MazeView after MazeModel
-        this.view = new MazeView(this);
+    public MazeController(final MazeModel model, final MazeView view) {
+        this.setModel(model);
+        this.setView(view);
     }
 
     /**
      * Run MazeApp.
      */
     public final void run() {
-        SwingUtilities.invokeLater(view);
+        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
+        this.view.display();
     }
 
     /**
-     * Ruturn current <code>app.model.MazeModel</code> instance.
+     * Return current <code>app.model.MazeModel</code> instance.
      *
      * @return MazeModel
      */
@@ -139,29 +146,30 @@ public class MazeController {
     }
 
     /**
-     * Fire <code>app.model.MazeModel.clear(CellPanel parent)</code> event.
+     * Set current <code>app.model.MazeModel</code> instance.
+     *
+     * @param model MazeModel
      */
-    public final void clearModel() {
-        if (this.model.getStart() != null)
-            MazeModel.clear(this.model.getStart());
-        else
-            System.err.println("No nodes to clear...");
+    public final void setModel(final MazeModel model) {
+        this.model = Objects.requireNonNull(model, "'model' must not be null");
     }
 
     /**
-     * Fire <code>app.model.MazeModel.reset()</code> event.
-     */
-    public final void resetModel() {
-        this.model.reset();
-    }
-
-    /**
-     * Ruturn current <code>app.view.MazeView</code> instance.
+     * Return current <code>app.view.MazeView</code> instance.
      *
      * @return MazeView
      */
     public final MazeView getView() {
         return this.view;
+    }
+
+    /**
+     * Set current <code>app.view.MazeView</code> instance.
+     *
+     * @param view MazeView
+     */
+    public final void setView(final MazeView view) {
+        this.view = Objects.requireNonNull(view, "'view' must not be null");
     }
 
     /**
@@ -204,6 +212,7 @@ public class MazeController {
         this.statusComponent.setVisible(!this.statusComponent.isVisible());
     }
 
+    // TODO: resetStatusComponent
     /**
      * Reset current <code>javax.swing.JLabel</code> instance custom application
      * output message.
@@ -242,6 +251,23 @@ public class MazeController {
         this.splitComponent.setDividerLocation(-1);
         this.splitComponent.setEnabled(!this.splitComponent.isEnabled());
         this.splitComponent.getLeftComponent().setVisible(!this.splitComponent.getLeftComponent().isVisible());
+    }
+
+    /**
+     * Request <code>app.model.MazeModel.clear()</code> event.
+     */
+    public final void requestClear() {
+        if (this.model.getStart().getInner() != null)
+            this.model.fireClear();
+        else
+            System.err.println("No nodes to clear...");
+    }
+
+    /**
+     * Fire <code>app.model.MazeModel.reset()</code> event.
+     */
+    public final void fireReset() {
+        this.model.reset();
     }
 
     /**
@@ -331,7 +357,7 @@ public class MazeController {
      */
     public final void setDimension(final int val) {
         this.dimension.setValue(val);
-        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
+        this.fireReset();
     }
 
     /**
@@ -390,8 +416,10 @@ public class MazeController {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void runPathFinder() {
-        this.clearModel();
-        this.model.awakePathFinder();
+        if (!this.model.getPathFinder().getIsRunning()) {
+            this.requestClear();
+            this.model.awakePathFinder();
+        }
     }
 
     /**
@@ -414,7 +442,10 @@ public class MazeController {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void runGenerator() {
-        this.model.awakeGenerator();
+        // if (!this.model.getGenerator().getIsRunning()) {
+            this.requestClear();
+            this.model.awakeGenerator();
+        // }
     }
 
     @Override

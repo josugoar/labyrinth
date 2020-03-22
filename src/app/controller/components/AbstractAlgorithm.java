@@ -1,9 +1,11 @@
 package app.controller.components;
 
 /**
- * Abstract algorithm class wrapper.
+ * Abstract algorithm interface wrapper.
  */
-public abstract class AbstractAlgorithm {
+public abstract interface AbstractAlgorithm {
+
+    // TODO: extends AlgorithmMethod
 
     /**
      * Awake algorithm on given euclidean space.
@@ -13,9 +15,18 @@ public abstract class AbstractAlgorithm {
      */
     public abstract <T extends AbstractCell<T>> void awake(final T[][] grid);
 
-    @Override
-    public final String toString() {
-        return this.getClass().getSimpleName();
-    }
+    /**
+     * Return current running state.
+     *
+     * @return boolean
+     */
+    public abstract boolean getIsRunning();
+
+    /**
+     * Set current running state.
+     *
+     * @param isRunning boolean
+     */
+    public abstract void setIsRunning(final boolean isRunning);
 
 }

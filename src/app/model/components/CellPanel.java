@@ -5,14 +5,14 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import app.controller.components.AbstractCell;
 import app.model.MazeModel;
@@ -61,13 +61,14 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private Node<CellPanel> inner = null;
 
+    // TODO: Fix selection
     /**
      * Selected flag for menu.
      */
     public static boolean selected = false;
 
     {
-        CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         this.addMouseListener(new CellPanelListener());
     }
 
@@ -100,9 +101,37 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private final void checkOverride() {
         if (this.getState() == CellState.START)
-            ((MazeModel) this.getParent()).setStart(null);
+            this.ancestor.setStart(null);
         else if (this.getState() == CellState.END)
-            ((MazeModel) this.getParent()).setEnd(null);
+            this.ancestor.setEnd(null);
+    }
+
+    /**
+     * Recursively traverse entire <code>app.model.components.CellPanel</code> and
+     * <code>app.model.components.Node</code> tree structure.
+     */
+    public final void clear() {
+        if (this.getInner() != null) {
+            this.setInner(null);
+            for (CellPanel child : this.getNeighbors()) {
+                child.clear();
+            }
+        }
+    }
+
+    /**
+     * Paint border color selection.
+     */
+    protected final void paintSelection() {
+        if (this.state == CellPanel.CellState.START || this.state == CellPanel.CellState.END) {
+            this.setBorder(BorderFactory.createLineBorder(this.state.getColor()));
+        } else {
+            if (this.inner == null) {
+                this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            } else {
+                this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getColor()));
+            }
+        }
     }
 
     /**
@@ -180,35 +209,26 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private final class CellPanelListener extends MouseAdapter {
 
-        // TODO: When selecting CellPanel check color and set same colored background
-
+        /**
+         * <code>javax.swing.JPopupMenu</code> containing selection logic.
+         *
+         * @see javax.swing.JPopupMenu JPopupMenu
+         */
         final JPopupMenu popup = new JPopupMenu() {
             private static final long serialVersionUID = 1L;
             {
-                // this.addPopupMenuListener(new PopupMenuListener() {
-                //     @Override
-                //     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                //         CellPanel.selected = true;
-                //     }
-                //     @Override
-                //     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                //         CellPanel.selected = false;
-                //     }
-                //     @Override
-                //     public void popupMenuCanceled(PopupMenuEvent e) {
-
-                //     }
-                // });
-                this.addPropertyChangeListener("visible", new PropertyChangeListener() {
+                this.addPopupMenuListener(new PopupMenuListener() {
                     @Override
-                    public void propertyChange(PropertyChangeEvent e) {
-                        if ((boolean) e.getNewValue())
-                            CellPanel.selected = true;
-                        else {
-                            CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-                            CellPanel.selected = false;
-                        }
+                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                        CellPanel.selected = true;
                     }
+                    @Override
+                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                        CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+                         CellPanel.selected = false;
+                    }
+                    @Override
+                    public void popupMenuCanceled(PopupMenuEvent e) { }
                 });
                 this.add(new JMenuItem("Start") {
                     private static final long serialVersionUID = 1L;
@@ -227,6 +247,8 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
         @Override
         public final void mousePressed(final MouseEvent e) {
+            if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning()))
+                ancestor.fireClear();
             // Check for draw state
             if (e.isShiftDown()) {
                 // Check for running action
@@ -254,7 +276,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         public final void mouseEntered(final MouseEvent e) {
             // Select Cell
             if (!CellPanel.selected)
-                CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                CellPanel.this.paintSelection();
             if (e.isShiftDown()) {
                 if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
@@ -272,8 +294,9 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
         @Override
         public final void mouseExited(final MouseEvent e) {
-            if (!CellPanel.selected)
+            if (!CellPanel.selected) {
                 CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+            }
         }
 
     }

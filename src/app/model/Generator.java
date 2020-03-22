@@ -1,18 +1,36 @@
 package app.model;
 
+import app.controller.components.AbstractAlgorithm;
+import app.controller.components.AbstractCell;
 import app.model.components.CellPanel;
 
-public abstract class Generator {
+public abstract class Generator implements AbstractAlgorithm {
 
-    public final void awake(final CellPanel[][] grid) {
+    protected boolean isRunning = false;
 
+    protected final void awake(final CellPanel[][] grid) {
+    }
+
+    @Override
+    public final String toString() {
+        return this.getClass().getSimpleName();
     }
 
     public static final class BackTracker extends Generator {
 
         @Override
-        public final String toString() {
-            return "BackTracker";
+        public <T extends AbstractCell<T>> void awake(T[][] grid) {
+        }
+
+        @Override
+        public final boolean getIsRunning() {
+            return this.isRunning;
+        }
+
+        @Override
+        public final void setIsRunning(final boolean isRunning) {
+            // TODO: Glass pane
+            this.isRunning = isRunning;
         }
 
     }
