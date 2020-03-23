@@ -89,9 +89,11 @@ public class MazeModel extends JPanel {
     /**
      * Reset grid with identical row and column values.
      *
-     * @throws ClassCastException Layout might not have been initialized
+     * @throws ClassCastException if (!(getLayout() instanceof GridLayout))
      */
     public final void reset() throws ClassCastException {
+        if (!(this.getLayout() instanceof GridLayout))
+            throw new ClassCastException("GridLayout might not have been initialized");
         this.pathfinder.setIsRunning(false);
         this.setGrid(((GridLayout) this.getLayout()).getRows(), ((GridLayout) this.getLayout()).getColumns());
     }
@@ -152,6 +154,8 @@ public class MazeModel extends JPanel {
      * @throws NegativeArraySizeException if (rows < 0 || cols < 0)
      */
     public final void setGrid(final int rows, final int cols) throws NegativeArraySizeException {
+        if (rows < 0 || cols < 0)
+            throw new NegativeArraySizeException("Invalid size...");
         // Remove previous components
         this.removeAll();
         // Update layout and grid

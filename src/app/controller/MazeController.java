@@ -97,14 +97,15 @@ public class MazeController {
      *
      * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private BoundedRange dimension = new BoundedRange(10, 50, 20);
+    private final BoundedRange dimension = new BoundedRange(10, 50, 20);
 
     /**
-     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw cycles.
+     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
+     * cycles.
      *
      * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private BoundedRange delay = new BoundedRange(0, 250, 100);
+    private final BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
      * Maze <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
@@ -112,7 +113,7 @@ public class MazeController {
      *
      * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private BoundedRange density = new BoundedRange(1, 100, 10);
+    private final BoundedRange density = new BoundedRange(1, 100, 10);
 
     /**
      * Create a new isolated pipeline component.
@@ -125,7 +126,7 @@ public class MazeController {
      * <code>app.controller.MazeController</code> component.
      *
      * @param model MazeModel
-     * @param view MazeView
+     * @param view  MazeView
      */
     public MazeController(final MazeModel model, final MazeView view) {
         this.setModel(model);
@@ -142,12 +143,13 @@ public class MazeController {
 
     /**
      * Request <code>app.model.MazeModel.clear()</code> event.
+     *
+     * @throws NullPointerException if (model.getStart().getInner() == null)
      */
     public final void requestClear() {
-        if (this.model.getStart().getInner() != null)
-            this.model.fireClear();
-        else
-            System.err.println("No nodes to clear...");
+        if (this.model.getStart().getInner() == null)
+            throw new NullPointerException("No nodes to clear...");
+        this.model.fireClear();
     }
 
     /**
@@ -166,8 +168,8 @@ public class MazeController {
     public final JPopupMenu fireCellPopup(final CellPanel cell) {
         try {
             return this.view.releaseCellPopup(cell);
-        } catch (InvalidParameterException e) {
-            System.err.println("Invalid 'cell'...");
+        } catch (final InvalidParameterException e) {
+            System.err.println(e.toString());
             return null;
         }
     }
@@ -362,7 +364,8 @@ public class MazeController {
     }
 
     /**
-     * Return current dimension <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current dimension
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
      * @return BoundedRange
      */
@@ -371,18 +374,21 @@ public class MazeController {
     }
 
     /**
-     * Set current dimension <code>app.view.components.RangedSlider.BoundedRange</code> value
-     * and fire <code>app.model.MazeModel.setGrid(int rows, int cols)</code> event.
+     * Set current dimension
+     * <code>app.view.components.RangedSlider.BoundedRange</code> value and fire
+     * <code>app.model.MazeModel.setGrid(int rows, int cols)</code> event.
      *
      * @param val int
      */
     public final void setDimension(final int val) {
         this.dimension.setValue(val);
+        this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
         this.fireReset();
     }
 
     /**
-     * Return current delay <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current delay
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
      * @return BoundedRange
      */
@@ -391,7 +397,8 @@ public class MazeController {
     }
 
     /**
-     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code> value.
+     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
+     * value.
      *
      * @param val int
      */
@@ -400,7 +407,8 @@ public class MazeController {
     }
 
     /**
-     * Return current density <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current density
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
      * @return BoundedRange
      */
@@ -409,7 +417,8 @@ public class MazeController {
     }
 
     /**
-     * Set current density <code>app.view.components.RangedSlider.BoundedRange</code> value.
+     * Set current density
+     * <code>app.view.components.RangedSlider.BoundedRange</code> value.
      *
      * @param val int
      */

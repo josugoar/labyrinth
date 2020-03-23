@@ -21,7 +21,7 @@ public abstract class Generator implements AbstractAlgorithm {
     public static final class BackTracker extends Generator {
 
         @Override
-        public <T extends AbstractCell<T>> void awake(T[][] grid) {
+        public <T extends AbstractCell<T>> void awake(final T[][] grid) {
         }
 
         @Override

@@ -13,12 +13,18 @@ public final class Maze implements Runnable {
     private MazeView mazeView;
     private MazeController mazeController;
 
+    /**
+     * Create a new maze architecture initializer.
+     */
     public Maze() {
         this.mazeModel = new MazeModel();
         this.mazeView = new MazeView();
         this.mazeController = new MazeController();
     }
 
+    /**
+     * Assemble pivotal relationships.
+     */
     private final void initMaze() {
         this.mazeModel.setController(this.mazeController);
         this.mazeView.setController(this.mazeController);
@@ -26,14 +32,17 @@ public final class Maze implements Runnable {
         this.mazeController.setView(this.mazeView);
     }
 
+    /**
+     * Pivot initializer wrapper.
+     */
     private final void runMaze() {
         this.mazeController.run();
     }
 
     /**
-     * *<code>java.lang.Thread</code> invokation initializer.
+     * <code>java.lang.Thread</code> invokation initializer.
      *
-     * @see java.lang.Thread Thread*
+     * @see java.lang.Thread Thread
      * @see javax.swing.SwingUtilities#invokeLater(Runnable doRun) invokeLater()
      */
     @Override

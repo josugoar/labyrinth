@@ -44,7 +44,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      *
      * @see java.awt.Point Point
      */
-    private Point seed;
+    private final Point seed;
 
     /**
      * Tree-like graph neighbor pointer storage.
@@ -95,12 +95,13 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
     /**
      * Recursively traverse entire <code>app.model.components.CellPanel</code> and
-     * <code>app.model.components.Node</code> tree structure for maximum performance.
+     * <code>app.model.components.Node</code> tree structure for maximum
+     * performance.
      */
     public final void clear() {
         if (this.getInner() != null) {
             this.setInner(null);
-            for (CellPanel child : this.getNeighbors()) {
+            for (final CellPanel child : this.getNeighbors()) {
                 child.clear();
             }
         }
@@ -249,24 +250,26 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         @Override
         public final void mousePressed(final MouseEvent e) {
             CellPanel.this.ancestor.fireClear();
-            // Check for draw state
-            if (e.isShiftDown()) {
-                // Check for running action
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+            // Check for running action
+            try {
+                // Check for draw state
+                if (e.isShiftDown()) {
+                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
+                        throw new InterruptedException("Invalid input while running...");
+                    // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
+                    // Right input
                     else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.EMPTY);
-                } else {
-                    System.err.println("Invalid input while running...");
-                }
-                // Check for popup state
-            } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-                // Check for running action
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning()))
+                    // Check for popup state
+                } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
+                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
+                        throw new InterruptedException("Invalid input while running...");
                     CellPanel.this.ancestor.requestCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
-                else
-                    System.err.println("Invalid input while running...");
+                }
+            } catch (InterruptedException l) {
+                System.err.println(l.toString());
             }
         }
 
@@ -275,15 +278,19 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
             // Select Cell
             if (!CellPanel.selected)
                 CellPanel.this.paintSelection();
-            if (e.isShiftDown()) {
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+            try {
+                if (e.isShiftDown()) {
+                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
+                        throw new InterruptedException("Invalid input while running...");
+                    // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
+                    // Right input
                     else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.EMPTY);
-                } else {
-                    System.err.println("Invalid input while running...");
                 }
+            } catch (InterruptedException l) {
+                System.err.println(l.toString());
             }
         }
 

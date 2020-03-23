@@ -7,8 +7,8 @@ import java.util.Set;
 import app.model.components.Node;
 
 /**
- * CellPanel interface wrapper with inneer <code>app.model.components.Node</code>
- * pointer.
+ * CellPanel interface wrapper with inneer
+ * <code>app.model.components.Node</code> pointer.
  *
  * @param <T> AbstractCell<T>
  * @see app.model.components.Node Node
@@ -45,7 +45,7 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> {
         }
 
         @Override
-        public void setColor(Color color) {
+        public void setColor(final Color color) {
             this.color = Objects.requireNonNull(color, "'color' must not be null");
         }
 
@@ -57,8 +57,8 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> {
     public abstract void notifyChange();
 
     /**
-     * Return current
-     * <code>app.controller.components.AbstractCell.CellState</code> instance.
+     * Return current <code>app.controller.components.AbstractCell.CellState</code>
+     * instance.
      */
     public CellState getState();
 

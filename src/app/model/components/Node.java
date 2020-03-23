@@ -48,7 +48,7 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
         }
 
         @Override
-        public void setColor(Color color) {
+        public void setColor(final Color color) {
             this.color = Objects.requireNonNull(color, "'color' must not be null");
         }
 

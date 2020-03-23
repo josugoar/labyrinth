@@ -10,9 +10,13 @@ import javax.swing.Timer;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
+import app.controller.components.AbstractCell.CellState;
 import app.model.components.Node;
+import app.model.components.Node.NodeState;
 
 public abstract class PathFinder implements AbstractAlgorithm, Serializable {
+
+    // TODO: Refactor PathFinder
 
     private static final long serialVersionUID = 1L;
 
@@ -23,44 +27,43 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
 
     public static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
         if (child.getParent() != null) {
-            child.setState(Node.NodeState.PATH);
+            child.setState(NodeState.PATH);
             PathFinder.traverse(child.getParent());
         }
     }
 
     @Override
-    public final <T extends AbstractCell<T>> void awake(final T[][] grid) {
-        try {
-            this.setIsRunning(true);
-            this.find(grid, new HashSet<Node<T>>() {
-                private static final long serialVersionUID = 1L;
-                {
-                    final boolean directAccess = true;
-                    if (directAccess) {
-                        final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
-                        if (start == null) {
-                            PathFinder.this.setIsRunning(false);
-                            throw new NullPointerException("No starting node found...");
-                        }
-                        this.add(new Node<T>(start));
-                    } else {
-                        outer: for (int row = 0; row < grid.length; row++) {
-                            for (int col = 0; col < grid.length; col++) {
-                                final T CellPanel = grid[row][col];
-                                if (CellPanel.getState() == AbstractCell.CellState.START) {
-                                    this.add(new Node<T>(CellPanel));
-                                    break outer;
-                                }
+    @SuppressWarnings("unchecked")
+    public final <T extends AbstractCell<T>> void awake(final T[][] grid) throws NullPointerException {
+        this.find(grid, new HashSet<Node<T>>() {
+            private static final long serialVersionUID = 1L;
+            {
+                final boolean directAccess = true;
+                if (directAccess) {
+                    final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
+                    if (start == null) {
+                        PathFinder.this.setIsRunning(false);
+                        throw new NullPointerException("No starting node found...");
+                    }
+                    this.add(new Node<T>(start));
+                } else {
+                    outer: for (int row = 0; row < grid.length; row++) {
+                        for (int col = 0; col < grid.length; col++) {
+                            final T cell = grid[row][col];
+                            if (cell.getState() == CellState.START) {
+                                this.add(new Node<T>(cell));
+                                break outer;
                             }
                         }
-                        if (this.size() == 0)
-                            throw new NullPointerException("No starting node found...");
+                    }
+                    if (this.size() == 0) {
+                        PathFinder.this.setIsRunning(false);
+                        throw new NullPointerException("No starting node found...");
                     }
                 }
-            });
-        } catch (final StackOverflowError e) {
-            System.err.println(e.toString());
-        }
+                PathFinder.this.setIsRunning(true);
+            }
+        });
     }
 
     @Override
@@ -77,38 +80,42 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
                 throws StackOverflowError {
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
             for (final Node<T> node : currGen) {
-                for (T CellPanel : node.getOuter().getNeighbors()) {
-                    if (CellPanel.getInner() == null)
-                        CellPanel.setInner(new Node<T>(node, CellPanel));
-                    switch (CellPanel.getState()) {
+                for (final T cell : node.getOuter().getNeighbors()) {
+                    if (cell.getInner() == null)
+                        cell.setInner(new Node<T>(node, cell));
+                    switch (cell.getState()) {
                         case EMPTY:
-                            if (CellPanel.getInner().getState() != Node.NodeState.VISITED) {
-                                newGen.add(CellPanel.getInner());
+                            if (cell.getInner().getState() != Node.NodeState.VISITED) {
+                                newGen.add(cell.getInner());
                             }
                             break;
                         case END:
                             this.setIsRunning(false);
-                            PathFinder.traverse(CellPanel.getInner().getParent());
+                            PathFinder.traverse(cell.getInner().getParent());
                             break;
                         default:
                     }
                 }
             }
             if (newGen.size() == 0) {
-                this.setIsRunning(false);
                 throw new StackOverflowError("No solution...");
             }
             if (!this.isRunning) {
                 return;
             }
-            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController()
-                    .getDelay().getValue()), e -> {
-                        for (final Node<T> node : newGen) {
-                            node.setState(Node.NodeState.VISITED);
-                        }
-                        this.find(grid, newGen);
-                        ((Timer) e.getSource()).stop();
-                    }).start();
+            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()), e -> {
+                try {
+                    for (final Node<T> node : newGen) {
+                        node.setState(Node.NodeState.VISITED);
+                    }
+                    this.find(grid, newGen);
+                } catch (final StackOverflowError l) {
+                    this.setIsRunning(false);
+                    System.err.println(l.toString());
+                } finally {
+                    ((Timer) e.getSource()).stop();
+                }
+            }).start();
         }
 
         @Override
