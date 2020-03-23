@@ -2,6 +2,7 @@ package app.model;
 
 import java.awt.Component;
 import java.io.Serializable;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +18,8 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
 
     protected boolean isRunning = false;
 
-    protected abstract <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen) throws StackOverflowError;
+    protected abstract <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen)
+            throws StackOverflowError;
 
     public static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
         if (child.getParent() != null) {
@@ -62,7 +64,7 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
     }
 
     @Override
-    public final String toString() {
+    public final String getAlgorithm() {
         return this.getClass().getSimpleName();
     }
 
@@ -99,7 +101,8 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
             if (!this.isRunning) {
                 return;
             }
-            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()), e -> {
+            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController()
+                    .getDelay().getValue()), e -> {
                         for (final Node<T> node : newGen) {
                             node.setState(Node.NodeState.VISITED);
                         }
@@ -117,6 +120,11 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
         public final void setIsRunning(final boolean isRunning) {
             // TODO: Glass pane
             this.isRunning = isRunning;
+        }
+
+        @Override
+        public AlgorithmParameterSpec getParameterSpec() {
+            return null;
         }
 
     }

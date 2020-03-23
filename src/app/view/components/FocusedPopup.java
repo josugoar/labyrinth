@@ -1,17 +1,9 @@
 package app.view.components;
 
 import java.awt.Component;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 
 import javax.swing.JPopupMenu;
 import javax.swing.Timer;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 /**
  * <code>javax.swing.JPopupMenu</code> that return focus to given
@@ -32,7 +24,7 @@ public class FocusedPopup extends JPopupMenu {
     public FocusedPopup(final Component component) {
         super();
         this.addPropertyChangeListener("visible", e -> {
-            // Set focus delay
+            // Set focus delay after property change
             new Timer(1, l -> {
                 component.requestFocusInWindow();
                 ((Timer) l.getSource()).stop();

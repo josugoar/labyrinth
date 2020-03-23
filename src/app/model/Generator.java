@@ -1,5 +1,7 @@
 package app.model;
 
+import java.security.spec.AlgorithmParameterSpec;
+
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.model.components.CellPanel;
@@ -12,7 +14,7 @@ public abstract class Generator implements AbstractAlgorithm {
     }
 
     @Override
-    public final String toString() {
+    public final String getAlgorithm() {
         return this.getClass().getSimpleName();
     }
 
@@ -31,6 +33,11 @@ public abstract class Generator implements AbstractAlgorithm {
         public final void setIsRunning(final boolean isRunning) {
             // TODO: Glass pane
             this.isRunning = isRunning;
+        }
+
+        @Override
+        public AlgorithmParameterSpec getParameterSpec() {
+            return null;
         }
 
     }

@@ -1,8 +1,10 @@
 package app.controller;
 
+import java.security.InvalidParameterException;
 import java.util.Objects;
 
 import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
@@ -95,7 +97,7 @@ public class MazeController {
      *
      * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private BoundedRange dimension = new BoundedRange(10, 100, 20);
+    private BoundedRange dimension = new BoundedRange(10, 50, 20);
 
     /**
      * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw cycles.
@@ -136,6 +138,38 @@ public class MazeController {
     public final void run() {
         this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
         this.view.display();
+    }
+
+    /**
+     * Request <code>app.model.MazeModel.clear()</code> event.
+     */
+    public final void requestClear() {
+        if (this.model.getStart().getInner() != null)
+            this.model.fireClear();
+        else
+            System.err.println("No nodes to clear...");
+    }
+
+    /**
+     * Fire <code>app.model.MazeModel.reset()</code> event.
+     */
+    public final void fireReset() {
+        this.model.reset();
+    }
+
+    /**
+     * Fire <code>app.view.MazeView.releaseCellPopup(CellPanel cell)</code> event.
+     *
+     * @param cell CellPanel
+     * @return JPopupMenu
+     */
+    public final JPopupMenu fireCellPopup(final CellPanel cell) {
+        try {
+            return this.view.releaseCellPopup(cell);
+        } catch (InvalidParameterException e) {
+            System.err.println("Invalid 'cell'...");
+            return null;
+        }
     }
 
     /**
@@ -253,23 +287,6 @@ public class MazeController {
         this.splitComponent.setDividerLocation(-1);
         this.splitComponent.setEnabled(!this.splitComponent.isEnabled());
         this.splitComponent.getLeftComponent().setVisible(!this.splitComponent.getLeftComponent().isVisible());
-    }
-
-    /**
-     * Request <code>app.model.MazeModel.clear()</code> event.
-     */
-    public final void requestClear() {
-        if (this.model.getStart().getInner() != null)
-            this.model.fireClear();
-        else
-            System.err.println("No nodes to clear...");
-    }
-
-    /**
-     * Fire <code>app.model.MazeModel.reset()</code> event.
-     */
-    public final void fireReset() {
-        this.model.reset();
     }
 
     /**
@@ -421,7 +438,7 @@ public class MazeController {
      */
     public final void runPathFinder() {
         if (!this.model.getPathFinder().getIsRunning()) {
-            this.requestClear();
+            this.model.fireClear();
             this.model.awakePathFinder();
         }
     }
@@ -446,10 +463,10 @@ public class MazeController {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void runGenerator() {
-        // if (!this.model.getGenerator().getIsRunning()) {
-            this.requestClear();
+        if (!this.model.getGenerator().getIsRunning()) {
+            this.model.fireClear();
             this.model.awakeGenerator();
-        // }
+        }
     }
 
     @Override

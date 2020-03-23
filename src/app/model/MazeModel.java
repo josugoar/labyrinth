@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import app.controller.MazeController;
@@ -42,6 +43,16 @@ public class MazeModel extends JPanel {
     private CellPanel[][] grid;
 
     /**
+     * Grid starting <code>app.model.components.CellPanel</code> pointer.
+     */
+    private CellPanel start = null;
+
+    /**
+     * Grid ending <code>app.model.components.CellPanel</code> pointer.
+     */
+    private CellPanel end = null;
+
+    /**
      * Current maze trasversal <code>app.model.PathFinder</code> algorithm.
      *
      * @see app.model.PathFinder PathFinder
@@ -54,16 +65,6 @@ public class MazeModel extends JPanel {
      * @see app.model.Generator Generator
      */
     private Generator generator = new Generator.BackTracker();
-
-    /**
-     * Grid starting <code>app.model.components.CellPanel</code> pointer.
-     */
-    private CellPanel start = null;
-
-    /**
-     * Grid ending <code>app.model.components.CellPanel</code> pointer.
-     */
-    private CellPanel end = null;
 
     {
         this.setBorder(new EtchedBorder());
@@ -96,12 +97,23 @@ public class MazeModel extends JPanel {
     }
 
     /**
+     * Request <code>app.view.MazeView.releaseCellPopup(CellPanel cell)</code>
+     * event.
+     *
+     * @param cell CellPanel
+     * @return JPopupMenu
+     */
+    public final JPopupMenu requestCellPopup(final CellPanel cell) {
+        return this.controller.fireCellPopup(cell);
+    }
+
+    /**
      * Fire <code>app.model.components.CellPanel.clear()</code> event.
      */
     public final void fireClear() {
-        if (!this.pathfinder.getIsRunning() && this.start != null) {
-            this.start.clear();
-        }
+        if (this.pathfinder.getIsRunning() || this.start == null)
+            return;
+        this.start.clear();
     }
 
     /**
@@ -137,8 +149,9 @@ public class MazeModel extends JPanel {
      *
      * @param rows int
      * @param cols int
+     * @throws NegativeArraySizeException if (rows < 0 || cols < 0)
      */
-    public final void setGrid(final int rows, final int cols) {
+    public final void setGrid(final int rows, final int cols) throws NegativeArraySizeException {
         // Remove previous components
         this.removeAll();
         // Update layout and grid
@@ -154,6 +167,7 @@ public class MazeModel extends JPanel {
         // Set CellPanel neighbors
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
+                // TODO: Add diagonals by calling controller
                 final int CellPanelRow = row;
                 final int CellPanelCol = col;
                 this.grid[row][col].setNeighbors(new HashSet<CellPanel>() {
@@ -174,6 +188,83 @@ public class MazeModel extends JPanel {
         // Update draw changes
         this.revalidate();
         this.repaint();
+    }
+
+    /**
+     * Return current grid starting <code>app.model.components.CellPanel</code>
+     * pointer.
+     *
+     * @return CellPanel
+     */
+    public final CellPanel getStart() {
+        return this.start;
+    }
+
+    /**
+     * Set current grid starting <code>app.model.components.CellPanel</code>
+     * pointer.
+     *
+     * @param start CellPanel
+     */
+    public final void setStart(final CellPanel start) {
+        if (start == null) {
+            this.start = null;
+        } else {
+            // Override start
+            if (this.start != null && !start.equals(this.start)) {
+                start.setState(CellState.START);
+                this.start.setState(CellState.EMPTY);
+                this.start = start;
+            } else {
+                // Delete start
+                if (start.getState() == CellState.START) {
+                    start.setState(CellState.EMPTY);
+                    this.start = null;
+                    // Set new start
+                } else {
+                    start.setState(CellState.START);
+                    this.start = start;
+                }
+            }
+        }
+    }
+
+    /**
+     * Return current grid ending <code>app.model.components.CellPanel</code>
+     * pointer.
+     *
+     * @return CellPanel
+     */
+    public final CellPanel getEnd() {
+        return this.end;
+    }
+
+    /**
+     * Set current grid ending <code>app.model.components.CellPanel</code> pointer.
+     *
+     * @param end CellPanel
+     */
+    public final void setEnd(final CellPanel end) {
+        if (end == null) {
+            this.end = null;
+        } else {
+            // Override start
+            if (this.end != null && !end.equals(this.end)) {
+                end.setState(CellState.END);
+                this.end.setState(CellState.EMPTY);
+                this.end = end;
+            } else {
+                // Delete start
+                if (end.getState() == CellState.END) {
+                    end.setState(CellState.EMPTY);
+                    this.end = null;
+                    // Set new start
+                } else {
+                    end.setState(CellState.END);
+                    this.end = end;
+                }
+            }
+        }
     }
 
     /**
@@ -220,80 +311,6 @@ public class MazeModel extends JPanel {
      */
     public final void awakeGenerator() {
         this.generator.awake(this.getGrid());
-    }
-
-    /**
-     * Return current grid starting <code>app.model.components.CellPanel</code> pointer.
-     *
-     * @return CellPanel
-     */
-    public final CellPanel getStart() {
-        return this.start;
-    }
-
-    /**
-     * Set current grid starting <code>app.model.components.CellPanel</code> pointer.
-     *
-     * @param start CellPanel
-     */
-    public final void setStart(final CellPanel start) {
-        if (start == null) {
-            this.start = null;
-        } else {
-            // Override start
-            if (this.start != null && !start.equals(this.start)) {
-                start.setState(CellState.START);
-                this.start.setState(CellState.EMPTY);
-                this.start = start;
-            } else {
-                // Delete start
-                if (start.getState() == CellState.START) {
-                    start.setState(CellState.EMPTY);
-                    this.start = null;
-                    // Set new start
-                } else {
-                    start.setState(CellState.START);
-                    this.start = start;
-                }
-            }
-        }
-    }
-
-    /**
-     * Return current grid ending <code>app.model.components.CellPanel</code> pointer.
-     *
-     * @return CellPanel
-     */
-    public final CellPanel getEnd() {
-        return this.end;
-    }
-
-    /**
-     * Set current grid ending <code>app.model.components.CellPanel</code> pointer.
-     *
-     * @param end CellPanel
-     */
-    public final void setEnd(final CellPanel end) {
-        if (end == null) {
-            this.end = null;
-        } else {
-            // Override start
-            if (this.end != null && !end.equals(this.end)) {
-                end.setState(CellState.END);
-                this.end.setState(CellState.EMPTY);
-                this.end = end;
-            } else {
-                // Delete start
-                if (end.getState() == CellState.END) {
-                    end.setState(CellState.EMPTY);
-                    this.end = null;
-                    // Set new start
-                } else {
-                    end.setState(CellState.END);
-                    this.end = end;
-                }
-            }
-        }
     }
 
 }

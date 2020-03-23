@@ -1,11 +1,14 @@
 package app.controller.components;
 
-/**
- * Abstract algorithm interface wrapper.
- */
-public abstract interface AbstractAlgorithm {
+import javax.xml.crypto.AlgorithmMethod;
 
-    // TODO: extends AlgorithmMethod
+/**
+ * Abstract algorithm interface wrapper, extending
+ * <code>javax.xml.crypto.AlgorithmMethod</code>.
+ *
+ * @see javax.xml.crypto.AlgorithmMethod AlgorithmMethod
+ */
+public abstract interface AbstractAlgorithm extends AlgorithmMethod {
 
     /**
      * Awake algorithm on given euclidean space.
