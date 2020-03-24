@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 /**
@@ -20,6 +21,7 @@ public class RangedSlider extends JSlider {
     private static final long serialVersionUID = 1L;
 
     {
+        this.add(new JLabel("AAA"));
         // Set custom size
         this.setPreferredSize(new Dimension(100, this.getPreferredSize().height));
     }

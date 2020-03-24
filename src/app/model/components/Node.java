@@ -137,8 +137,6 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.outer == null) ? 0 : this.outer.hashCode());
-        result = prime * result + ((this.parent == null) ? 0 : this.parent.hashCode());
         result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
         return result;
     }
@@ -152,16 +150,6 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
         if (this.getClass() != obj.getClass())
             return false;
         final Node<?> other = (Node<?>) obj;
-        if (this.outer == null) {
-            if (other.outer != null)
-                return false;
-        } else if (!this.outer.equals(other.outer))
-            return false;
-        if (this.parent == null) {
-            if (other.parent != null)
-                return false;
-        } else if (!this.parent.equals(other.parent))
-            return false;
         if (this.state != other.state)
             return false;
         return true;

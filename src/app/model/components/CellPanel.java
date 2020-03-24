@@ -233,37 +233,25 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.ancestor == null) ? 0 : this.ancestor.hashCode());
         result = prime * result + ((this.inner == null) ? 0 : this.inner.hashCode());
-        result = prime * result + ((this.neighbors == null) ? 0 : this.neighbors.hashCode());
         result = prime * result + ((this.seed == null) ? 0 : this.seed.hashCode());
         result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (this.getClass() != obj.getClass())
             return false;
-        final CellPanel other = (CellPanel) obj;
-        if (this.ancestor == null) {
-            if (other.ancestor != null)
-                return false;
-        } else if (!this.ancestor.equals(other.ancestor))
-            return false;
+        CellPanel other = (CellPanel) obj;
         if (this.inner == null) {
             if (other.inner != null)
                 return false;
         } else if (!this.inner.equals(other.inner))
-            return false;
-        if (this.neighbors == null) {
-            if (other.neighbors != null)
-                return false;
-        } else if (!this.neighbors.equals(other.neighbors))
             return false;
         if (this.seed == null) {
             if (other.seed != null)
