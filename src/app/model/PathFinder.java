@@ -29,14 +29,9 @@ public abstract class PathFinder implements AbstractAlgorithm {
     protected boolean isRunning = false;
 
     /**
-     * Starting endpoint pointer.
-     */
-    protected Point start;
-
-    /**
      * Ending endpoint pointer.
      */
-    protected Point end;
+    protected Point target;
 
     /**
      * Recursively iterate over generations using
@@ -78,17 +73,12 @@ public abstract class PathFinder implements AbstractAlgorithm {
     }
 
     /**
-     * Store endpoints for performing later comparisons.
+     * Store target for later comparisons.
      *
-     * @param start Point
-     * @param end   Point
-     * @throws NullPointerException if (start == null || end == null)
+     * @param target Point
      */
-    private final void setEndpoints(final Point start, final Point end) throws NullPointerException {
-        if (start == null || end == null)
-            throw new NullPointerException("No endpoint found...");
-        this.start = start;
-        this.end = end;
+    private final void setTarget(final Point target) {
+        this.target = target;
     }
 
     @Override
@@ -96,18 +86,25 @@ public abstract class PathFinder implements AbstractAlgorithm {
         // Invoke new Thread
         new Thread(() -> {
             try {
-                // Store endpoints
-                this.setEndpoints(start, end);
-                // Find child and traverse tree
-                PathFinder.traverse(this.advance(grid, new HashSet<Node<T>>() {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        // Construct first generation
-                        this.add(new Node<T>(grid[start.x][start.y]));
-                        // Start running
-                        PathFinder.this.setIsRunning(true);
-                    }
-                }));
+                if (start == null)
+                    throw new NullPointerException("No starting node found...");
+                try {
+                    final T startCell = grid[start.x][start.y];
+                    // Store target which could not belong to array
+                    this.setTarget(end);
+                    // Find child and traverse tree
+                    PathFinder.traverse(this.advance(grid, new HashSet<Node<T>>() {
+                        private static final long serialVersionUID = 1L;
+                        {
+                            // Construct first generation
+                            this.add(new Node<T>(startCell));
+                            // Start running
+                            PathFinder.this.setIsRunning(true);
+                        }
+                    }));
+                } catch (final IndexOutOfBoundsException e) {
+                    throw new IndexOutOfBoundsException("Start does not belong to array...");
+                }
             } catch (NullPointerException | StackOverflowError | InterruptedException e) {
                 System.err.println(e.toString());
             } finally {
@@ -119,6 +116,39 @@ public abstract class PathFinder implements AbstractAlgorithm {
     @Override
     public final String getAlgorithm() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (this.isRunning ? 1231 : 1237);
+        result = prime * result + ((this.target == null) ? 0 : this.target.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        final PathFinder other = (PathFinder) obj;
+        if (this.isRunning != other.isRunning)
+            return false;
+        if (this.target == null)
+            if (other.target != null)
+                return false;
+        else if (!this.target.equals(other.target))
+            return false;
+        return true;
+    }
+
+    @Override
+    public final String toString() {
+        return this.getAlgorithm();
     }
 
     /**
@@ -163,6 +193,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
             if (!this.isRunning)
                 throw new InterruptedException("Invokation interrupted...");
             // Delay iteration
+            // TODO: Fix runtime
             Thread.sleep((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController()
                     .getDelay().getValue()));
             // Call method recursively until convergence

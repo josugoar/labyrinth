@@ -1,5 +1,10 @@
 package app.controller;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.Objects;
@@ -173,15 +178,6 @@ public class MazeController implements Serializable {
             System.err.println(e.toString());
             return null;
         }
-    }
-
-    // TODO: Serielize
-    public final void readMaze() {
-
-    }
-
-    public final void writeMaze() {
-
     }
 
     /**
@@ -482,6 +478,107 @@ public class MazeController implements Serializable {
     public final void runGenerator() {
         this.model.clear();
         this.model.awakeGenerator();
+    }
+
+    // TODO: Fix serialization
+    public final void readMaze() {
+        try {
+            final FileInputStream file = new FileInputStream("test.ser");
+            final ObjectInputStream in = new ObjectInputStream(file);
+            this.model.override((MazeModel) in.readObject());
+            in.close();
+            file.close();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println(e.toString());
+        }
+    }
+
+    public final void writeMaze() {
+        try {
+            final FileOutputStream file = new FileOutputStream("test.ser");
+            final ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(this.model);
+            out.close();
+            file.close();
+        } catch (final IOException e) {
+            System.err.println(e.toString());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (this.arrows ? 1231 : 1237);
+        result = prime * result + ((this.delay == null) ? 0 : this.delay.hashCode());
+        result = prime * result + ((this.density == null) ? 0 : this.density.hashCode());
+        result = prime * result + (this.diagonals ? 1231 : 1237);
+        result = prime * result + ((this.dimension == null) ? 0 : this.dimension.hashCode());
+        result = prime * result + ((this.mode == null) ? 0 : this.mode.hashCode());
+        result = prime * result + ((this.model == null) ? 0 : this.model.hashCode());
+        result = prime * result + ((this.splitComponent == null) ? 0 : this.splitComponent.hashCode());
+        result = prime * result + ((this.statusComponent == null) ? 0 : this.statusComponent.hashCode());
+        result = prime * result + ((this.treeComponent == null) ? 0 : this.treeComponent.hashCode());
+        result = prime * result + ((this.view == null) ? 0 : this.view.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        final MazeController other = (MazeController) obj;
+        if (this.arrows != other.arrows)
+            return false;
+        if (this.delay == null) {
+            if (other.delay != null)
+                return false;
+        } else if (!this.delay.equals(other.delay))
+            return false;
+        if (this.density == null) {
+            if (other.density != null)
+                return false;
+        } else if (!this.density.equals(other.density))
+            return false;
+        if (this.diagonals != other.diagonals)
+            return false;
+        if (this.dimension == null) {
+            if (other.dimension != null)
+                return false;
+        } else if (!this.dimension.equals(other.dimension))
+            return false;
+        if (this.mode != other.mode)
+            return false;
+        if (this.model == null) {
+            if (other.model != null)
+                return false;
+        } else if (!this.model.equals(other.model))
+            return false;
+        if (this.splitComponent == null) {
+            if (other.splitComponent != null)
+                return false;
+        } else if (!this.splitComponent.equals(other.splitComponent))
+            return false;
+        if (this.statusComponent == null) {
+            if (other.statusComponent != null)
+                return false;
+        } else if (!this.statusComponent.equals(other.statusComponent))
+            return false;
+        if (this.treeComponent == null) {
+            if (other.treeComponent != null)
+                return false;
+        } else if (!this.treeComponent.equals(other.treeComponent))
+            return false;
+        if (this.view == null) {
+            if (other.view != null)
+                return false;
+        } else if (!this.view.equals(other.view))
+            return false;
+        return true;
     }
 
     @Override

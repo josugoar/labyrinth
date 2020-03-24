@@ -447,7 +447,7 @@ public class MazeView extends JFrame {
                                             // TODO: Generalize
                                             try {
                                                 MazeView.this.controller.clear();
-                                            } catch (NullPointerException l) {
+                                            } catch (final NullPointerException l) {
                                                 System.err.println(l.toString());
                                             }
                                         });
@@ -594,6 +594,31 @@ public class MazeView extends JFrame {
      */
     public final void setController(final MazeController controller) {
         this.controller = Objects.requireNonNull(controller, "'controller' must not be null");
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.controller == null) ? 0 : this.controller.hashCode());
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        final MazeView other = (MazeView) obj;
+        if (this.controller == null) {
+            if (other.controller != null)
+                return false;
+        } else if (!this.controller.equals(other.controller))
+            return false;
+        return true;
     }
 
 }

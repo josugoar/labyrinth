@@ -3,6 +3,7 @@ package app.model;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -84,6 +85,24 @@ public class MazeModel extends JPanel {
      */
     public MazeModel(final MazeController controller) {
         this.setController(controller);
+    }
+
+    // TODO: Fix serialization
+    public final void override(final MazeModel model) {
+        // Remove previous components
+        this.removeAll();
+        // Update layout and grid
+        this.setLayout(new GridLayout(model.getGrid().length, model.getGrid().length));
+        this.grid = new CellPanel[model.getGrid().length][model.getGrid().length];
+        // Initialize CellPanel with only seed
+        for (int row = 0; row < model.getGrid().length; row++)
+            for (int col = 0; col < model.getGrid().length; col++) {
+                this.grid[row][col] = model.getGrid()[row][col];
+                this.add(this.grid[row][col]);
+            }
+        // Update draw changes
+        this.revalidate();
+        this.repaint();
     }
 
     /**
@@ -285,7 +304,9 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.PathFinder.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakePathFinder() {
-        this.pathfinder.awake(this.getGrid(), this.start.getSeed(), this.end.getSeed());
+        this.pathfinder.awake(this.getGrid(),
+                (this.start != null) ? this.start.getSeed() : null,
+                (this.end != null) ? this.start.getSeed() : null);
     }
 
     /**
@@ -308,7 +329,61 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakeGenerator() {
-        this.generator.awake(this.getGrid(), this.start.getSeed(), this.end.getSeed());
+        this.generator.awake(this.getGrid(),
+                (this.start != null) ? this.start.getSeed() : null,
+                (this.end != null) ? this.start.getSeed() : null);
+    }
+
+	@Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.controller == null) ? 0 : this.controller.hashCode());
+        result = prime * result + ((this.end == null) ? 0 : end.hashCode());
+        result = prime * result + ((this.generator == null) ? 0 : this.generator.hashCode());
+        result = prime * result + Arrays.deepHashCode(this.grid);
+        result = prime * result + ((this.pathfinder == null) ? 0 : this.pathfinder.hashCode());
+        result = prime * result + ((this.start == null) ? 0 : this.start.hashCode());
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        final MazeModel other = (MazeModel) obj;
+        if (controller == null)
+            if (other.controller != null)
+                return false;
+        else if (!this.controller.equals(other.controller))
+            return false;
+        if (this.end == null)
+            if (other.end != null)
+                return false;
+        else if (!this.end.equals(other.end))
+            return false;
+        if (this.generator == null)
+            if (other.generator != null)
+                return false;
+        else if (!this.generator.equals(other.generator))
+            return false;
+        if (!Arrays.deepEquals(grid, other.grid))
+            return false;
+        if (this.pathfinder == null)
+            if (other.pathfinder != null)
+                return false;
+        else if (!this.pathfinder.equals(other.pathfinder))
+            return false;
+        if (this.start == null)
+            if (other.start != null)
+                return false;
+        else if (!this.start.equals(other.start))
+            return false;
+        return true;
     }
 
 }

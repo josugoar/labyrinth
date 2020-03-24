@@ -139,6 +139,39 @@ public class RangedSlider extends JSlider {
             this.val = val;
         }
 
+        @Override
+        public final int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + this.max;
+            result = prime * result + this.min;
+            result = prime * result + this.val;
+            return result;
+        }
+
+        @Override
+        public final boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (this.getClass() != obj.getClass())
+                return false;
+            final BoundedRange other = (BoundedRange) obj;
+            if (this.max != other.max)
+                return false;
+            if (this.min != other.min)
+                return false;
+            if (this.val != other.val)
+                return false;
+            return true;
+        }
+
+        @Override
+        public final String toString() {
+            return String.format("BoundedRange [min: %d, max: %d, val: %d]", this.min, this.max, this.val);
+        }
+
     }
 
 }

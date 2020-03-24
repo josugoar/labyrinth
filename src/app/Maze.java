@@ -9,8 +9,6 @@ import app.view.MazeView;
  */
 public final class Maze implements Runnable {
 
-    // TODO: add toString, hascode, equals
-
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
      * pivotal <code>app.view.MazeView</code> component, extending
@@ -83,6 +81,48 @@ public final class Maze implements Runnable {
     public void run() {
         this.initMaze();
         this.runMaze();
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.mazeController == null) ? 0 : this.mazeController.hashCode());
+        result = prime * result + ((this.mazeModel == null) ? 0 : this.mazeModel.hashCode());
+        result = prime * result + ((this.mazeView == null) ? 0 : this.mazeView.hashCode());
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        final Maze other = (Maze) obj;
+        if (this.mazeController == null)
+            if (other.mazeController != null)
+                return false;
+        else if (!this.mazeController.equals(other.mazeController))
+            return false;
+        if (this.mazeModel == null)
+            if (other.mazeModel != null)
+                return false;
+        else if (!this.mazeModel.equals(other.mazeModel))
+            return false;
+        if (this.mazeView == null)
+            if (other.mazeView != null)
+                return false;
+        else if (!this.mazeView.equals(other.mazeView))
+            return false;
+        return true;
+    }
+
+    @Override
+    public final String toString() {
+        return this.mazeController.toString();
     }
 
 }
