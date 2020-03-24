@@ -1,5 +1,5 @@
 .vscode/*
+*.class
 *.code-workspace
 *.stackdump
-*.class
 *test.*
