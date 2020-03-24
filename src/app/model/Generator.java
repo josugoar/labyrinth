@@ -8,6 +8,8 @@ import app.model.components.CellPanel;
 
 public abstract class Generator implements AbstractAlgorithm {
 
+    private static final long serialVersionUID = 1L;
+
     protected boolean isRunning = false;
 
     protected final void awake(final CellPanel[][] grid) {
@@ -19,6 +21,8 @@ public abstract class Generator implements AbstractAlgorithm {
     }
 
     public static final class BackTracker extends Generator {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public <T extends AbstractCell<T>> void awake(final T[][] grid) {

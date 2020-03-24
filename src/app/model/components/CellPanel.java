@@ -101,9 +101,8 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     public final void clear() {
         if (this.getInner() != null) {
             this.setInner(null);
-            for (final CellPanel child : this.getNeighbors()) {
+            for (final CellPanel child : this.getNeighbors())
                 child.clear();
-            }
         }
     }
 
@@ -122,14 +121,13 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      * Paint border color selection.
      */
     protected final void paintSelection() {
-        if (this.state != CellState.EMPTY) {
-            this.setBorder(BorderFactory.createLineBorder(this.state.getColor()));
-        } else {
+        if (this.state != CellState.EMPTY)
+            this.setBorder(BorderFactory.createLineBorder(this.state.getReference()));
+        else
             if (this.inner == null)
                 this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             else
-                this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getColor()));
-        }
+                this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getReference()));
     }
 
     /**
@@ -225,11 +223,10 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
     @Override
     public final void paintComponent(final Graphics g) {
-        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY) {
-            g.setColor(this.inner.getState().getColor());
-        } else {
-            g.setColor(this.state.getColor());
-        }
+        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY)
+            g.setColor(this.inner.getState().getReference());
+        else
+            g.setColor(this.state.getReference());
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 

@@ -1,14 +1,18 @@
 package app.controller.components;
 
+import java.io.Serializable;
+
 import javax.xml.crypto.AlgorithmMethod;
 
 /**
- * Abstract algorithm interface wrapper, extending
- * <code>javax.xml.crypto.AlgorithmMethod</code>.
+ * Abstract algorithm interface wrapper, implementing
+ * <code>javax.xml.crypto.AlgorithmMethod</code> and
+ * <code>java.io.Serializable</code>.
  *
  * @see javax.xml.crypto.AlgorithmMethod AlgorithmMethod
+ * @see java.io.Serializable Serializable
  */
-public abstract interface AbstractAlgorithm extends AlgorithmMethod {
+public abstract interface AbstractAlgorithm extends AlgorithmMethod, Serializable {
 
     /**
      * Awake algorithm on given euclidean space.

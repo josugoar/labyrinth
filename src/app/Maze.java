@@ -9,8 +9,41 @@ import app.view.MazeView;
  */
 public final class Maze implements Runnable {
 
+    // TODO: add toString, hascode, equals
+
+    /**
+     * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
+     * pivotal <code>app.view.MazeView</code> component, extending
+     * <code>java.awt.JFrame</code>.
+     *
+     * @author JoshGoA
+     * @version 0.1
+     * @see javax.swing.JFrame JFrame
+     */
     private MazeModel mazeModel;
+
+    /**
+     * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
+     * pivotal <code>app.model.MazeModel</code> component, extending
+     * <code>javax.swing.JPanel</code> and storing
+     * <code>app.model.components.CellPanel</code>.
+     *
+     * @author JoshGoA
+     * @version 0.1
+     * @see javax.swing.JPanel JPanel
+     * @see app.model.components.CellPanel CellPanel
+     */
     private MazeView mazeView;
+
+    /**
+     * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
+     * pivotal <code>app.controller.MazeController</code> component, handling
+     * multiple pivotal interactions, implementing <code>java.io.Serializable</code>.
+     *
+     * @author JoshGoA
+     * @version 0.1
+     * @see java.io.Serializable Serializable
+     */
     private MazeController mazeController;
 
     /**

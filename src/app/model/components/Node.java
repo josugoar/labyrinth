@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import app.controller.components.AbstractCell;
-import app.controller.components.ColoredState;
+import app.controller.components.State;
 
 /**
  * <code>app.controller.components.AbstractCell</code> helper for
@@ -20,11 +20,11 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
 
     /**
      * Enum representing state and implementing
-     * <code>app.controller.components.ColoredState</code>.
+     * <code>app.controller.components.State</code>.
      *
-     * @see app.controller.components.ColoredState ColoredState
+     * @see app.controller.components.State State
      */
-    public static enum NodeState implements ColoredState {
+    public static enum NodeState implements State<Color> {
 
         VISITED(Color.CYAN), GERMINATED(Color.BLUE), PATH(Color.YELLOW);
 
@@ -43,12 +43,12 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
         }
 
         @Override
-        public final Color getColor() {
+        public final Color getReference() {
             return this.color;
         }
 
         @Override
-        public void setColor(final Color color) {
+        public void setReference(final Color color) {
             this.color = Objects.requireNonNull(color, "'color' must not be null");
         }
 

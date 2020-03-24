@@ -1,5 +1,6 @@
 package app.controller;
 
+import java.io.Serializable;
 import java.security.InvalidParameterException;
 import java.util.Objects;
 
@@ -20,15 +21,15 @@ import app.view.components.RangedSlider.BoundedRange;
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
  * pivotal <code>app.controller.MazeController</code> component, handling
- * <code>app.controller.MazeModel</code> and <code>app.view.MazeView</code>
- * multiple interactions.
+ * multiple pivotal interactions, implementing <code>java.io.Serializable</code>.
  *
  * @author JoshGoA
  * @version 0.1
- * @see app.model.MazeModel MazeModel
- * @see app.view.MazeView MazeView
+ * @see java.io.Serializable Serializable
  */
-public class MazeController {
+public class MazeController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Two-sided <code>app.model.MazeModel</code>
@@ -76,7 +77,7 @@ public class MazeController {
     /**
      * Current user input mode selection.
      *
-     * @see app.model.ColoredState.CellPanel.CellState CellState
+     * @see app.model.State.CellPanel.CellState CellState
      * @deprecated Draw cycle made by mouse input
      */
     private CellPanel.CellState mode = CellState.OBSTACLE;
@@ -446,10 +447,8 @@ public class MazeController {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void runPathFinder() {
-        if (!this.model.getPathFinder().getIsRunning()) {
-            this.model.fireClear();
-            this.model.awakePathFinder();
-        }
+        this.model.fireClear();
+        this.model.awakePathFinder();
     }
 
     /**
@@ -472,10 +471,8 @@ public class MazeController {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void runGenerator() {
-        if (!this.model.getGenerator().getIsRunning()) {
-            this.model.fireClear();
-            this.model.awakeGenerator();
-        }
+        this.model.fireClear();
+        this.model.awakeGenerator();
     }
 
     @Override

@@ -1,30 +1,53 @@
 package app.model;
 
 import java.awt.Component;
-import java.io.Serializable;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.Timer;
-
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
-import app.controller.components.AbstractCell.CellState;
 import app.model.components.Node;
 import app.model.components.Node.NodeState;
 
-public abstract class PathFinder implements AbstractAlgorithm, Serializable {
-
-    // TODO: Refactor PathFinder
+/**
+ * PathFinding algorithm abstract wrapper, implementing
+ * <code>app.controller.components.AbstractAlgorithm</code>.
+ *
+ * @see app.controller.components.AbstractAlgorithm AbstractAlgorithm
+ * @see app.controller.components.AbstractCell AbstractCell
+ * @see app.model.components.Node Node
+ */
+public abstract class PathFinder implements AbstractAlgorithm {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Flag for algorithm running state.
+     */
     protected boolean isRunning = false;
 
-    protected abstract <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen)
-            throws StackOverflowError;
+    /**
+     * Recursively iterate over generations using
+     * <code>app.model.components.Node</code> priority queue.
+     *
+     * @param <T>     AbstractCell<T>
+     * @param grid    T[][]
+     * @param currGen Set<Node<T>>Set<Node<T>>
+     * @throws StackOverflowError   if (newGen.size() == 0)
+     * @throws InterruptedException if (!isRunning)
+     */
+    protected abstract <T extends AbstractCell<T>> Node<T> find(final T[][] grid, final Set<Node<T>> currGen)
+            throws StackOverflowError, InterruptedException;
 
+    /**
+     * Iterate over all parents of
+     * <code>app.controller.components.AbstractCell</code>
+     * <code>app.model.components.Node</code>.
+     *
+     * @param <T>   AbstractCell<T>
+     * @param child Node<T>
+     */
     public static final <T extends AbstractCell<T>> void traverse(final Node<T> child) {
         if (child.getParent() != null) {
             child.setState(NodeState.PATH);
@@ -32,38 +55,45 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
         }
     }
 
+    /**
+     * Visit all <code>app.model.components.Node</code> in generation.
+     *
+     * @param <T> AbstractCell<T>
+     * @param gen Set<Node<T>>
+     */
+    protected static final <T extends AbstractCell<T>> void visitGeneration(final Set<Node<T>> gen) {
+        for (final Node<T> node : gen)
+            node.setState(Node.NodeState.VISITED);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public final <T extends AbstractCell<T>> void awake(final T[][] grid) throws NullPointerException {
-        this.find(grid, new HashSet<Node<T>>() {
-            private static final long serialVersionUID = 1L;
-            {
-                final boolean directAccess = true;
-                if (directAccess) {
-                    final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
-                    if (start == null) {
-                        PathFinder.this.setIsRunning(false);
-                        throw new NullPointerException("No starting node found...");
-                    }
-                    this.add(new Node<T>(start));
-                } else {
-                    outer: for (int row = 0; row < grid.length; row++) {
-                        for (int col = 0; col < grid.length; col++) {
-                            final T cell = grid[row][col];
-                            if (cell.getState() == CellState.START) {
-                                this.add(new Node<T>(cell));
-                                break outer;
-                            }
+    public final <T extends AbstractCell<T>> void awake(final T[][] grid) {
+        // Invoke new Thread
+        new Thread(() -> {
+            try {
+                // Find child
+                PathFinder.traverse(this.find(grid, new HashSet<Node<T>>() {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        // TODO: Generalize start
+                        // Get start
+                        final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
+                        if (start == null) {
+                            throw new NullPointerException("No starting node found...");
                         }
+                        // Construct first generation
+                        this.add(new Node<T>(start));
+                        // Start running
+                        PathFinder.this.setIsRunning(true);
                     }
-                    if (this.size() == 0) {
-                        PathFinder.this.setIsRunning(false);
-                        throw new NullPointerException("No starting node found...");
-                    }
-                }
-                PathFinder.this.setIsRunning(true);
+                }));
+                PathFinder.this.setIsRunning(false);
+            } catch (NullPointerException | StackOverflowError | InterruptedException e) {
+                this.setIsRunning(false);
+                System.err.println(e.toString());
             }
-        });
+        }).start();
     }
 
     @Override
@@ -71,51 +101,51 @@ public abstract class PathFinder implements AbstractAlgorithm, Serializable {
         return this.getClass().getSimpleName();
     }
 
+    /**
+     * Dijkstra pathfinding algorithm implementation, extending
+     * <code>app.model.PathFinder</code>.
+     *
+     * @see app.model.PathFinder PathFinder
+     */
     public static final class Dijkstra extends PathFinder {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected final <T extends AbstractCell<T>> void find(final T[][] grid, final Set<Node<T>> currGen)
-                throws StackOverflowError {
+        protected final <T extends AbstractCell<T>> Node<T> find(final T[][] grid, final Set<Node<T>> currGen)
+                throws StackOverflowError, InterruptedException {
+            // Visit nodes
+            PathFinder.visitGeneration(currGen);
+            // Initialize new empty generation
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
-            for (final Node<T> node : currGen) {
+            // Range through current generaton nodes cell neighbors
+            for (final Node<T> node : currGen)
                 for (final T cell : node.getOuter().getNeighbors()) {
+                    // Set new node
                     if (cell.getInner() == null)
                         cell.setInner(new Node<T>(node, cell));
+                    // Check state
                     switch (cell.getState()) {
                         case EMPTY:
-                            if (cell.getInner().getState() != Node.NodeState.VISITED) {
+                            // Visit node
+                            if (cell.getInner().getState() != Node.NodeState.VISITED)
                                 newGen.add(cell.getInner());
-                            }
                             break;
                         case END:
-                            this.setIsRunning(false);
-                            PathFinder.traverse(cell.getInner().getParent());
-                            break;
+                            // End reached
+                            PathFinder.visitGeneration(newGen);
+                            return cell.getInner();
                         default:
                     }
                 }
-            }
-            if (newGen.size() == 0) {
+            if (newGen.size() == 0)
                 throw new StackOverflowError("No solution...");
-            }
-            if (!this.isRunning) {
-                return;
-            }
-            new Timer((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()), e -> {
-                try {
-                    for (final Node<T> node : newGen) {
-                        node.setState(Node.NodeState.VISITED);
-                    }
-                    this.find(grid, newGen);
-                } catch (final StackOverflowError l) {
-                    this.setIsRunning(false);
-                    System.err.println(l.toString());
-                } finally {
-                    ((Timer) e.getSource()).stop();
-                }
-            }).start();
+            if (!this.isRunning)
+                throw new InterruptedException("Invokation interrupted...");
+            // Delay iteration
+            Thread.sleep((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()));
+            // Call method recursively until convergence
+            return this.find(grid, newGen);
         }
 
         @Override

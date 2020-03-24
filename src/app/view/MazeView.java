@@ -27,6 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -158,10 +159,11 @@ public class MazeView extends JFrame {
      * Initialize <code>javax.swing.JFrame</code> custom parameters.
      */
     private final void initFrame() {
-        this.setMinimumSize(new Dimension(450, 400));
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setMinimumSize(new Dimension(450, 525));
         this.setLocationRelativeTo(null);
         this.setFocusable(true);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.pack();
     }
 
     /**
@@ -261,7 +263,7 @@ public class MazeView extends JFrame {
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
                                                                         this.addChangeListener(e -> {
-                                                                            if (!((RangedSlider) e.getSource()).getValueIsAdjusting())
+                                                                            if (!((JSlider) e.getSource()).getValueIsAdjusting())
                                                                                 MazeView.this.controller.setDimension(this.getValue());
                                                                         });
                                                                     }

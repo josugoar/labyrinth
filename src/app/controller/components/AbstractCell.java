@@ -1,6 +1,7 @@
 package app.controller.components;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
@@ -8,20 +9,22 @@ import app.model.components.Node;
 
 /**
  * CellPanel interface wrapper with inneer
- * <code>app.model.components.Node</code> pointer.
+ * <code>app.model.components.Node</code> pointer, implementing
+ * <code>java.io.Serializable</code>.
  *
  * @param <T> AbstractCell<T>
+ * @see java.io.Serializable Serializable
  * @see app.model.components.Node Node
  */
-public abstract interface AbstractCell<T extends AbstractCell<T>> {
+public abstract interface AbstractCell<T extends AbstractCell<T>> extends Serializable {
 
     /**
      * Enum representing state and implementing
-     * <code>app.controller.components.ColoredState</code>.
+     * <code>app.controller.components.State</code>.
      *
-     * @see app.controller.components.ColoredState ColoredState
+     * @see app.controller.components.State State
      */
-    public static enum CellState implements ColoredState {
+    public static enum CellState implements State<Color> {
 
         START(Color.RED), END(Color.GREEN), OBSTACLE(Color.BLACK), EMPTY(Color.WHITE);
 
@@ -40,12 +43,12 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> {
         }
 
         @Override
-        public final Color getColor() {
+        public final Color getReference() {
             return this.color;
         }
 
         @Override
-        public void setColor(final Color color) {
+        public void setReference(final Color color) {
             this.color = Objects.requireNonNull(color, "'color' must not be null");
         }
 

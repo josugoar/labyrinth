@@ -99,6 +99,15 @@ public class MazeModel extends JPanel {
     }
 
     /**
+     * Fire <code>app.model.components.CellPanel.clear()</code> event.
+     */
+    public final void fireClear() {
+        if (this.pathfinder.getIsRunning() || this.start == null)
+            return;
+        this.start.clear();
+    }
+
+    /**
      * Request <code>app.view.MazeView.releaseCellPopup(CellPanel cell)</code>
      * event.
      *
@@ -107,15 +116,6 @@ public class MazeModel extends JPanel {
      */
     public final JPopupMenu requestCellPopup(final CellPanel cell) {
         return this.controller.fireCellPopup(cell);
-    }
-
-    /**
-     * Fire <code>app.model.components.CellPanel.clear()</code> event.
-     */
-    public final void fireClear() {
-        if (this.pathfinder.getIsRunning() || this.start == null)
-            return;
-        this.start.clear();
     }
 
     /**
@@ -162,14 +162,13 @@ public class MazeModel extends JPanel {
         this.setLayout(new GridLayout(rows, cols));
         this.grid = new CellPanel[rows][cols];
         // Initialize CellPanel with only seed
-        for (int row = 0; row < rows; row++) {
+        for (int row = 0; row < rows; row++)
             for (int col = 0; col < cols; col++) {
                 this.grid[row][col] = new CellPanel(this, new Point(row, col));
                 this.add(this.grid[row][col]);
             }
-        }
         // Set CellPanel neighbors
-        for (int row = 0; row < rows; row++) {
+        for (int row = 0; row < rows; row++)
             for (int col = 0; col < cols; col++) {
                 // TODO: Add diagonals by calling controller
                 final int CellPanelRow = row;
@@ -188,7 +187,6 @@ public class MazeModel extends JPanel {
                     }
                 });
             }
-        }
         // Update draw changes
         this.revalidate();
         this.repaint();
@@ -211,15 +209,15 @@ public class MazeModel extends JPanel {
      * @param start CellPanel
      */
     public final void setStart(final CellPanel start) {
-        if (start == null) {
+        if (start == null)
             this.start = null;
-        } else {
+        else
             // Override start
             if (this.start != null && !start.equals(this.start)) {
                 start.setState(CellState.START);
                 this.start.setState(CellState.EMPTY);
                 this.start = start;
-            } else {
+            } else
                 // Delete start
                 if (start.getState() == CellState.START) {
                     start.setState(CellState.EMPTY);
@@ -229,8 +227,6 @@ public class MazeModel extends JPanel {
                     start.setState(CellState.START);
                     this.start = start;
                 }
-            }
-        }
     }
 
     /**
@@ -249,15 +245,15 @@ public class MazeModel extends JPanel {
      * @param end CellPanel
      */
     public final void setEnd(final CellPanel end) {
-        if (end == null) {
+        if (end == null)
             this.end = null;
-        } else {
+        else
             // Override start
             if (this.end != null && !end.equals(this.end)) {
                 end.setState(CellState.END);
                 this.end.setState(CellState.EMPTY);
                 this.end = end;
-            } else {
+            } else
                 // Delete start
                 if (end.getState() == CellState.END) {
                     end.setState(CellState.EMPTY);
@@ -267,8 +263,6 @@ public class MazeModel extends JPanel {
                     end.setState(CellState.END);
                     this.end = end;
                 }
-            }
-        }
     }
 
     /**

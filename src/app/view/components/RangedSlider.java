@@ -15,6 +15,8 @@ import javax.swing.JSlider;
  */
 public class RangedSlider extends JSlider {
 
+    // TODO: Add JSlider annotations
+
     private static final long serialVersionUID = 1L;
 
     {
