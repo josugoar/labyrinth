@@ -1,5 +1,6 @@
 package app.controller.components;
 
+import java.awt.Point;
 import java.io.Serializable;
 
 import javax.xml.crypto.AlgorithmMethod;
@@ -20,7 +21,7 @@ public abstract interface AbstractAlgorithm extends AlgorithmMethod, Serializabl
      * @param <T>  AbstractCell<T>
      * @param grid T[][]
      */
-    public abstract <T extends AbstractCell<T>> void awake(final T[][] grid);
+    public abstract <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end);
 
     /**
      * Return current running state.

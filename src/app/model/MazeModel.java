@@ -285,7 +285,7 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.PathFinder.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakePathFinder() {
-        this.pathfinder.awake(this.getGrid());
+        this.pathfinder.awake(this.getGrid(), this.start.getSeed(), this.end.getSeed());
     }
 
     /**
@@ -308,7 +308,7 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakeGenerator() {
-        this.generator.awake(this.getGrid());
+        this.generator.awake(this.getGrid(), this.start.getSeed(), this.end.getSeed());
     }
 
 }

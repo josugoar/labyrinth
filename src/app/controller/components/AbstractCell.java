@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
+import app.controller.State;
 import app.model.components.Node;
 
 /**
@@ -20,9 +21,9 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> extends Serial
 
     /**
      * Enum representing state and implementing
-     * <code>app.controller.components.State</code>.
+     * <code>app.controller.State</code>.
      *
-     * @see app.controller.components.State State
+     * @see app.controller.State State
      */
     public static enum CellState implements State<Color> {
 

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import app.controller.components.AbstractCell;
-import app.controller.components.State;
+import app.controller.State;
 
 /**
  * <code>app.controller.components.AbstractCell</code> helper for
@@ -20,9 +20,9 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
 
     /**
      * Enum representing state and implementing
-     * <code>app.controller.components.State</code>.
+     * <code>app.controller.State</code>.
      *
-     * @see app.controller.components.State State
+     * @see app.controller.State State
      */
     public static enum NodeState implements State<Color> {
 

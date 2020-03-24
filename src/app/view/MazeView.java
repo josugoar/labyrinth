@@ -512,7 +512,7 @@ public class MazeView extends JFrame {
                             // mn_editPreferences
                             private static final long serialVersionUID = 1L;
                             {
-                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/viewIcon.gif")));
+                                this.setIcon(new ImageIcon(MazeView.class.getResource("assets/preferencesIcon.gif")));
                                 this.add(new JCheckBoxMenuItem("Arrows") {
                                     // chb_mni_preferencesArrows
                                     private static final long serialVersionUID = 1L;

@@ -1,4 +1,4 @@
-package app.controller.components;
+package app.controller;
 
 import java.io.Serializable;
 

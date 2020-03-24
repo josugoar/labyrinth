@@ -1,6 +1,7 @@
 package app.model;
 
 import java.awt.Component;
+import java.awt.Point;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +27,16 @@ public abstract class PathFinder implements AbstractAlgorithm {
      * Flag for algorithm running state.
      */
     protected boolean isRunning = false;
+
+    /**
+     * Starting endpoint pointer.
+     */
+    protected Point start;
+
+    /**
+     * Ending endpoint pointer.
+     */
+    protected Point end;
 
     /**
      * Recursively iterate over generations using
@@ -66,32 +77,41 @@ public abstract class PathFinder implements AbstractAlgorithm {
             node.setState(Node.NodeState.VISITED);
     }
 
+    /**
+     * Store endpoints for performing later comparisons.
+     *
+     * @param start Point
+     * @param end   Point
+     * @throws NullPointerException if (start == null || end == null)
+     */
+    private final void setEndpoints(final Point start, final Point end) throws NullPointerException {
+        if (start == null || end == null)
+            throw new NullPointerException("No endpoint found...");
+        this.start = start;
+        this.end = end;
+    }
+
     @Override
-    @SuppressWarnings("unchecked")
-    public final <T extends AbstractCell<T>> void awake(final T[][] grid) {
+    public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
         // Invoke new Thread
         new Thread(() -> {
             try {
-                // Find child
+                // Store endpoints
+                this.setEndpoints(start, end);
+                // Find child and traverse tree
                 PathFinder.traverse(this.find(grid, new HashSet<Node<T>>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        // TODO: Generalize start
-                        // Get start
-                        final T start = (T) ((MazeModel) ((Component) grid[0][0]).getParent()).getStart();
-                        if (start == null) {
-                            throw new NullPointerException("No starting node found...");
-                        }
                         // Construct first generation
-                        this.add(new Node<T>(start));
+                        this.add(new Node<T>(grid[start.x][start.y]));
                         // Start running
                         PathFinder.this.setIsRunning(true);
                     }
                 }));
-                PathFinder.this.setIsRunning(false);
             } catch (NullPointerException | StackOverflowError | InterruptedException e) {
-                this.setIsRunning(false);
                 System.err.println(e.toString());
+            } finally {
+                this.setIsRunning(false);
             }
         }).start();
     }
@@ -115,7 +135,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
         protected final <T extends AbstractCell<T>> Node<T> find(final T[][] grid, final Set<Node<T>> currGen)
                 throws StackOverflowError, InterruptedException {
             // Visit nodes
-            PathFinder.visitGeneration(currGen);
+            super.visitGeneration(currGen);
             // Initialize new empty generation
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
             // Range through current generaton nodes cell neighbors
@@ -133,7 +153,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
                             break;
                         case END:
                             // End reached
-                            PathFinder.visitGeneration(newGen);
+                            super.visitGeneration(newGen);
                             return cell.getInner();
                         default:
                     }

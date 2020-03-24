@@ -77,10 +77,10 @@ public class MazeController implements Serializable {
     /**
      * Current user input mode selection.
      *
-     * @see app.model.State.CellPanel.CellState CellState
+     * @see app.model.components.CellPanel.CellState CellState
      * @deprecated Draw cycle made by mouse input
      */
-    private CellPanel.CellState mode = CellState.OBSTACLE;
+    private CellState mode = CellState.OBSTACLE;
 
     /**
      * Diagonal tile trasversal flag.

@@ -144,7 +144,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      *
      * @param selected boolean
      */
-    public final void setSelected(final boolean selected) {
+    public synchronized final void setSelected(final boolean selected) {
         if (selected)
             CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         else
@@ -245,7 +245,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private final class CellPanelListener extends MouseAdapter {
 
         @Override
-        public final void mousePressed(final MouseEvent e) {
+        public synchronized final void mousePressed(final MouseEvent e) {
             CellPanel.this.ancestor.fireClear();
             // Check for running action
             try {
@@ -265,13 +265,13 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                         throw new InterruptedException("Invalid input while running...");
                     CellPanel.this.ancestor.requestCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
                 }
-            } catch (InterruptedException l) {
+            } catch (final InterruptedException l) {
                 System.err.println(l.toString());
             }
         }
 
         @Override
-        public final void mouseEntered(final MouseEvent e) {
+        public synchronized final void mouseEntered(final MouseEvent e) {
             // Select Cell
             if (!CellPanel.selected)
                 CellPanel.this.paintSelection();
@@ -286,13 +286,13 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                     else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.EMPTY);
                 }
-            } catch (InterruptedException l) {
+            } catch (final InterruptedException l) {
                 System.err.println(l.toString());
             }
         }
 
         @Override
-        public final void mouseExited(final MouseEvent e) {
+        public synchronized final void mouseExited(final MouseEvent e) {
             if (!CellPanel.selected)
                 CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         }
