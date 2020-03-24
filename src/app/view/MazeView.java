@@ -98,9 +98,7 @@ public class MazeView extends JFrame {
     /**
      * Create a new isolated pipeline component.
      */
-    public MazeView() {
-        super("MazeApp");
-    }
+    public MazeView() { }
 
     /**
      * Create a new two-sided <code>app.controller.MazeController</code> interaction
@@ -114,56 +112,16 @@ public class MazeView extends JFrame {
     }
 
     /**
-     * Release a new <code>javax.swing.JPopupMenu</code> selection changer.
-     *
-     * @param cell CellPanel
-     * @return JPopupMenu
-     * @throws InvalidParameterException if (cell == null)
+     * Display frame on screen.
      */
-    public final JPopupMenu releaseCellPopup(final CellPanel cell) throws InvalidParameterException {
-        if (cell == null)
-            throw new InvalidParameterException("Invalid cell...");
-        return new FocusedPopup(this) {
-            private static final long serialVersionUID = 1L;
-            {
-                this.addPopupMenuListener(new PopupMenuListener() {
-                    @Override
-                    public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-                        cell.setSelected(true);
-                    }
-                    @Override
-                    public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                        cell.setSelected(false);
-                    }
-                    @Override
-                    public void popupMenuCanceled(final PopupMenuEvent e) {
-                    }
-                });
-                this.add(new JMenuItem("Start") {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        this.addActionListener(e -> cell.getAncestor().setStart(cell));
-                    }
-                });
-                this.add(new JMenuItem("End") {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        this.addActionListener(e -> cell.getAncestor().setEnd(cell));
-                    }
-                });
-            }
-        };
-    }
-
-    /**
-     * Initialize <code>javax.swing.JFrame</code> custom parameters.
-     */
-    private final void initFrame() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setMinimumSize(new Dimension(450, 525));
-        this.setLocationRelativeTo(null);
-        this.setFocusable(true);
-        this.pack();
+    public final void display() {
+        try {
+            this.initComponent();
+            this.initFrame();
+            this.setVisible(true);
+        } catch (final NullPointerException e) {
+            System.err.println(e.toString());
+        }
     }
 
     /**
@@ -172,49 +130,48 @@ public class MazeView extends JFrame {
      * @see java.awt.Component Component
      * @throws NullPointerException if (controller == null)
      */
-    private final void initView() throws NullPointerException {
+    private final void initComponent() throws NullPointerException {
         if (this.controller == null)
             throw new NullPointerException("MazeController might not hvae been initialized...");
-        this.add(new JPanel(new BorderLayout()) {
+        this.add(new JPanel(new BorderLayout(0, 0)) {
             // pnl_splitComponentWrapper
             private static final long serialVersionUID = 1L;
             {
-                this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JTabbedPane() {
+                this.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JTabbedPane(SwingConstants.TOP, JTabbedPane.WRAP_TAB_LAYOUT) {
                     // tab_treeComponentWrapper
                     private static final long serialVersionUID = 1L;
                     {
                         this.setVisible(false);
-                        this.addTab("Node Tree", new JScrollPane() {
+                        this.addTab("Node Tree", new JScrollPane(new JTree(new DefaultMutableTreeNode("Start")) {
+                            // tre_treeComponent
+                            private static final long serialVersionUID = 1L;
+                            {
+                                this.setShowsRootHandles(true);
+                                MazeView.this.controller.setTreeComponent(this);
+                            }
+                        }, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
                             // scr_treeComponentScroll
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMinimumSize(new Dimension(100, this.getMinimumSize().height));
-                                this.setViewportView(new JTree(new DefaultMutableTreeNode("Start")) {
-                                    // tre_treeComponent
-                                    private static final long serialVersionUID = 1L;
-                                    {
-                                        this.setShowsRootHandles(true);
-                                        MazeView.this.controller.setTreeComponent(this);
-                                    }
-                                });
                             }
                         });
                     }
-                }, new JPanel(new BorderLayout()) {
+                }, new JPanel(new BorderLayout(0, 0)) {
                     // pnl_mazeModelWrapper
                     private static final long serialVersionUID = 1L;
                     {
                         // pnl_mazeModel
                         this.add(MazeView.this.controller.getModel(), BorderLayout.CENTER);
-                        this.add(new JPanel(new FlowLayout(FlowLayout.LEFT)) {
+                        this.add(new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5)) {
                             // pnl_statusComponentWrapper
                             private static final long serialVersionUID = 1L;
                             {
-                                this.add(new JLabel(MazeView.this.controller.toString()) {
+                                this.add(new JLabel(MazeView.this.controller.toString(), null, SwingConstants.LEADING) {
                                     // lbl_statusComponent
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.addPropertyChangeListener("text", e -> MazeView.this.controller.resetStatusComponent());
+                                        this.addPropertyChangeListener("text",e -> MazeView.this.controller.resetStatusComponent());
                                         MazeView.this.controller.setStatusComponent(this);
                                     }
                                 });
@@ -230,11 +187,11 @@ public class MazeView extends JFrame {
                         MazeView.this.controller.setSplitComponent(this);
                     }
                 }, BorderLayout.CENTER);
-                this.add(new JPanel() {
+                this.add(new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5)) {
                     // pnl_toolBarWrapper
                     private static final long serialVersionUID = 1L;
                     {
-                        this.add(new JPanel() {
+                        this.add(new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5)) {
                             // pnl_toolBar
                             private static final long serialVersionUID = 1L;
                             {
@@ -243,14 +200,13 @@ public class MazeView extends JFrame {
                                     // tlb_featureBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.add(new JPanel(new GridLayout(3, 1)) {
+                                        this.add(new JPanel(new GridLayout(3, 1, 0, 0)) {
                                             // pnl_featuresBarWrapper
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.setBorder(new EtchedBorder());
-                                                this.add(new IconifiedButton(
-                                                        new ImageIcon(MazeView.class.getResource("assets/dimensionIcon.gif")),
-                                                        "Dimension") {
+                                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+                                                this.add(new IconifiedButton("Dimension",
+                                                        new ImageIcon(MazeView.class.getResource("assets/dimensionIcon.gif"))) {
                                                     // btn_dimensionSelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
@@ -272,9 +228,8 @@ public class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new IconifiedButton(
-                                                        new ImageIcon(MazeView.class.getResource("assets/delayIcon.gif")),
-                                                        "Delay") {
+                                                this.add(new IconifiedButton("Delay",
+                                                        new ImageIcon(MazeView.class.getResource("assets/delayIcon.gif"))) {
                                                     // btn_delaySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
@@ -293,9 +248,8 @@ public class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new IconifiedButton(
-                                                        new ImageIcon(MazeView.class.getResource("assets/densityIcon.gif")),
-                                                        "Density") {
+                                                this.add(new IconifiedButton("Density",
+                                                        new ImageIcon(MazeView.class.getResource("assets/densityIcon.gif"))) {
                                                     // btn_densitySelector
                                                     private static final long serialVersionUID = 1L;
                                                     {
@@ -322,23 +276,21 @@ public class MazeView extends JFrame {
                                     // tlb_runBar
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.add(new JPanel(new GridLayout(2, 1)) {
+                                        this.add(new JPanel(new GridLayout(2, 1, 0, 0)) {
                                             // pnl_runBarWrapper
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.setBorder(new EtchedBorder());
-                                                this.add(new IconifiedButton(
-                                                        new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif")),
-                                                        "Run PathFinder") {
+                                                this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+                                                this.add(new IconifiedButton("Run PathFinder",
+                                                        new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
                                                     // btn_runPathFinder
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> MazeView.this.controller.runPathFinder());
                                                     }
                                                 });
-                                                this.add(new IconifiedButton(
-                                                        new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif")),
-                                                        "Run Generator") {
+                                                this.add(new IconifiedButton("Run Generator",
+                                                        new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif"))) {
                                                     // btn_runGenerator
                                                     private static final long serialVersionUID = 1L;
                                                     {
@@ -367,29 +319,29 @@ public class MazeView extends JFrame {
                                     // btn_grp_pathfinderSelector
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.add(new JRadioButtonMenuItem("A Star") {
+                                        this.add(new JRadioButtonMenuItem("A Star", null, false) {
                                             // rd_btn_mni_pathfinderAStar
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 // this.addItemListener(e -> MazeView.this.controller.setPathFinder(new PathFinder.AStar()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("BFS") {
+                                        this.add(new JRadioButtonMenuItem("BFS", null, false) {
                                             // rd_btn_mni_pathfinderBFS
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 // this.addItemListener(e -> MazeView.this.controller.setPathFinder(new PathFinder.BFS()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("Dijkstra", true) {
+                                        this.add(new JRadioButtonMenuItem("Dijkstra", null, true) {
                                             // rd_btn_mni_pathfinderDijkstra
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeView.this.controller.updatePathFinder(new PathFinder.Dijkstra()));
+                                                this.addItemListener(e -> MazeView.this.controller.setPathFinder(new PathFinder.Dijkstra()));
                                             }
                                         });
                                     }
-                                }.getElements();e.hasMoreElements();) {
+                                }.getElements(); e.hasMoreElements();) {
                                     this.add(e.nextElement());
                                 }
                             }
@@ -404,21 +356,21 @@ public class MazeView extends JFrame {
                                     // btn_grp_generatorSelector
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.add(new JRadioButtonMenuItem("BackTracker") {
+                                        this.add(new JRadioButtonMenuItem("BackTracker", null, false) {
                                             // rd_btn_mni_generatorBackTracker
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeView.this.controller.updateGenerator(new Generator.BackTracker()));
+                                                this.addItemListener(e -> MazeView.this.controller.setGenerator(new Generator.BackTracker()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("DFS", true) {
+                                        this.add(new JRadioButtonMenuItem("DFS", null, true) {
                                             // rd_btn_mni_generatorDFS
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 // this.addItemListener(e -> MazeView.this.controller.setGenerator(new Generator.DFS()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("Prim") {
+                                        this.add(new JRadioButtonMenuItem("Prim", null, false) {
                                             // rd_btn_mni_generatorPrim
                                             private static final long serialVersionUID = 1L;
                                             {
@@ -426,7 +378,7 @@ public class MazeView extends JFrame {
                                             }
                                         });
                                     }
-                                }.getElements();e.hasMoreElements();) {
+                                }.getElements(); e.hasMoreElements();) {
                                     this.add(e.nextElement());
                                 }
                             }
@@ -444,26 +396,24 @@ public class MazeView extends JFrame {
                     private static final long serialVersionUID = 1L;
                     {
                         this.setMnemonic(KeyEvent.VK_F);
-                        this.add(new JMenuItem("Open",
-                                new ImageIcon(MazeView.class.getResource("assets/openIcon.gif"))) {
+                        this.add(new JMenuItem("Open", new ImageIcon(MazeView.class.getResource("assets/openIcon.gif"))) {
                             // mni_fileOpen
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_O);
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
-                                this.addActionListener(e -> System.out.println("Open"));
+                                this.addActionListener(e -> MazeView.this.controller.readMaze());
                             }
                         });
                         // spr_menuFile
-                        this.add(new JSeparator());
-                        this.add(new JMenuItem("Save",
-                                new ImageIcon(MazeView.class.getResource("assets/saveIcon.gif"))) {
+                        this.add(new JSeparator(SwingConstants.HORIZONTAL));
+                        this.add(new JMenuItem("Save", new ImageIcon(MazeView.class.getResource("assets/saveIcon.gif"))) {
                             // mni_fileSave
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setMnemonic(KeyEvent.VK_S);
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
-                                this.addActionListener(e -> System.out.println("Save"));
+                                this.addActionListener(e -> MazeView.this.controller.writeMaze());
                             }
                         });
                     }
@@ -478,26 +428,25 @@ public class MazeView extends JFrame {
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setIcon(new ImageIcon(MazeView.class.getResource("assets/gridIcon.gif")));
-                                this.add(new JMenuItem("Clear",
-                                        new ImageIcon(MazeView.class.getResource("assets/clearIcon.gif"))) {
+                                this.add(new JMenuItem("Clear", new ImageIcon(MazeView.class.getResource("assets/clearIcon.gif"))) {
                                     // mni_gridClear
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setMnemonic(KeyEvent.VK_Z);
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK));
-                                        this.addActionListener(e -> MazeView.this.controller.fireReset());
+                                        this.addActionListener(e -> MazeView.this.controller.reset());
                                     }
                                 });
-                                this.add(new JMenuItem("Refresh",
-                                        new ImageIcon(MazeView.class.getResource("assets/refreshIcon.gif"))) {
+                                this.add(new JMenuItem("Refresh", new ImageIcon(MazeView.class.getResource("assets/refreshIcon.gif"))) {
                                     // mni_gridRefresh
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.setMnemonic(KeyEvent.VK_R);
                                         this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
                                         this.addActionListener(e -> {
+                                            // TODO: Generalize
                                             try {
-                                                MazeView.this.controller.requestClear();
+                                                MazeView.this.controller.clear();
                                             } catch (NullPointerException l) {
                                                 System.err.println(l.toString());
                                             }
@@ -507,34 +456,34 @@ public class MazeView extends JFrame {
                             }
                         });
                         // spr_menuEdit
-                        this.add(new JSeparator());
+                        this.add(new JSeparator(SwingConstants.HORIZONTAL));
                         this.add(new JMenu("Preferences") {
                             // mn_editPreferences
                             private static final long serialVersionUID = 1L;
                             {
                                 this.setIcon(new ImageIcon(MazeView.class.getResource("assets/preferencesIcon.gif")));
-                                this.add(new JCheckBoxMenuItem("Arrows") {
+                                this.add(new JCheckBoxMenuItem("Arrows", null, false) {
                                     // chb_mni_preferencesArrows
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addActionListener(e -> MazeView.this.controller.cycleArrows());
                                     }
                                 });
-                                this.add(new JCheckBoxMenuItem("Diagonals", true) {
+                                this.add(new JCheckBoxMenuItem("Diagonals", null, true) {
                                     // chb_mni_preferencesDiagonals
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addActionListener(e -> MazeView.this.controller.cycleDiagonals());
                                     }
                                 });
-                                this.add(new JCheckBoxMenuItem("Status Bar", true) {
+                                this.add(new JCheckBoxMenuItem("Status Bar", null, true) {
                                     // chb_mni_preferencesStatusBar
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addItemListener(e -> MazeView.this.controller.cycleStatusComponent());
                                     }
                                 });
-                                this.add(new JCheckBoxMenuItem("Node Tree") {
+                                this.add(new JCheckBoxMenuItem("Node Tree", null, false) {
                                     // chb_mni_preferencesWrapper
                                     private static final long serialVersionUID = 1L;
                                     {
@@ -550,8 +499,7 @@ public class MazeView extends JFrame {
                     private static final long serialVersionUID = 1L;
                     {
                         this.setMnemonic(KeyEvent.VK_R);
-                        this.add(new JMenuItem("PathFinder",
-                                new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
+                        this.add(new JMenuItem("PathFinder", new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
                             // mni_runPathFinder
                             private static final long serialVersionUID = 1L;
                             {
@@ -560,8 +508,7 @@ public class MazeView extends JFrame {
                                 this.addActionListener(e -> MazeView.this.controller.runPathFinder());
                             }
                         });
-                        this.add(new JMenuItem("Generator",
-                                new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif"))) {
+                        this.add(new JMenuItem("Generator", new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif"))) {
                             // mni_runGenerator
                             private static final long serialVersionUID = 1L;
                             {
@@ -574,19 +521,61 @@ public class MazeView extends JFrame {
                 });
             }
         }, BorderLayout.NORTH);
-        this.initFrame();
     }
 
     /**
-     * Display frame on screen.
+     * Initialize <code>javax.swing.JFrame</code> custom parameters.
      */
-    public final void display() {
-        try {
-            this.initView();
-            this.setVisible(true);
-        } catch (final NullPointerException e) {
-            System.err.println(e.toString());
-        }
+    private final void initFrame() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setMinimumSize(new Dimension(450, 525));
+        this.setLocationRelativeTo(null);
+        this.setFocusable(true);
+        this.pack();
+    }
+
+    /**
+     * Release a new <code>javax.swing.JPopupMenu</code> selection changer.
+     *
+     * @param cell CellPanel
+     * @return JPopupMenu
+     * @throws InvalidParameterException if (cell == null)
+     */
+    public final JPopupMenu releaseCellPopup(final CellPanel cell) throws InvalidParameterException {
+        if (cell == null)
+            throw new InvalidParameterException("Invalid cell...");
+        return new FocusedPopup(this) {
+            private static final long serialVersionUID = 1L;
+            {
+                this.addPopupMenuListener(new PopupMenuListener() {
+                    @Override
+                    public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+                        cell.setSelected(true);
+                    }
+
+                    @Override
+                    public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+                        cell.setSelected(false);
+                    }
+
+                    @Override
+                    public void popupMenuCanceled(final PopupMenuEvent e) {
+                    }
+                });
+                this.add(new JMenuItem("Start", new ImageIcon(MazeView.class.getResource("assets/startIcon.gif"))) {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        this.addActionListener(e -> cell.getAncestor().setStart(cell));
+                    }
+                });
+                this.add(new JMenuItem("End", new ImageIcon(MazeView.class.getResource("assets/endIcon.gif"))) {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        this.addActionListener(e -> cell.getAncestor().setEnd(cell));
+                    }
+                });
+            }
+        };
     }
 
     /**

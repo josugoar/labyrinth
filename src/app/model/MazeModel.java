@@ -35,7 +35,7 @@ public class MazeModel extends JPanel {
      *
      * @see app.controller.MazeController MazeController
      */
-    private MazeController controller;
+    private transient MazeController controller;
 
     /**
      * Bi-dimensional <code>app.model.components.CellPanel</code> array.
@@ -57,17 +57,17 @@ public class MazeModel extends JPanel {
      *
      * @see app.model.PathFinder PathFinder
      */
-    private PathFinder pathfinder = new PathFinder.Dijkstra();
+    private transient PathFinder pathfinder = new PathFinder.Dijkstra();
 
     /**
      * Current maze generation <code>app.model.Generator</code> algorithm.
      *
      * @see app.model.Generator Generator
      */
-    private Generator generator = new Generator.BackTracker();
+    private transient Generator generator = new Generator.BackTracker();
 
     {
-        this.setBorder(new EtchedBorder());
+        this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
         this.setBackground(Color.WHITE);
     }
 
@@ -101,7 +101,7 @@ public class MazeModel extends JPanel {
     /**
      * Fire <code>app.model.components.CellPanel.clear()</code> event.
      */
-    public final void fireClear() {
+    public final void clear() {
         if (this.pathfinder.getIsRunning() || this.start == null)
             return;
         this.start.clear();
@@ -114,8 +114,8 @@ public class MazeModel extends JPanel {
      * @param cell CellPanel
      * @return JPopupMenu
      */
-    public final JPopupMenu requestCellPopup(final CellPanel cell) {
-        return this.controller.fireCellPopup(cell);
+    public final JPopupMenu releaseCellPopup(final CellPanel cell) {
+        return this.controller.releaseCellPopup(cell);
     }
 
     /**

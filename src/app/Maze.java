@@ -20,7 +20,7 @@ public final class Maze implements Runnable {
      * @version 0.1
      * @see javax.swing.JFrame JFrame
      */
-    private MazeModel mazeModel;
+    private final MazeModel mazeModel;
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -33,18 +33,19 @@ public final class Maze implements Runnable {
      * @see javax.swing.JPanel JPanel
      * @see app.model.components.CellPanel CellPanel
      */
-    private MazeView mazeView;
+    private final MazeView mazeView;
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
      * pivotal <code>app.controller.MazeController</code> component, handling
-     * multiple pivotal interactions, implementing <code>java.io.Serializable</code>.
+     * multiple pivotal interactions, implementing
+     * <code>java.io.Serializable</code>.
      *
      * @author JoshGoA
      * @version 0.1
      * @see java.io.Serializable Serializable
      */
-    private MazeController mazeController;
+    private final MazeController mazeController;
 
     /**
      * Create a new maze architecture initializer.

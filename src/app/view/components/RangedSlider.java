@@ -48,12 +48,12 @@ public class RangedSlider extends JSlider {
         /**
          * Inclusive minimum value stored.
          */
-        private final int min;
+        private int min;
 
         /**
          * Inclusive maximum value stored.
          */
-        private final int max;
+        private int max;
 
         /**
          * Current value stored.
@@ -86,12 +86,36 @@ public class RangedSlider extends JSlider {
         }
 
         /**
+         * Set current inclusive minimum value.
+         *
+         * @param min int
+         * @throws InvalidParameterException
+         */
+        public final void setMin(final int min) throws InvalidParameterException {
+            if (min > this.max || min > this.val)
+                throw new InvalidParameterException();
+            this.min = min;
+        }
+
+        /**
          * Return current inclusive maximum value.
          *
          * @return int
          */
-        public int getMax() {
+        public final int getMax() {
             return this.max;
+        }
+
+        /**
+         * Set current inclusive maximum value.
+         *
+         * @param max int
+         * @throws InvalidParameterException
+         */
+        public final void setMax(final int max) throws InvalidParameterException {
+            if (max < this.min || max < this.val)
+                throw new InvalidParameterException();
+            this.max = max;
         }
 
         /**
@@ -99,7 +123,7 @@ public class RangedSlider extends JSlider {
          *
          * @return int
          */
-        public int getValue() {
+        public final int getValue() {
             return this.val;
         }
 
@@ -109,7 +133,7 @@ public class RangedSlider extends JSlider {
          * @param val int
          * @throws InvalidParameterException if (val < min || val > max)
          */
-        public void setValue(final int val) throws InvalidParameterException {
+        public final void setValue(final int val) throws InvalidParameterException {
             if (val < this.min || val > this.max)
                 throw new InvalidParameterException();
             this.val = val;

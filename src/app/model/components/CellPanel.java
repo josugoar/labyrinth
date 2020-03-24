@@ -33,13 +33,6 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     public static boolean selected = false;
 
     /**
-     * Ancestor <code>app.model.MazeModel</code> pointer.
-     *
-     * @see app.model.MazeModel MazeModel
-     */
-    public MazeModel ancestor;
-
-    /**
      * Euclidean space coordinate <code>java.awt.Point</code>.
      *
      * @see java.awt.Point Point
@@ -47,16 +40,16 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private final Point seed;
 
     /**
+     * Ancestor <code>app.model.MazeModel</code> pointer.
+     *
+     * @see app.model.MazeModel MazeModel
+     */
+    public MazeModel ancestor;
+
+    /**
      * Tree-like graph neighbor pointer storage.
      */
     private Set<CellPanel> neighbors;
-
-    /**
-     * Current <code>app.controller.components.AbstractCell.CellState</code>.
-     *
-     * @see app.controller.components.AbstractCell.CellState CellState
-     */
-    private CellState state = CellState.EMPTY;
 
     /**
      * Current inner <code>app.model.components.Node</code> pointer.
@@ -64,6 +57,13 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      * @see app.model.components.Node Node
      */
     private Node<CellPanel> inner = null;
+
+    /**
+     * Current <code>app.controller.components.AbstractCell.CellState</code>.
+     *
+     * @see app.controller.components.AbstractCell.CellState CellState
+     */
+    private CellState state = CellState.EMPTY;
 
     {
         this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
@@ -123,11 +123,25 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     protected final void paintSelection() {
         if (this.state != CellState.EMPTY)
             this.setBorder(BorderFactory.createLineBorder(this.state.getReference()));
+        else if (this.inner == null)
+            this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         else
-            if (this.inner == null)
-                this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            else
-                this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getReference()));
+            this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getReference()));
+    }
+
+    @Override
+    public final void paintComponent(final Graphics g) {
+        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY)
+            g.setColor(this.inner.getState().getReference());
+        else
+            g.setColor(this.state.getReference());
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    @Override
+    public final void notifyChange() {
+        this.revalidate();
+        this.repaint();
     }
 
     /**
@@ -153,6 +167,15 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     /**
+     * Return current space coordinate <code>java.awt.Point</code>.
+     *
+     * @return Point
+     */
+    public final Point getSeed() {
+        return this.seed;
+    }
+
+    /**
      * Return current <code>app.model.MazeModel</code> pointer.
      *
      * @return MazeModel
@@ -170,15 +193,6 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         this.ancestor = Objects.requireNonNull(ancestor, "'ancestor' must not be null");
     }
 
-    /**
-     * Return current space coordinate <code>java.awt.Point</code>.
-     *
-     * @return Point
-     */
-    public final Point getSeed() {
-        return this.seed;
-    }
-
     @Override
     public final Set<CellPanel> getNeighbors() {
         return this.neighbors;
@@ -187,6 +201,17 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     @Override
     public final void setNeighbors(final Set<CellPanel> neighbors) {
         this.neighbors = neighbors;
+    }
+
+    @Override
+    public final Node<CellPanel> getInner() {
+        return this.inner;
+    }
+
+    @Override
+    public final void setInner(final Node<CellPanel> inner) {
+        this.inner = inner;
+        this.notifyChange();
     }
 
     @Override
@@ -205,32 +230,6 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     @Override
-    public final Node<CellPanel> getInner() {
-        return this.inner;
-    }
-
-    @Override
-    public final void setInner(final Node<CellPanel> inner) {
-        this.inner = inner;
-        this.notifyChange();
-    }
-
-    @Override
-    public final void notifyChange() {
-        this.revalidate();
-        this.repaint();
-    }
-
-    @Override
-    public final void paintComponent(final Graphics g) {
-        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY)
-            g.setColor(this.inner.getState().getReference());
-        else
-            g.setColor(this.state.getReference());
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
-    }
-
-    @Override
     public final String toString() {
         return String.format("CellPanel [state: %s, seed: (%d, %d)]", this.state, this.seed.x, this.seed.y);
     }
@@ -246,7 +245,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
         @Override
         public synchronized final void mousePressed(final MouseEvent e) {
-            CellPanel.this.ancestor.fireClear();
+            CellPanel.this.ancestor.clear();
             // Check for running action
             try {
                 // Check for draw state
@@ -263,7 +262,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                 } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
                     if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
                         throw new InterruptedException("Invalid input while running...");
-                    CellPanel.this.ancestor.requestCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
+                    CellPanel.this.ancestor.releaseCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
                 }
             } catch (final InterruptedException l) {
                 System.err.println(l.toString());

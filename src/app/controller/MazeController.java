@@ -143,21 +143,21 @@ public class MazeController implements Serializable {
     }
 
     /**
+     * Fire <code>app.model.MazeModel.reset()</code> event.
+     */
+    public final void reset() {
+        this.model.reset();
+    }
+
+    /**
      * Request <code>app.model.MazeModel.clear()</code> event.
      *
      * @throws NullPointerException if (model.getStart().getInner() == null)
      */
-    public final void requestClear() {
+    public final void clear() {
         if (this.model.getStart().getInner() == null)
             throw new NullPointerException("No nodes to clear...");
-        this.model.fireClear();
-    }
-
-    /**
-     * Fire <code>app.model.MazeModel.reset()</code> event.
-     */
-    public final void fireReset() {
-        this.model.reset();
+        this.model.clear();
     }
 
     /**
@@ -166,13 +166,22 @@ public class MazeController implements Serializable {
      * @param cell CellPanel
      * @return JPopupMenu
      */
-    public final JPopupMenu fireCellPopup(final CellPanel cell) {
+    public final JPopupMenu releaseCellPopup(final CellPanel cell) {
         try {
             return this.view.releaseCellPopup(cell);
         } catch (final InvalidParameterException e) {
             System.err.println(e.toString());
             return null;
         }
+    }
+
+    // TODO: Serielize
+    public final void readMaze() {
+
+    }
+
+    public final void writeMaze() {
+
     }
 
     /**
@@ -384,7 +393,7 @@ public class MazeController implements Serializable {
     public final void setDimension(final int val) {
         this.dimension.setValue(val);
         this.model.setGrid(this.dimension.getValue(), this.dimension.getValue());
-        this.fireReset();
+        this.reset();
     }
 
     /**
@@ -432,14 +441,14 @@ public class MazeController implements Serializable {
      *
      * @return PathFinder
      */
-    public final PathFinder requestPathFinder() {
+    public final PathFinder getPathFinder() {
         return this.model.getPathFinder();
     }
 
     /**
      * Update current <code>app.model.PathFinder</code> instance.
      */
-    public final void updatePathFinder(final PathFinder pathfinder) {
+    public final void setPathFinder(final PathFinder pathfinder) {
         this.model.setPathFinder(pathfinder);
     }
 
@@ -447,7 +456,7 @@ public class MazeController implements Serializable {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void runPathFinder() {
-        this.model.fireClear();
+        this.model.clear();
         this.model.awakePathFinder();
     }
 
@@ -456,14 +465,14 @@ public class MazeController implements Serializable {
      *
      * @return Generator
      */
-    public final Generator requestGenerator() {
+    public final Generator getGenerator() {
         return this.model.getGenerator();
     }
 
     /**
      * Update current <code>app.model.Generator</code> instance.
      */
-    public final void updateGenerator(final Generator generator) {
+    public final void setGenerator(final Generator generator) {
         this.model.setGenerator(generator);
     }
 
@@ -471,7 +480,7 @@ public class MazeController implements Serializable {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void runGenerator() {
-        this.model.fireClear();
+        this.model.clear();
         this.model.awakeGenerator();
     }
 

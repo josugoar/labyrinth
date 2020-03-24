@@ -48,7 +48,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
      * @throws StackOverflowError   if (newGen.size() == 0)
      * @throws InterruptedException if (!isRunning)
      */
-    protected abstract <T extends AbstractCell<T>> Node<T> find(final T[][] grid, final Set<Node<T>> currGen)
+    protected abstract <T extends AbstractCell<T>> Node<T> advance(final T[][] grid, final Set<Node<T>> currGen)
             throws StackOverflowError, InterruptedException;
 
     /**
@@ -99,7 +99,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
                 // Store endpoints
                 this.setEndpoints(start, end);
                 // Find child and traverse tree
-                PathFinder.traverse(this.find(grid, new HashSet<Node<T>>() {
+                PathFinder.traverse(this.advance(grid, new HashSet<Node<T>>() {
                     private static final long serialVersionUID = 1L;
                     {
                         // Construct first generation
@@ -132,7 +132,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected final <T extends AbstractCell<T>> Node<T> find(final T[][] grid, final Set<Node<T>> currGen)
+        protected final <T extends AbstractCell<T>> Node<T> advance(final T[][] grid, final Set<Node<T>> currGen)
                 throws StackOverflowError, InterruptedException {
             // Visit nodes
             super.visitGeneration(currGen);
@@ -163,9 +163,15 @@ public abstract class PathFinder implements AbstractAlgorithm {
             if (!this.isRunning)
                 throw new InterruptedException("Invokation interrupted...");
             // Delay iteration
-            Thread.sleep((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController().getDelay().getValue()));
+            Thread.sleep((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController()
+                    .getDelay().getValue()));
             // Call method recursively until convergence
-            return this.find(grid, newGen);
+            return this.advance(grid, newGen);
+        }
+
+        @Override
+        public AlgorithmParameterSpec getParameterSpec() {
+            return null;
         }
 
         @Override
@@ -177,11 +183,6 @@ public abstract class PathFinder implements AbstractAlgorithm {
         public final void setIsRunning(final boolean isRunning) {
             // TODO: Glass pane
             this.isRunning = isRunning;
-        }
-
-        @Override
-        public AlgorithmParameterSpec getParameterSpec() {
-            return null;
         }
 
     }

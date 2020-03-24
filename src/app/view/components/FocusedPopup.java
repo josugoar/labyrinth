@@ -22,7 +22,7 @@ public class FocusedPopup extends JPopupMenu {
      * @param component Component
      */
     public FocusedPopup(final Component component) {
-        super();
+        super(null);
         this.addPropertyChangeListener("visible", e -> {
             // Set focus delay after property change
             new Timer(1, l -> {

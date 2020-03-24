@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @see java.io.Serializable Serializable
  */
-public abstract interface State<T> extends Serializable {
+public abstract interface State<T extends Serializable> extends Serializable {
 
     /**
      * Return current associated reference.
