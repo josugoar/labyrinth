@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 import javax.xml.crypto.AlgorithmMethod;
 
+import app.view.components.RangedSlider.BoundedRange;
+
 /**
  * Abstract algorithm interface wrapper, implementing
  * <code>javax.xml.crypto.AlgorithmMethod</code> and
@@ -36,5 +38,19 @@ public abstract interface AbstractAlgorithm extends AlgorithmMethod, Serializabl
      * @param isRunning boolean
      */
     public abstract void setIsRunning(final boolean isRunning);
+
+    /**
+     * Return current delay <code>BoundedRange</code>.
+     *
+     * @return BoundedRange
+     */
+    public abstract BoundedRange getDelay();
+
+    /**
+     * Set current delay <code>BoundedRange</code> value.
+     *
+     * @param delay int
+     */
+    public abstract void setDelay(final int delay);
 
 }

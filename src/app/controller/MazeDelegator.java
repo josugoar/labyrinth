@@ -212,10 +212,10 @@ public class MazeDelegator implements Serializable {
      * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
      * value.
      *
-     * @param val int
+     * @param delay int
      */
-    public final void setDelay(final int val) {
-        this.panel.getPathFinder().setDelay(val);
+    public final void setDelay(final int delay) {
+        this.panel.getPathFinder().setDelay(delay);
     }
 
     /**
@@ -256,10 +256,10 @@ public class MazeDelegator implements Serializable {
      * Set current density
      * <code>app.view.components.RangedSlider.BoundedRange</code> value.
      *
-     * @param val int
+     * @param density int
      */
-    public final void setDensity(final int val) {
-        this.panel.getGenerator().setDensity(val);
+    public final void setDensity(final int density) {
+        this.panel.getGenerator().setDensity(density);
     }
 
     /**
@@ -347,7 +347,7 @@ public class MazeDelegator implements Serializable {
         this.frame.getStatusComponent().setVisible(!this.frame.getStatusComponent().isVisible());
     }
 
-    // TODO: resetStatusComponent
+    // TODO: statusComponent
     /**
      * Reset current <code>javax.swing.JLabel</code> instance custom application
      * output message.

@@ -5,6 +5,7 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
+import app.controller.components.AbstractCell.CellState;
 import app.view.components.RangedSlider.BoundedRange;
 
 public abstract class Generator implements AbstractAlgorithm {
@@ -12,6 +13,14 @@ public abstract class Generator implements AbstractAlgorithm {
     private static final long serialVersionUID = 1L;
 
     protected boolean isRunning = false;
+
+    /**
+     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
+     * cycles.
+     *
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
+     */
+    private final BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
      * Maze <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
@@ -23,11 +32,15 @@ public abstract class Generator implements AbstractAlgorithm {
 
     @Override
     public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
+        // TODO: Generator
+        for (T[] ts : grid)
+            for (T t : ts)
+                if (Math.random() > 0.5)
+                    t.setState(CellState.OBSTACLE);
     }
 
     /**
-     * Return current density
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current density <code>BoundedRange</code>.
      *
      * @return BoundedRange
      */
@@ -36,13 +49,12 @@ public abstract class Generator implements AbstractAlgorithm {
     }
 
     /**
-     * Set current density
-     * <code>app.view.components.RangedSlider.BoundedRange</code> value.
+     * Set current density <code>BoundedRange</code> value.
      *
-     * @param val int
+     * @param delay int
      */
-    public final void setDensity(final int val) {
-        this.density.setValue(val);
+    public final void setDensity(final int density) {
+        this.density.setValue(density);
     }
 
     @Override
@@ -54,6 +66,16 @@ public abstract class Generator implements AbstractAlgorithm {
     public final void setIsRunning(final boolean isRunning) {
         // TODO: Glass pane
         this.isRunning = isRunning;
+    }
+
+    @Override
+    public final BoundedRange getDelay() {
+        return this.delay;
+    }
+
+    @Override
+    public final void setDelay(final int delay) {
+        this.delay.setValue(delay);
     }
 
     @Override

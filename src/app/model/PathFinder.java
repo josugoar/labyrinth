@@ -122,26 +122,6 @@ public abstract class PathFinder implements AbstractAlgorithm {
         this.target = target;
     }
 
-    /**
-     * Return current delay
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
-     *
-     * @return BoundedRange
-     */
-    public final BoundedRange getDelay() {
-        return this.delay;
-    }
-
-    /**
-     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
-     * value.
-     *
-     * @param val int
-     */
-    public final void setDelay(final int val) {
-        this.delay.setValue(val);
-    }
-
     @Override
     public final boolean getIsRunning() {
         return this.isRunning;
@@ -151,6 +131,16 @@ public abstract class PathFinder implements AbstractAlgorithm {
     public final void setIsRunning(final boolean isRunning) {
         // TODO: Glass pane
         this.isRunning = isRunning;
+    }
+
+    @Override
+    public final BoundedRange getDelay() {
+        return this.delay;
+    }
+
+    @Override
+    public final void setDelay(final int delay) {
+        this.delay.setValue(delay);
     }
 
     @Override
