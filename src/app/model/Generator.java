@@ -46,24 +46,29 @@ public abstract class Generator implements AbstractAlgorithm {
     }
 
     @Override
+    public final boolean getIsRunning() {
+        return this.isRunning;
+    }
+
+    @Override
+    public final void setIsRunning(final boolean isRunning) {
+        // TODO: Glass pane
+        this.isRunning = isRunning;
+    }
+
+    @Override
     public final String getAlgorithm() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public final String toString() {
+        return this.getAlgorithm();
     }
 
     public static final class BackTracker extends Generator {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        public final boolean getIsRunning() {
-            return this.isRunning;
-        }
-
-        @Override
-        public final void setIsRunning(final boolean isRunning) {
-            // TODO: Glass pane
-            this.isRunning = isRunning;
-        }
 
         @Override
         public AlgorithmParameterSpec getParameterSpec() {

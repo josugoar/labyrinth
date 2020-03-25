@@ -10,6 +10,7 @@ import app.controller.components.AbstractCell;
 import app.model.components.Node;
 import app.model.components.Node.NodeState;
 import app.view.components.RangedSlider.BoundedRange;
+import utils.JWrapper;
 
 /**
  * PathFinding algorithm abstract wrapper, implementing
@@ -75,9 +76,41 @@ public abstract class PathFinder implements AbstractAlgorithm {
      * @param <T> AbstractCell<T>
      * @param gen Set<Node<T>>
      */
-    protected static final <T extends AbstractCell<T>> void visitGeneration(final Set<Node<T>> gen) {
+    protected static final <T extends AbstractCell<T>> void visit(final Set<Node<T>> gen) {
         for (final Node<T> node : gen)
             node.setState(Node.NodeState.VISITED);
+    }
+
+    @Override
+    public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
+        // Invoke new Thread
+        new Thread(() -> {
+            try {
+                if (start == null)
+                    throw new NullPointerException("No starting node found...");
+                try {
+                    final T startCell = grid[start.x][start.y];
+                    // Store target which could not belong to array
+                    this.setTarget(end);
+                    // Find child and traverse tree
+                    PathFinder.traverse(this.advance(grid, new HashSet<Node<T>>() {
+                        private static final long serialVersionUID = 1L;
+                        {
+                            // Construct first generation
+                            this.add(new Node<T>(startCell));
+                            // Start running
+                            PathFinder.this.setIsRunning(true);
+                        }
+                    }));
+                } catch (final IndexOutOfBoundsException e) {
+                    throw new IndexOutOfBoundsException("Start does not belong to array...");
+                }
+            } catch (NullPointerException | StackOverflowError | InterruptedException e) {
+                JWrapper.dispatchException(e);
+            } finally {
+                this.setIsRunning(false);
+            }
+        }).start();
     }
 
     /**
@@ -110,35 +143,14 @@ public abstract class PathFinder implements AbstractAlgorithm {
     }
 
     @Override
-    public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
-        // Invoke new Thread
-        new Thread(() -> {
-            try {
-                if (start == null)
-                    throw new NullPointerException("No starting node found...");
-                try {
-                    final T startCell = grid[start.x][start.y];
-                    // Store target which could not belong to array
-                    this.setTarget(end);
-                    // Find child and traverse tree
-                    PathFinder.traverse(this.advance(grid, new HashSet<Node<T>>() {
-                        private static final long serialVersionUID = 1L;
-                        {
-                            // Construct first generation
-                            this.add(new Node<T>(startCell));
-                            // Start running
-                            PathFinder.this.setIsRunning(true);
-                        }
-                    }));
-                } catch (final IndexOutOfBoundsException e) {
-                    throw new IndexOutOfBoundsException("Start does not belong to array...");
-                }
-            } catch (NullPointerException | StackOverflowError | InterruptedException e) {
-                System.err.println(e.toString());
-            } finally {
-                this.setIsRunning(false);
-            }
-        }).start();
+    public final boolean getIsRunning() {
+        return this.isRunning;
+    }
+
+    @Override
+    public final void setIsRunning(final boolean isRunning) {
+        // TODO: Glass pane
+        this.isRunning = isRunning;
     }
 
     @Override
@@ -192,8 +204,10 @@ public abstract class PathFinder implements AbstractAlgorithm {
         @Override
         protected final <T extends AbstractCell<T>> Node<T> advance(final T[][] grid, final Set<Node<T>> currGen)
                 throws StackOverflowError, InterruptedException {
+            if (!this.isRunning)
+                throw new InterruptedException("Invokation interrupted...");
             // Visit nodes
-            super.visitGeneration(currGen);
+            super.visit(currGen);
             // Initialize new empty generation
             final Set<Node<T>> newGen = new HashSet<Node<T>>();
             // Range through current generaton nodes cell neighbors
@@ -211,15 +225,13 @@ public abstract class PathFinder implements AbstractAlgorithm {
                             break;
                         case END:
                             // End reached
-                            super.visitGeneration(newGen);
+                            super.visit(newGen);
                             return cell.getInner();
                         default:
                     }
                 }
             if (newGen.size() == 0)
                 throw new StackOverflowError("No solution...");
-            if (!this.isRunning)
-                throw new InterruptedException("Invokation interrupted...");
             // Delay iteration
             Thread.sleep(super.delay.getValue());
             // Call method recursively until convergence
@@ -229,17 +241,6 @@ public abstract class PathFinder implements AbstractAlgorithm {
         @Override
         public AlgorithmParameterSpec getParameterSpec() {
             return null;
-        }
-
-        @Override
-        public final boolean getIsRunning() {
-            return this.isRunning;
-        }
-
-        @Override
-        public final void setIsRunning(final boolean isRunning) {
-            // TODO: Glass pane
-            this.isRunning = isRunning;
         }
 
     }

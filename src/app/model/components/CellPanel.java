@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import app.controller.components.AbstractCell;
 import app.model.MazePanel;
+import utils.JWrapper;
 
 /**
  * Component neighbor pointer responsible of self-reference via inner
@@ -33,18 +34,18 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     public static boolean selected = false;
 
     /**
-     * Euclidean space coordinate <code>java.awt.Point</code>.
-     *
-     * @see java.awt.Point Point
-     */
-    private final Point seed;
-
-    /**
      * Ancestor <code>app.model.MazePanel</code> pointer.
      *
      * @see app.model.MazePanel MazePanel
      */
     public MazePanel ancestor;
+
+    /**
+     * Euclidean space coordinate <code>java.awt.Point</code>.
+     *
+     * @see java.awt.Point Point
+     */
+    private final Point seed;
 
     /**
      * Tree-like graph neighbor pointer storage.
@@ -167,15 +168,6 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     /**
-     * Return current space coordinate <code>java.awt.Point</code>.
-     *
-     * @return Point
-     */
-    public final Point getSeed() {
-        return this.seed;
-    }
-
-    /**
      * Return current <code>app.model.MazePanel</code> pointer.
      *
      * @return MazePanel
@@ -191,6 +183,15 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     public final void setAncestor(final MazePanel ancestor) {
         this.ancestor = Objects.requireNonNull(ancestor, "'ancestor' must not be null");
+    }
+
+    /**
+     * Return current space coordinate <code>java.awt.Point</code>.
+     *
+     * @return Point
+     */
+    public final Point getSeed() {
+        return this.seed;
     }
 
     @Override
@@ -284,8 +285,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
             try {
                 // Check for draw state
                 if (e.isShiftDown()) {
-                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
-                        throw new InterruptedException("Invalid input while running...");
+                    CellPanel.this.ancestor.assertIsRunning();
                     // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
@@ -294,12 +294,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                         CellPanel.this.setState(CellState.EMPTY);
                     // Check for popup state
                 } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
-                        throw new InterruptedException("Invalid input while running...");
+                    CellPanel.this.ancestor.assertIsRunning();
                     CellPanel.this.ancestor.releaseCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
                 }
             } catch (final InterruptedException l) {
-                System.err.println(l.toString());
+                JWrapper.dispatchException(l);
             }
         }
 
@@ -310,17 +309,18 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                 CellPanel.this.paintSelection();
             try {
                 if (e.isShiftDown()) {
-                    if (CellPanel.this.ancestor.getPathFinder().getIsRunning())
-                        throw new InterruptedException("Invalid input while running...");
                     // Left input
-                    if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
+                    if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
+                        CellPanel.this.ancestor.assertIsRunning();
                         CellPanel.this.setState(CellState.OBSTACLE);
-                    // Right input
-                    else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
+                        // Right input
+                    } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
+                        CellPanel.this.ancestor.assertIsRunning();
                         CellPanel.this.setState(CellState.EMPTY);
+                    }
                 }
             } catch (final InterruptedException l) {
-                System.err.println(l.toString());
+                JWrapper.dispatchException(l);
             }
         }
 

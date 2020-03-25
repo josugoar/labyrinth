@@ -47,6 +47,7 @@ import app.model.components.CellPanel;
 import app.view.components.FocusedPopup;
 import app.view.components.IconifiedButton;
 import app.view.components.RangedSlider;
+import utils.JWrapper;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -112,7 +113,7 @@ public class MazeFrame extends JFrame {
             public final void keyPressed(final KeyEvent e) {
                 // Enable draw state
                 if (e.isShiftDown())
-                    MazeFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                    MazeFrame.this.delegator.dispatchKey();
             }
             @Override
             public final void keyReleased(final KeyEvent e) {
@@ -149,7 +150,7 @@ public class MazeFrame extends JFrame {
             this.initFrame();
             this.setVisible(true);
         } catch (final NullPointerException e) {
-            System.err.println(e.toString());
+            JWrapper.dispatchException(e);
         }
     }
 

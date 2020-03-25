@@ -1,5 +1,6 @@
 package app.controller;
 
+import java.awt.Cursor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import app.model.PathFinder;
 import app.model.components.CellPanel;
 import app.view.MazeFrame;
 import app.view.components.RangedSlider.BoundedRange;
+import utils.JWrapper;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -53,14 +55,6 @@ public class MazeDelegator implements Serializable {
     private MazeFrame frame;
 
     /**
-     * Current user input mode selection.
-     *
-     * @see app.model.components.CellPanel.CellState CellState
-     * @deprecated Draw cycle made by mouse input
-     */
-    private CellState mode = CellState.OBSTACLE;
-
-    /**
      * Diagonal tile trasversal flag.
      */
     private boolean diagonals = true;
@@ -69,6 +63,14 @@ public class MazeDelegator implements Serializable {
      * Arrow draw flag.
      */
     private boolean arrows = false;
+
+    /**
+     * Current user input mode selection.
+     *
+     * @see app.model.components.CellPanel.CellState CellState
+     * @deprecated Draw cycle made by mouse input
+     */
+    private CellState mode = CellState.OBSTACLE;
 
     /**
      * Create a new isolated pipeline component.
@@ -97,7 +99,7 @@ public class MazeDelegator implements Serializable {
             in.close();
             file.close();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println(e.toString());
+            JWrapper.dispatchException(e);
         }
     }
 
@@ -109,7 +111,7 @@ public class MazeDelegator implements Serializable {
             out.close();
             file.close();
         } catch (final IOException e) {
-            System.err.println(e.toString());
+            JWrapper.dispatchException(e);
         }
     }
 
@@ -147,7 +149,7 @@ public class MazeDelegator implements Serializable {
                 throw new NullPointerException("No nodes to clear...");
             this.panel.clear();
         } catch (NullPointerException e) {
-            System.err.println(e.toString());
+            JWrapper.dispatchException(e);
         }
     }
 
@@ -192,6 +194,7 @@ public class MazeDelegator implements Serializable {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void awakePathFinder() {
+        this.frame.requestFocus();
         this.panel.awakePathFinder();
     }
 
@@ -235,6 +238,7 @@ public class MazeDelegator implements Serializable {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void awakeGenerator() {
+        this.frame.requestFocus();
         this.panel.awakeGenerator();
     }
 
@@ -286,8 +290,20 @@ public class MazeDelegator implements Serializable {
         try {
             return this.frame.releaseCellPopup(cell);
         } catch (final InvalidParameterException e) {
-            System.err.println(e.toString());
+            JWrapper.dispatchException(e);
             return null;
+        }
+    }
+
+    /**
+     * Dispatch <code>java.awt.Cursor</code> <code>java.awt.event.KeyEvent</code>.
+     */
+    public final void dispatchKey() {
+        try {
+            this.panel.assertIsRunning();
+            this.frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        } catch (InterruptedException e) {
+            JWrapper.dispatchException(e);
         }
     }
 
@@ -373,28 +389,6 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Return current <code>app.model.components.CellPanel</code>
-     * <code>app.model.components.CellPanel.CellState</code>.
-     *
-     * @return CellPanel.CellState
-     * @deprecated Draw cycle made by mouse input
-     */
-    public final CellState getMode() {
-        return this.mode;
-    }
-
-    /**
-     * Set current <code>app.model.components.CellPanel</code>
-     * <code>app.model.components.CellPanel.CellState</code>.
-     *
-     * @param mode CellState
-     * @deprecated Draw cycle made by mouse input
-     */
-    public final void setMode(final CellState mode) {
-        this.mode = mode;
-    }
-
-    /**
      * Return current diagonals state.
      *
      * @return boolean
@@ -442,6 +436,28 @@ public class MazeDelegator implements Serializable {
      */
     public final void cycleArrows() {
         this.setArrows(!this.arrows);
+    }
+
+    /**
+     * Return current <code>app.model.components.CellPanel</code>
+     * <code>app.model.components.CellPanel.CellState</code>.
+     *
+     * @return CellPanel.CellState
+     * @deprecated Draw cycle made by mouse input
+     */
+    public final CellState getMode() {
+        return this.mode;
+    }
+
+    /**
+     * Set current <code>app.model.components.CellPanel</code>
+     * <code>app.model.components.CellPanel.CellState</code>.
+     *
+     * @param mode CellState
+     * @deprecated Draw cycle made by mouse input
+     */
+    public final void setMode(final CellState mode) {
+        this.mode = mode;
     }
 
     @Override

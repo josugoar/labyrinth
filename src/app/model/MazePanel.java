@@ -177,6 +177,11 @@ public class MazePanel extends JPanel {
         return this.dimension;
     }
 
+    /**
+     * Return euclidean dimension rectangle box for different sizes.
+     *
+     * @return Dimension
+     */
     public final Dimension getEucliadeanDimension() {
         return new Dimension(this.dimension.getValue(), this.dimension.getValue());
     }
@@ -344,8 +349,7 @@ public class MazePanel extends JPanel {
      */
     public final void awakePathFinder() {
         this.clear();
-        this.pathfinder.awake(this.getGrid(),
-                (this.start != null) ? this.start.getSeed() : null,
+        this.pathfinder.awake(this.getGrid(), (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
     }
 
@@ -370,9 +374,20 @@ public class MazePanel extends JPanel {
      */
     public final void awakeGenerator() {
         this.clear();
-        this.generator.awake(this.getGrid(),
-                (this.start != null) ? this.start.getSeed() : null,
+        this.generator.awake(this.getGrid(), (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
+    }
+
+    /**
+     * Assert wheter <code>app.model.PathFinder</code> or
+     * <code>app.model.Generator</code> are running.
+     *
+     * @throws InterruptedException if (ancestor.getPathFinder().getIsRunning() ||
+     *                              ancestor.getGenerator().getIsRunning())
+     */
+    public final void assertIsRunning() throws InterruptedException {
+        if (this.pathfinder.getIsRunning() || this.generator.getIsRunning())
+            throw new InterruptedException("Invalid input while running...");
     }
 
 }

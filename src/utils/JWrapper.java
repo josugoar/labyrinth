@@ -33,4 +33,13 @@ public interface JWrapper {
         }
     }
 
+    /**
+     * Dispatch generic exception by printing in error output steam.
+     *
+     * @param e Exception
+     */
+    public static void dispatchException(Throwable e) {
+        System.err.println(e.toString());
+    }
+
 }
