@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import app.controller.components.AbstractCell;
-import app.model.MazeModel;
+import app.model.MazePanel;
 
 /**
  * Component neighbor pointer responsible of self-reference via inner
@@ -40,11 +40,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private final Point seed;
 
     /**
-     * Ancestor <code>app.model.MazeModel</code> pointer.
+     * Ancestor <code>app.model.MazePanel</code> pointer.
      *
-     * @see app.model.MazeModel MazeModel
+     * @see app.model.MazePanel MazePanel
      */
-    public MazeModel ancestor;
+    public MazePanel ancestor;
 
     /**
      * Tree-like graph neighbor pointer storage.
@@ -74,9 +74,9 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      *
      * @param seed      Point
      * @param neighbors Set<CellPanel>
-     * @param ancestor  MazeModel
+     * @param ancestor  MazePanel
      */
-    public CellPanel(final MazeModel ancestor, final Point seed, final Set<CellPanel> neighbors) {
+    public CellPanel(final MazePanel ancestor, final Point seed, final Set<CellPanel> neighbors) {
         this.seed = seed;
         this.setNeighbors(neighbors);
         this.setAncestor(ancestor);
@@ -87,9 +87,9 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      * Create a new isolated vertex.
      *
      * @param seed     Point
-     * @param ancestor MazeModel
+     * @param ancestor MazePanel
      */
-    public CellPanel(final MazeModel ancestor, final Point seed) {
+    public CellPanel(final MazePanel ancestor, final Point seed) {
         this(ancestor, seed, null);
     }
 
@@ -176,20 +176,20 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     /**
-     * Return current <code>app.model.MazeModel</code> pointer.
+     * Return current <code>app.model.MazePanel</code> pointer.
      *
-     * @return MazeModel
+     * @return MazePanel
      */
-    public final MazeModel getAncestor() {
+    public final MazePanel getAncestor() {
         return this.ancestor;
     }
 
     /**
-     * Set <code>app.model.MazeModel</code> pointer.
+     * Set <code>app.model.MazePanel</code> pointer.
      *
-     * @param ancestor MazeModel
+     * @param ancestor MazePanel
      */
-    public final void setAncestor(final MazeModel ancestor) {
+    public final void setAncestor(final MazePanel ancestor) {
         this.ancestor = Objects.requireNonNull(ancestor, "'ancestor' must not be null");
     }
 

@@ -1,8 +1,8 @@
 package app;
 
-import app.controller.MazeController;
-import app.model.MazeModel;
-import app.view.MazeView;
+import app.controller.MazeDelegator;
+import app.model.MazePanel;
+import app.view.MazeFrame;
 
 /**
  * Maze architecture initializer.
@@ -11,18 +11,18 @@ public final class Maze implements Runnable {
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
-     * pivotal <code>app.view.MazeView</code> component, extending
+     * pivotal <code>app.view.MazeFrame</code> component, extending
      * <code>java.awt.JFrame</code>.
      *
      * @author JoshGoA
      * @version 0.1
      * @see javax.swing.JFrame JFrame
      */
-    private final MazeModel mazeModel;
+    private final MazePanel mazePanel;
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
-     * pivotal <code>app.model.MazeModel</code> component, extending
+     * pivotal <code>app.model.MazePanel</code> component, extending
      * <code>javax.swing.JPanel</code> and storing
      * <code>app.model.components.CellPanel</code>.
      *
@@ -31,11 +31,11 @@ public final class Maze implements Runnable {
      * @see javax.swing.JPanel JPanel
      * @see app.model.components.CellPanel CellPanel
      */
-    private final MazeView mazeView;
+    private final MazeFrame mazeFrame;
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
-     * pivotal <code>app.controller.MazeController</code> component, handling
+     * pivotal <code>app.controller.MazeDelegator</code> component, handling
      * multiple pivotal interactions, implementing
      * <code>java.io.Serializable</code>.
      *
@@ -43,32 +43,32 @@ public final class Maze implements Runnable {
      * @version 0.1
      * @see java.io.Serializable Serializable
      */
-    private final MazeController mazeController;
+    private final MazeDelegator mazeDelegator;
 
     /**
      * Create a new maze architecture initializer.
      */
     public Maze() {
-        this.mazeModel = new MazeModel();
-        this.mazeView = new MazeView();
-        this.mazeController = new MazeController();
+        this.mazePanel = new MazePanel();
+        this.mazeFrame = new MazeFrame();
+        this.mazeDelegator = new MazeDelegator();
     }
 
     /**
      * Assemble pivotal relationships.
      */
     private final void initMaze() {
-        this.mazeModel.setController(this.mazeController);
-        this.mazeView.setController(this.mazeController);
-        this.mazeController.setModel(this.mazeModel);
-        this.mazeController.setView(this.mazeView);
+        this.mazePanel.setDelegator(this.mazeDelegator);
+        this.mazeFrame.setDelegator(this.mazeDelegator);
+        this.mazeDelegator.setPanel(this.mazePanel);
+        this.mazeDelegator.setFrame(this.mazeFrame);
     }
 
     /**
      * Pivot initializer wrapper.
      */
     private final void runMaze() {
-        this.mazeController.run();
+        this.mazeFrame.display();
     }
 
     /**
@@ -87,9 +87,9 @@ public final class Maze implements Runnable {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.mazeController == null) ? 0 : this.mazeController.hashCode());
-        result = prime * result + ((this.mazeModel == null) ? 0 : this.mazeModel.hashCode());
-        result = prime * result + ((this.mazeView == null) ? 0 : this.mazeView.hashCode());
+        result = prime * result + ((this.mazeDelegator == null) ? 0 : this.mazeDelegator.hashCode());
+        result = prime * result + ((this.mazePanel == null) ? 0 : this.mazePanel.hashCode());
+        result = prime * result + ((this.mazeFrame == null) ? 0 : this.mazeFrame.hashCode());
         return result;
     }
 
@@ -102,27 +102,27 @@ public final class Maze implements Runnable {
         if (this.getClass() != obj.getClass())
             return false;
         final Maze other = (Maze) obj;
-        if (this.mazeController == null)
-            if (other.mazeController != null)
+        if (this.mazeDelegator == null)
+            if (other.mazeDelegator != null)
                 return false;
-        else if (!this.mazeController.equals(other.mazeController))
+        else if (!this.mazeDelegator.equals(other.mazeDelegator))
             return false;
-        if (this.mazeModel == null)
-            if (other.mazeModel != null)
+        if (this.mazePanel == null)
+            if (other.mazePanel != null)
                 return false;
-        else if (!this.mazeModel.equals(other.mazeModel))
+        else if (!this.mazePanel.equals(other.mazePanel))
             return false;
-        if (this.mazeView == null)
-            if (other.mazeView != null)
+        if (this.mazeFrame == null)
+            if (other.mazeFrame != null)
                 return false;
-        else if (!this.mazeView.equals(other.mazeView))
+        else if (!this.mazeFrame.equals(other.mazeFrame))
             return false;
         return true;
     }
 
     @Override
     public final String toString() {
-        return this.mazeController.toString();
+        return this.mazeDelegator.toString();
     }
 
 }

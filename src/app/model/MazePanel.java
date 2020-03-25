@@ -1,9 +1,9 @@
 package app.model;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -11,13 +11,14 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
-import app.controller.MazeController;
+import app.controller.MazeDelegator;
 import app.controller.components.AbstractCell.CellState;
 import app.model.components.CellPanel;
+import app.view.components.RangedSlider.BoundedRange;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
- * pivotal <code>app.model.MazeModel</code> component, extending
+ * pivotal <code>app.model.MazePanel</code> component, extending
  * <code>javax.swing.JPanel</code> and storing
  * <code>app.model.components.CellPanel</code>.
  *
@@ -26,17 +27,25 @@ import app.model.components.CellPanel;
  * @see javax.swing.JPanel JPanel
  * @see app.model.components.CellPanel CellPanel
  */
-public class MazeModel extends JPanel {
+public class MazePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Two-sided <code>app.controller.MazeController</code>
-     * <code>app.view.MazeView</code> interaction pipeline.
+     * Two-sided <code>app.controller.MazeDelegator</code>
+     * <code>app.view.MazeFrame</code> interaction pipeline.
      *
-     * @see app.controller.MazeController MazeController
+     * @see app.controller.MazeDelegator MazeDelegator
      */
-    private transient MazeController controller;
+    private transient MazeDelegator delegator;
+
+    /**
+     * <code>app.model.MazePanel</code> dimension resizing
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     *
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
+     */
+    private final BoundedRange dimension = new BoundedRange(10, 50, 20);
 
     /**
      * Bi-dimensional <code>app.model.components.CellPanel</code> array.
@@ -73,22 +82,25 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Create a new isolated pipeline component.
+     * Create a new two-sided <code>app.controller.MazeDelegator</code> interaction
+     * <code>app.model.MazePanel</code> pipeline component.
+     *
+     * @param delegator MazeDelegator
      */
-    public MazeModel() { }
+    public MazePanel(final MazeDelegator delegator) {
+        this.setDelegator(delegator);
+        this.setGrid(this.dimension.getValue(), this.dimension.getValue());
+    }
 
     /**
-     * Create a new two-sided <code>app.controller.MazeController</code> interaction
-     * <code>app.model.MazeModel</code> pipeline component.
-     *
-     * @param controller MazeController
+     * Create a new isolated pipeline component.
      */
-    public MazeModel(final MazeController controller) {
-        this.setController(controller);
+    public MazePanel() {
+        this(null);
     }
 
     // TODO: Fix serialization
-    public final void override(final MazeModel model) {
+    public final void override(final MazePanel model) {
         // Remove previous components
         this.removeAll();
         // Update layout and grid
@@ -127,32 +139,59 @@ public class MazeModel extends JPanel {
     }
 
     /**
-     * Request <code>app.view.MazeView.releaseCellPopup(CellPanel cell)</code>
+     * Return current <code>app.controller.MazeDelegator</code> instance.
+     *
+     * @return MazeDelegator
+     */
+    public final MazeDelegator getDelegator() {
+        return this.delegator;
+    }
+
+    /**
+     * Set current <code>app.controller.MazeDelegator</code> instance.
+     *
+     * @param delegator MazeDelegator
+     */
+    public final void setDelegator(final MazeDelegator delegator) {
+        this.delegator = delegator;
+    }
+
+    /**
+     * Request <code>app.view.MazeFrame.releaseCellPopup(CellPanel cell)</code>
      * event.
      *
      * @param cell CellPanel
      * @return JPopupMenu
      */
     public final JPopupMenu releaseCellPopup(final CellPanel cell) {
-        return this.controller.releaseCellPopup(cell);
+        return this.delegator.releaseCellPopup(cell);
     }
 
     /**
-     * Return current <code>app.controller.MazeController</code> instance.
+     * Return current dimension
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
      *
-     * @return MazeController
+     * @return BoundedRange
      */
-    public final MazeController getController() {
-        return this.controller;
+    public final BoundedRange getDimension() {
+        return this.dimension;
+    }
+
+    public final Dimension getEucliadeanDimension() {
+        return new Dimension(this.dimension.getValue(), this.dimension.getValue());
     }
 
     /**
-     * Set current <code>app.controller.MazeController</code> instance.
+     * Set current dimension
+     * <code>app.view.components.RangedSlider.BoundedRange</code> value and fire
+     * <code>app.model.MazePanel.setGrid(int rows, int cols)</code> event.
      *
-     * @param controller MazeController
+     * @param val int
      */
-    public final void setController(final MazeController controller) {
-        this.controller = Objects.requireNonNull(controller, "'controller' must not be null");
+    public final void setDimension(final int val) {
+        this.dimension.setValue(val);
+        this.setGrid(this.dimension.getValue(), this.dimension.getValue());
+        this.reset();
     }
 
     /**
@@ -189,7 +228,7 @@ public class MazeModel extends JPanel {
         // Set CellPanel neighbors
         for (int row = 0; row < rows; row++)
             for (int col = 0; col < cols; col++) {
-                // TODO: Add diagonals by calling controller
+                // TODO: Add diagonals by calling delegator
                 final int CellPanelRow = row;
                 final int CellPanelCol = col;
                 this.grid[row][col].setNeighbors(new HashSet<CellPanel>() {
@@ -304,6 +343,7 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.PathFinder.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakePathFinder() {
+        this.clear();
         this.pathfinder.awake(this.getGrid(),
                 (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
@@ -329,6 +369,7 @@ public class MazeModel extends JPanel {
      * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakeGenerator() {
+        this.clear();
         this.generator.awake(this.getGrid(),
                 (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);

@@ -134,28 +134,6 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
     }
 
     @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
-        return result;
-    }
-
-    @Override
-    public final boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (this.getClass() != obj.getClass())
-            return false;
-        final Node<?> other = (Node<?>) obj;
-        if (this.state != other.state)
-            return false;
-        return true;
-    }
-
-    @Override
     public final String toString() {
         return String.format("Node [state: %s]", this.state);
     }

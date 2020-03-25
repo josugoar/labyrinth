@@ -1,6 +1,5 @@
 package app.model;
 
-import java.awt.Component;
 import java.awt.Point;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
@@ -10,6 +9,7 @@ import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.model.components.Node;
 import app.model.components.Node.NodeState;
+import app.view.components.RangedSlider.BoundedRange;
 
 /**
  * PathFinding algorithm abstract wrapper, implementing
@@ -32,6 +32,14 @@ public abstract class PathFinder implements AbstractAlgorithm {
      * Ending endpoint pointer.
      */
     protected Point target;
+
+    /**
+     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
+     * cycles.
+     *
+     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
+     */
+    private final BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
      * Recursively iterate over generations using
@@ -79,6 +87,26 @@ public abstract class PathFinder implements AbstractAlgorithm {
      */
     private final void setTarget(final Point target) {
         this.target = target;
+    }
+
+    /**
+     * Return current delay
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     *
+     * @return BoundedRange
+     */
+    public final BoundedRange getDelay() {
+        return this.delay;
+    }
+
+    /**
+     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
+     * value.
+     *
+     * @param val int
+     */
+    public final void setDelay(final int val) {
+        this.delay.setValue(val);
     }
 
     @Override
@@ -193,9 +221,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
             if (!this.isRunning)
                 throw new InterruptedException("Invokation interrupted...");
             // Delay iteration
-            // TODO: Fix runtime
-            Thread.sleep((((MazeModel) ((Component) newGen.iterator().next().getOuter()).getParent()).getController()
-                    .getDelay().getValue()));
+            Thread.sleep(super.delay.getValue());
             // Call method recursively until convergence
             return this.advance(grid, newGen);
         }
