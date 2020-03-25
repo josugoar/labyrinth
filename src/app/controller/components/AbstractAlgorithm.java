@@ -1,11 +1,19 @@
 package app.controller.components;
 
-/**
- * Abstract algorithm interface wrapper.
- */
-public abstract interface AbstractAlgorithm {
+import java.awt.Point;
+import java.io.Serializable;
 
-    // TODO: extends AlgorithmMethod
+import javax.xml.crypto.AlgorithmMethod;
+
+/**
+ * Abstract algorithm interface wrapper, implementing
+ * <code>javax.xml.crypto.AlgorithmMethod</code> and
+ * <code>java.io.Serializable</code>.
+ *
+ * @see javax.xml.crypto.AlgorithmMethod AlgorithmMethod
+ * @see java.io.Serializable Serializable
+ */
+public abstract interface AbstractAlgorithm extends AlgorithmMethod, Serializable {
 
     /**
      * Awake algorithm on given euclidean space.
@@ -13,7 +21,7 @@ public abstract interface AbstractAlgorithm {
      * @param <T>  AbstractCell<T>
      * @param grid T[][]
      */
-    public abstract <T extends AbstractCell<T>> void awake(final T[][] grid);
+    public abstract <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end);
 
     /**
      * Return current running state.

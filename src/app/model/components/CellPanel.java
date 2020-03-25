@@ -5,17 +5,15 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 import app.controller.components.AbstractCell;
-import app.model.MazeModel;
+import app.model.MazePanel;
+import utils.JWrapper;
 
 /**
  * Component neighbor pointer responsible of self-reference via inner
@@ -31,28 +29,28 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Ancestor <code>app.model.MazeModel</code> pointer.
+     * Selected flag for menu.
      */
-    public final MazeModel ancestor;
+    public static boolean selected = false;
+
+    /**
+     * Ancestor <code>app.model.MazePanel</code> pointer.
+     *
+     * @see app.model.MazePanel MazePanel
+     */
+    public MazePanel ancestor;
 
     /**
      * Euclidean space coordinate <code>java.awt.Point</code>.
      *
      * @see java.awt.Point Point
      */
-    private Point seed;
+    private final Point seed;
 
     /**
      * Tree-like graph neighbor pointer storage.
      */
     private Set<CellPanel> neighbors;
-
-    /**
-     * Current <code>app.controller.components.AbstractCell.CellState</code>.
-     *
-     * @see app.controller.components.AbstractCell.CellState CellState
-     */
-    private CellState state = CellState.EMPTY;
 
     /**
      * Current inner <code>app.model.components.Node</code> pointer.
@@ -61,38 +59,52 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private Node<CellPanel> inner = null;
 
-    // TODO: Fix selection
     /**
-     * Selected flag for menu.
+     * Current <code>app.controller.components.AbstractCell.CellState</code>.
+     *
+     * @see app.controller.components.AbstractCell.CellState CellState
      */
-    public static boolean selected = false;
+    private CellState state = CellState.EMPTY;
 
     {
         this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        this.addMouseListener(new CellPanelListener());
     }
 
     /**
      * Create a new pointer storage enclosing ancestor, seed and neighbors.
      *
-     * @param ancestor  MazeModel
      * @param seed      Point
      * @param neighbors Set<CellPanel>
+     * @param ancestor  MazePanel
      */
-    public CellPanel(final MazeModel ancestor, final Point seed, final Set<CellPanel> neighbors) {
-        this.ancestor = ancestor;
+    public CellPanel(final MazePanel ancestor, final Point seed, final Set<CellPanel> neighbors) {
         this.seed = seed;
         this.setNeighbors(neighbors);
+        this.setAncestor(ancestor);
+        this.addMouseListener(this.new CellPanelListener());
     }
 
     /**
      * Create a new isolated vertex.
      *
-     * @param ancestor MazeModel
      * @param seed     Point
+     * @param ancestor MazePanel
      */
-    public CellPanel(final MazeModel ancestor, final Point seed) {
+    public CellPanel(final MazePanel ancestor, final Point seed) {
         this(ancestor, seed, null);
+    }
+
+    /**
+     * Recursively traverse entire <code>app.model.components.CellPanel</code> and
+     * <code>app.model.components.Node</code> tree structure for maximum
+     * performance.
+     */
+    public final void clear() {
+        if (this.getInner() != null) {
+            this.setInner(null);
+            for (final CellPanel child : this.getNeighbors())
+                child.clear();
+        }
     }
 
     /**
@@ -107,31 +119,70 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     /**
-     * Recursively traverse entire <code>app.model.components.CellPanel</code> and
-     * <code>app.model.components.Node</code> tree structure.
-     */
-    public final void clear() {
-        if (this.getInner() != null) {
-            this.setInner(null);
-            for (CellPanel child : this.getNeighbors()) {
-                child.clear();
-            }
-        }
-    }
-
-    /**
      * Paint border color selection.
      */
     protected final void paintSelection() {
-        if (this.state == CellPanel.CellState.START || this.state == CellPanel.CellState.END) {
-            this.setBorder(BorderFactory.createLineBorder(this.state.getColor()));
-        } else {
-            if (this.inner == null) {
-                this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            } else {
-                this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getColor()));
-            }
-        }
+        if (this.state != CellState.EMPTY)
+            this.setBorder(BorderFactory.createLineBorder(this.state.getReference()));
+        else if (this.inner == null)
+            this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        else
+            this.setBorder(BorderFactory.createLineBorder(this.inner.getState().getReference()));
+    }
+
+    @Override
+    public final void paintComponent(final Graphics g) {
+        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY)
+            g.setColor(this.inner.getState().getReference());
+        else
+            g.setColor(this.state.getReference());
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    @Override
+    public final void notifyChange() {
+        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * Return selected flag for menu.
+     *
+     * @return boolean
+     */
+    public final boolean isSelected() {
+        return CellPanel.selected;
+    }
+
+    /**
+     * Set selected flag for menu.
+     *
+     * @param selected boolean
+     */
+    public synchronized final void setSelected(final boolean selected) {
+        if (selected)
+            CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        else
+            CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        CellPanel.selected = selected;
+    }
+
+    /**
+     * Return current <code>app.model.MazePanel</code> pointer.
+     *
+     * @return MazePanel
+     */
+    public final MazePanel getAncestor() {
+        return this.ancestor;
+    }
+
+    /**
+     * Set <code>app.model.MazePanel</code> pointer.
+     *
+     * @param ancestor MazePanel
+     */
+    public final void setAncestor(final MazePanel ancestor) {
+        this.ancestor = Objects.requireNonNull(ancestor, "'ancestor' must not be null");
     }
 
     /**
@@ -154,6 +205,17 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     @Override
+    public final Node<CellPanel> getInner() {
+        return this.inner;
+    }
+
+    @Override
+    public final void setInner(final Node<CellPanel> inner) {
+        this.inner = inner;
+        this.notifyChange();
+    }
+
+    @Override
     public final CellState getState() {
         return this.state;
     }
@@ -165,34 +227,41 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         // Check override
         this.checkOverride();
         this.state = state;
-        this.stateChange();
+        this.notifyChange();
     }
 
     @Override
-    public final Node<CellPanel> getInner() {
-        return this.inner;
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.inner == null) ? 0 : this.inner.hashCode());
+        result = prime * result + ((this.seed == null) ? 0 : this.seed.hashCode());
+        result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
+        return result;
     }
 
     @Override
-    public final void setInner(final Node<CellPanel> inner) {
-        this.inner = inner;
-        this.stateChange();
-    }
-
-    @Override
-    public final void stateChange() {
-        this.revalidate();
-        this.repaint();
-    }
-
-    @Override
-    public final void paintComponent(final Graphics g) {
-        if (this.inner != null && this.getState() == CellPanel.CellState.EMPTY) {
-            g.setColor(this.inner.getState().getColor());
-        } else {
-            g.setColor(this.state.getColor());
-        }
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (this.getClass() != obj.getClass())
+            return false;
+        CellPanel other = (CellPanel) obj;
+        if (this.inner == null) {
+            if (other.inner != null)
+                return false;
+        } else if (!this.inner.equals(other.inner))
+            return false;
+        if (this.seed == null) {
+            if (other.seed != null)
+                return false;
+        } else if (!this.seed.equals(other.seed))
+            return false;
+        if (this.state != other.state)
+            return false;
+        return true;
     }
 
     @Override
@@ -209,94 +278,56 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      */
     private final class CellPanelListener extends MouseAdapter {
 
-        /**
-         * <code>javax.swing.JPopupMenu</code> containing selection logic.
-         *
-         * @see javax.swing.JPopupMenu JPopupMenu
-         */
-        final JPopupMenu popup = new JPopupMenu() {
-            private static final long serialVersionUID = 1L;
-            {
-                this.addPopupMenuListener(new PopupMenuListener() {
-                    @Override
-                    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                        CellPanel.selected = true;
-                    }
-                    @Override
-                    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                        CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-                         CellPanel.selected = false;
-                    }
-                    @Override
-                    public void popupMenuCanceled(PopupMenuEvent e) { }
-                });
-                this.add(new JMenuItem("Start") {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        this.addActionListener(e -> CellPanel.this.ancestor.setStart(CellPanel.this));
-                    }
-                });
-                this.add(new JMenuItem("End") {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        this.addActionListener(e -> CellPanel.this.ancestor.setEnd(CellPanel.this));
-                    }
-                });
-            }
-        };
-
         @Override
-        public final void mousePressed(final MouseEvent e) {
-            if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning()))
-                ancestor.fireClear();
-            // Check for draw state
-            if (e.isShiftDown()) {
-                // Check for running action
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+        public synchronized final void mousePressed(final MouseEvent e) {
+            CellPanel.this.ancestor.clear();
+            // Check for running action
+            try {
+                // Check for draw state
+                if (e.isShiftDown()) {
+                    CellPanel.this.ancestor.assertIsRunning();
+                    // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
+                    // Right input
                     else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.EMPTY);
-                } else {
-                    System.err.println("Invalid input while running...");
+                    // Check for popup state
+                } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
+                    CellPanel.this.ancestor.assertIsRunning();
+                    CellPanel.this.ancestor.releaseCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
                 }
-                // Check for popup state
-            } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-                // Check for running action
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
-                    CellPanel.selected = true;
-                    this.popup.show(CellPanel.this, e.getX(), e.getY());
-                } else {
-                    System.err.println("Invalid input while running...");
-                }
+            } catch (final InterruptedException l) {
+                JWrapper.dispatchException(l);
             }
         }
 
         @Override
-        public final void mouseEntered(final MouseEvent e) {
+        public synchronized final void mouseEntered(final MouseEvent e) {
             // Select Cell
             if (!CellPanel.selected)
                 CellPanel.this.paintSelection();
-            if (e.isShiftDown()) {
-                if (!(CellPanel.this.ancestor.getPathFinder().getIsRunning())) {
+            try {
+                if (e.isShiftDown()) {
+                    // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
-
+                        CellPanel.this.ancestor.assertIsRunning();
                         CellPanel.this.setState(CellState.OBSTACLE);
+                        // Right input
                     } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-
+                        CellPanel.this.ancestor.assertIsRunning();
                         CellPanel.this.setState(CellState.EMPTY);
                     }
-                } else {
-                    System.err.println("Invalid input while running...");
                 }
+            } catch (final InterruptedException l) {
+                JWrapper.dispatchException(l);
             }
         }
 
         @Override
-        public final void mouseExited(final MouseEvent e) {
-            if (!CellPanel.selected) {
+        public synchronized final void mouseExited(final MouseEvent e) {
+            if (!CellPanel.selected)
                 CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-            }
         }
 
     }
