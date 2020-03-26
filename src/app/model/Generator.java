@@ -33,8 +33,8 @@ public abstract class Generator implements AbstractAlgorithm {
     @Override
     public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
         // TODO: Generator
-        for (T[] ts : grid)
-            for (T t : ts)
+        for (final T[] ts : grid)
+            for (final T t : ts)
                 if (Math.random() > 0.5)
                     t.setState(CellState.OBSTACLE);
     }

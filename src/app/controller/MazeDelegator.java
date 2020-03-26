@@ -148,7 +148,7 @@ public class MazeDelegator implements Serializable {
             if (this.panel.getStart() == null || this.panel.getStart().getInner() == null)
                 throw new NullPointerException("No nodes to clear...");
             this.panel.clear();
-        } catch (NullPointerException e) {
+        } catch (final NullPointerException e) {
             JWrapper.dispatchException(e);
         }
     }
@@ -302,7 +302,7 @@ public class MazeDelegator implements Serializable {
         try {
             this.panel.assertIsRunning();
             this.frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }
     }
@@ -445,6 +445,7 @@ public class MazeDelegator implements Serializable {
      * @return CellPanel.CellState
      * @deprecated Draw cycle made by mouse input
      */
+    @Deprecated
     public final CellState getMode() {
         return this.mode;
     }
@@ -456,6 +457,7 @@ public class MazeDelegator implements Serializable {
      * @param mode CellState
      * @deprecated Draw cycle made by mouse input
      */
+    @Deprecated
     public final void setMode(final CellState mode) {
         this.mode = mode;
     }
