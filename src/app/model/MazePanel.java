@@ -106,19 +106,19 @@ public class MazePanel extends JPanel {
      * @param other MazePanel
      */
     public final void override(final MazePanel other) {
-        // Rereference MazePanel
-        this.delegator.setPanel(other);
-        // Set transient variables
-        other.setDelegator(this.delegator);
-        other.setPathFinder(this.pathfinder);
-        other.setGenerator(this.generator);
         final Container frame = this.getParent();
         // Remove previous component
         frame.remove(this);
         frame.add(other);
+        // Set transient variables
+        other.setDelegator(this.delegator);
+        other.setPathFinder(this.pathfinder);
+        other.setGenerator(this.generator);
         // Update draw changes
         frame.revalidate();
         frame.repaint();
+        // Rereference MazePanel
+        this.delegator.setPanel(other);
     }
 
     /**

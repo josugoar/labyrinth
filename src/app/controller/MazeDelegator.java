@@ -113,11 +113,11 @@ public class MazeDelegator implements Serializable {
      */
     public final void writeMaze() {
         try {
-            // TODO: Clear CellPanel selection and do not throw InterruptedException
             this.panel.assertIsRunning();
             final FileOutputStream file = new FileOutputStream(MazePanel.class.getResource("ser/maze.ser").getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
-            this.clear();
+            CellPanel.setSelected(null);
+            this.panel.clear();
             out.writeObject(this.panel);
             out.close();
             file.close();

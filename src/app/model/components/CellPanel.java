@@ -30,9 +30,14 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Selected flag for menu.
+     * Focused flag for menu.
      */
-    public transient static boolean selected = false;
+    private transient static boolean focused = false;
+
+    /**
+     * Slected <code>focused</code> pointer.
+     */
+    private static CellPanel selected = null;
 
     /**
      * Ancestor <code>app.model.MazePanel</code> pointer.
@@ -147,25 +152,47 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     /**
-     * Return selected flag for menu.
+     * Return current selected pointer.
      *
-     * @return boolean
+     * @return CellPanel
      */
-    public final boolean isSelected() {
+    public static final CellPanel getSelected() {
         return CellPanel.selected;
     }
 
     /**
-     * Set selected flag for menu.
+     * Set current selected pointer.
      *
-     * @param selected boolean
+     * @param selected CellPanel
      */
-    public synchronized final void setSelected(final boolean selected) {
-        if (selected)
+    public synchronized static final void setSelected(final CellPanel selected) {
+        if (selected != null)
+            selected.paintSelection();
+        else if (CellPanel.selected != null)
+            CellPanel.selected.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        CellPanel.selected = selected;
+    }
+
+    /**
+     * Return selected flag for menu.
+     *
+     * @return boolean
+     */
+    public static final boolean isFocused() {
+        return CellPanel.focused;
+    }
+
+    /**
+     * Set focused flag for menu.
+     *
+     * @param focused boolean
+     */
+    public synchronized final void setFocused(final boolean focused) {
+        if (focused)
             CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         else
             CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        CellPanel.selected = selected;
+        CellPanel.focused = focused;
     }
 
     /**
@@ -274,8 +301,8 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
         @Override
         public synchronized final void mouseEntered(final MouseEvent e) {
             // Select Cell
-            if (!CellPanel.selected)
-                CellPanel.this.paintSelection();
+            if (!CellPanel.focused)
+                CellPanel.setSelected(CellPanel.this);
             try {
                 if (e.isShiftDown()) {
                     // Left input
@@ -295,7 +322,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
 
         @Override
         public synchronized final void mouseExited(final MouseEvent e) {
-            if (!CellPanel.selected)
+            if (!CellPanel.focused)
                 CellPanel.this.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         }
 

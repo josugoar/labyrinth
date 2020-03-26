@@ -64,7 +64,6 @@ public abstract class Generator implements AbstractAlgorithm {
 
     @Override
     public final void setIsRunning(final boolean isRunning) {
-        // TODO: Glass pane
         this.isRunning = isRunning;
     }
 
