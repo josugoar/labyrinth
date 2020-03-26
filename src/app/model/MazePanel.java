@@ -129,7 +129,7 @@ public class MazePanel extends JPanel {
     public final void reset() throws ClassCastException {
         if (!(this.getLayout() instanceof GridLayout))
             throw new ClassCastException("GridLayout might not have been initialized");
-        this.pathfinder.setIsRunning(false);
+        this.pathfinder.setRunning(false);
         this.setGrid(((GridLayout) this.getLayout()).getRows(), ((GridLayout) this.getLayout()).getColumns());
     }
 
@@ -137,7 +137,7 @@ public class MazePanel extends JPanel {
      * Fire <code>app.model.components.CellPanel.clear()</code> event.
      */
     public final void clear() {
-        if (this.pathfinder.getIsRunning() || this.start == null)
+        if (this.pathfinder.isRunning() || this.start == null)
             return;
         this.start.clear();
     }
@@ -353,7 +353,8 @@ public class MazePanel extends JPanel {
      */
     public final void awakePathFinder() {
         this.clear();
-        this.pathfinder.awake(this.getGrid(), (this.start != null) ? this.start.getSeed() : null,
+        this.pathfinder.awake(this.getGrid(),
+                (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
     }
 
@@ -378,7 +379,8 @@ public class MazePanel extends JPanel {
      */
     public final void awakeGenerator() {
         this.reset();
-        this.generator.awake(this.getGrid(), (this.start != null) ? this.start.getSeed() : null,
+        this.generator.awake(this.getGrid(),
+                (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
     }
 
@@ -390,7 +392,7 @@ public class MazePanel extends JPanel {
      *                              ancestor.getGenerator().getIsRunning())
      */
     public final void assertIsRunning() throws InterruptedException {
-        if (this.pathfinder.getIsRunning() || this.generator.getIsRunning())
+        if (this.pathfinder.isRunning() || this.generator.isRunning())
             throw new InterruptedException("Invalid input while running...");
     }
 

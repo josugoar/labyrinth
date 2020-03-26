@@ -1,29 +1,25 @@
 package app.model;
 
 import java.awt.Point;
+import java.io.Serializable;
 import java.security.spec.AlgorithmParameterSpec;
 
 import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.controller.components.AbstractCell.CellState;
 import app.view.components.RangedSlider.BoundedRange;
+import utils.JWrapper;
 
-public abstract class Generator implements AbstractAlgorithm {
+public abstract class Generator extends AbstractAlgorithm {
+
+    // TODO: Spec
+    private class GeneratorSpec implements AlgorithmParameterSpec, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+    }
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Flag for algorithm running state.
-     */
-    protected boolean isRunning = false;
-
-    /**
-     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
-     * cycles.
-     *
-     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
-     */
-    private final BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
      * Maze <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
@@ -38,12 +34,19 @@ public abstract class Generator implements AbstractAlgorithm {
      *
      * @param <T>  AbstractCell<T>
      * @param grid T[][]
+     * @throws InterruptedException
      */
-    protected abstract <T extends AbstractCell<T>> void generate(final T[][] grid);
+    protected abstract <T extends AbstractCell<T>> void generate(final T[][] grid) throws InterruptedException;
 
     @Override
     public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
-        new Thread(() -> this.generate(grid));
+        new Thread(() -> {
+            try {
+                this.generate(grid);
+            } catch (final InterruptedException e) {
+                JWrapper.dispatchException(e);
+            }
+        }).start();
     }
 
     /**
@@ -62,36 +65,6 @@ public abstract class Generator implements AbstractAlgorithm {
      */
     public final void setDensity(final int density) {
         this.density.setValue(density);
-    }
-
-    @Override
-    public final boolean getIsRunning() {
-        return this.isRunning;
-    }
-
-    @Override
-    public final void setIsRunning(final boolean isRunning) {
-        this.isRunning = isRunning;
-    }
-
-    @Override
-    public final BoundedRange getDelay() {
-        return this.delay;
-    }
-
-    @Override
-    public final void setDelay(final int delay) {
-        this.delay.setValue(delay);
-    }
-
-    @Override
-    public final String getAlgorithm() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public final String toString() {
-        return this.getAlgorithm();
     }
 
     public static final class BackTracker extends Generator {
@@ -115,11 +88,14 @@ public abstract class Generator implements AbstractAlgorithm {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public final <T extends AbstractCell<T>> void generate(final T[][] grid) {
-            for (final T[] ts : grid)
-                for (final T t : ts)
+        public final <T extends AbstractCell<T>> void generate(final T[][] grid) throws InterruptedException {
+            for (final T[] cells : grid)
+                for (final T cell : cells) {
                     if (Math.random() < (float) super.density.getValue() / 100)
-                        t.setState(CellState.OBSTACLE);
+                        cell.setState(CellState.OBSTACLE);
+                    // Delay iteration
+                    Thread.sleep(super.delay.getValue());
+                }
         }
 
         @Override

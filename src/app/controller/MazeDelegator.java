@@ -16,6 +16,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
+import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell.CellState;
 import app.model.Generator;
 import app.model.MazePanel;
@@ -210,26 +211,6 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Return current delay
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
-     *
-     * @return BoundedRange
-     */
-    public final BoundedRange getDelay() {
-        return this.panel.getPathFinder().getDelay();
-    }
-
-    /**
-     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
-     * value.
-     *
-     * @param delay int
-     */
-    public final void setDelay(final int delay) {
-        this.panel.getPathFinder().setDelay(delay);
-    }
-
-    /**
      * Request current <code>app.model.Generator</code> instance.
      *
      * @return Generator
@@ -251,6 +232,32 @@ public class MazeDelegator implements Serializable {
     public final void awakeGenerator() {
         this.frame.requestFocusInWindow();
         this.panel.awakeGenerator();
+    }
+
+    /**
+     * Return current delay
+     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     *
+     * @return BoundedRange
+     */
+    public final BoundedRange getDelay(Class<? extends AbstractAlgorithm> algorithm) {
+        if (algorithm.equals(PathFinder.class))
+            return this.panel.getPathFinder().getDelay();
+        else if (algorithm.equals(Generator.class))
+            return this.panel.getGenerator().getDelay();
+        else
+            return null;
+    }
+
+    /**
+     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
+     * value.
+     *
+     * @param delay int
+     */
+    public final void setDelay(final int delay) {
+        this.panel.getPathFinder().setDelay(delay);
+        this.panel.getGenerator().setDelay(delay);
     }
 
     /**

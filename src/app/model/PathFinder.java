@@ -9,7 +9,6 @@ import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.model.components.Node;
 import app.model.components.Node.NodeState;
-import app.view.components.RangedSlider.BoundedRange;
 import utils.JWrapper;
 
 /**
@@ -20,7 +19,7 @@ import utils.JWrapper;
  * @see app.controller.components.AbstractCell AbstractCell
  * @see app.model.components.Node Node
  */
-public abstract class PathFinder implements AbstractAlgorithm {
+public abstract class PathFinder extends AbstractAlgorithm {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,19 +27,6 @@ public abstract class PathFinder implements AbstractAlgorithm {
      * Ending endpoint pointer.
      */
     protected Point target;
-
-    /**
-     * Flag for algorithm running state.
-     */
-    protected volatile boolean isRunning = false;
-
-    /**
-     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
-     * cycles.
-     *
-     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
-     */
-    private final BoundedRange delay = new BoundedRange(0, 250, 100);
 
     /**
      * Recursively iterate over generations using
@@ -99,7 +85,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
                             // Construct first generation
                             this.add(new Node<T>(startCell));
                             // Start running
-                            PathFinder.this.setIsRunning(true);
+                            PathFinder.this.setRunning(true);
                         }
                     }));
                 } catch (final IndexOutOfBoundsException e) {
@@ -108,7 +94,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
             } catch (NullPointerException | StackOverflowError | InterruptedException e) {
                 JWrapper.dispatchException(e);
             } finally {
-                this.setIsRunning(false);
+                this.setRunning(false);
             }
         }).start();
     }
@@ -123,35 +109,10 @@ public abstract class PathFinder implements AbstractAlgorithm {
     }
 
     @Override
-    public final boolean getIsRunning() {
-        return this.isRunning;
-    }
-
-    @Override
-    public final void setIsRunning(final boolean isRunning) {
-        this.isRunning = isRunning;
-    }
-
-    @Override
-    public final BoundedRange getDelay() {
-        return this.delay;
-    }
-
-    @Override
-    public final void setDelay(final int delay) {
-        this.delay.setValue(delay);
-    }
-
-    @Override
-    public final String getAlgorithm() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (this.isRunning ? 1231 : 1237);
+        result = prime * result + (this.running ? 1231 : 1237);
         result = prime * result + ((this.target == null) ? 0 : this.target.hashCode());
         return result;
     }
@@ -165,7 +126,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
         if (this.getClass() != obj.getClass())
             return false;
         final PathFinder other = (PathFinder) obj;
-        if (this.isRunning != other.isRunning)
+        if (this.running != other.running)
             return false;
         if (this.target == null)
             if (other.target != null)
@@ -173,11 +134,6 @@ public abstract class PathFinder implements AbstractAlgorithm {
         else if (!this.target.equals(other.target))
             return false;
         return true;
-    }
-
-    @Override
-    public final String toString() {
-        return this.getAlgorithm();
     }
 
     /**
@@ -193,7 +149,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
         @Override
         protected final <T extends AbstractCell<T>> Node<T> advance(final T[][] grid, final Set<Node<T>> currGen)
                 throws StackOverflowError, InterruptedException {
-            if (!this.isRunning)
+            if (!this.running)
                 throw new InterruptedException("Invokation interrupted...");
             // Visit nodes
             super.visit(currGen);

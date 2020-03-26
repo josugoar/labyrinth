@@ -267,7 +267,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(MazeFrame.this.delegator.getDelay()) {
+                                                                this.add(new RangedSlider(MazeFrame.this.delegator.getDelay(PathFinder.class)) {
                                                                     // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {

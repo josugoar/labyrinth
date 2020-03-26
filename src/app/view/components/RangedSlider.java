@@ -41,7 +41,7 @@ public class RangedSlider extends JSlider {
      * @see app.view.components.RangedSlider RangedSlider
      * @see java.io.Serializable Serializable
      */
-    public static final class BoundedRange implements Serializable {
+    public static class BoundedRange implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
