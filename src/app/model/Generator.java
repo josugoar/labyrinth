@@ -12,6 +12,9 @@ public abstract class Generator implements AbstractAlgorithm {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Flag for algorithm running state.
+     */
     protected boolean isRunning = false;
 
     /**
@@ -28,15 +31,19 @@ public abstract class Generator implements AbstractAlgorithm {
      *
      * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private final BoundedRange density = new BoundedRange(1, 100, 10);
+    private final BoundedRange density = new BoundedRange(1, 99, 50);
+
+    /**
+     * Generate obstacle structure in grid.
+     *
+     * @param <T>  AbstractCell<T>
+     * @param grid T[][]
+     */
+    protected abstract <T extends AbstractCell<T>> void generate(final T[][] grid);
 
     @Override
     public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
-        // TODO: Generator
-        for (final T[] ts : grid)
-            for (final T t : ts)
-                if (Math.random() > 0.5)
-                    t.setState(CellState.OBSTACLE);
+        new Thread(() -> this.generate(grid));
     }
 
     /**
@@ -90,6 +97,30 @@ public abstract class Generator implements AbstractAlgorithm {
     public static final class BackTracker extends Generator {
 
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public final <T extends AbstractCell<T>> void generate(final T[][] grid) {
+
+        }
+
+        @Override
+        public AlgorithmParameterSpec getParameterSpec() {
+            return null;
+        }
+
+    }
+
+    public static final class Random extends Generator {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public final <T extends AbstractCell<T>> void generate(final T[][] grid) {
+            for (final T[] ts : grid)
+                for (final T t : ts)
+                    if (Math.random() < (float) super.density.getValue() / 100)
+                        t.setState(CellState.OBSTACLE);
+        }
 
         @Override
         public AlgorithmParameterSpec getParameterSpec() {

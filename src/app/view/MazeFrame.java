@@ -393,7 +393,7 @@ public class MazeFrame extends JFrame {
                                                 this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.BackTracker()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("DFS", null, true) {
+                                        this.add(new JRadioButtonMenuItem("DFS", null, false) {
                                             // rd_btn_mni_generatorDFS
                                             private static final long serialVersionUID = 1L;
                                             {
@@ -405,6 +405,13 @@ public class MazeFrame extends JFrame {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 // this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Prim()));
+                                            }
+                                        });
+                                        this.add(new JRadioButtonMenuItem("Random", null, true) {
+                                            // rd_btn_mni_generatorRandom
+                                            private static final long serialVersionUID = 1L;
+                                            {
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Random()));
                                             }
                                         });
                                     }

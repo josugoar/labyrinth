@@ -75,7 +75,7 @@ public class MazePanel extends JPanel {
      *
      * @see app.model.Generator Generator
      */
-    private transient Generator generator = new Generator.BackTracker();
+    private transient Generator generator = new Generator.Random();
 
     {
         this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
@@ -377,7 +377,7 @@ public class MazePanel extends JPanel {
      * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
      */
     public final void awakeGenerator() {
-        this.clear();
+        this.reset();
         this.generator.awake(this.getGrid(), (this.start != null) ? this.start.getSeed() : null,
                 (this.end != null) ? this.start.getSeed() : null);
     }
