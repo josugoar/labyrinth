@@ -5,9 +5,13 @@ import app.model.MazePanel;
 import app.view.MazeFrame;
 
 /**
- * Maze architecture initializer.
+ * Maze architecture initializer, extending <code>java.lang.Thread</code>.
+ *
+ * @author JoshGoA
+ * @version 0.1
+ * @see java.lang.Thread Thread
  */
-public final class Maze implements Runnable {
+public final class Maze extends Thread {
 
     /**
      * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture

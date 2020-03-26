@@ -575,12 +575,10 @@ public class MazeFrame extends JFrame {
                     public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
                         cell.setSelected(true);
                     }
-
                     @Override
                     public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
                         cell.setSelected(false);
                     }
-
                     @Override
                     public void popupMenuCanceled(final PopupMenuEvent e) {
                     }

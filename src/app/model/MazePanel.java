@@ -1,6 +1,7 @@
 package app.model;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -99,22 +100,25 @@ public class MazePanel extends JPanel {
         this(null);
     }
 
-    // TODO: Fix serialization
-    public final void override(final MazePanel model) {
-        // Remove previous components
-        this.removeAll();
-        // Update layout and grid
-        this.setLayout(new GridLayout(model.getGrid().length, model.getGrid().length));
-        this.grid = new CellPanel[model.getGrid().length][model.getGrid().length];
-        // Initialize CellPanel with only seed
-        for (int row = 0; row < model.getGrid().length; row++)
-            for (int col = 0; col < model.getGrid().length; col++) {
-                this.grid[row][col] = model.getGrid()[row][col];
-                this.add(this.grid[row][col]);
-            }
+    /**
+     * Override current instance with other.
+     *
+     * @param other MazePanel
+     */
+    public final void override(final MazePanel other) {
+        // Rereference MazePanel
+        this.delegator.setPanel(other);
+        // Set transient variables
+        other.setDelegator(this.delegator);
+        other.setPathFinder(this.pathfinder);
+        other.setGenerator(this.generator);
+        final Container frame = this.getParent();
+        // Remove previous component
+        frame.remove(this);
+        frame.add(other);
         // Update draw changes
-        this.revalidate();
-        this.repaint();
+        frame.revalidate();
+        frame.repaint();
     }
 
     /**

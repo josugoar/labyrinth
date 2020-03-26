@@ -25,14 +25,14 @@ public abstract class PathFinder implements AbstractAlgorithm {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Flag for algorithm running state.
-     */
-    protected boolean isRunning = false;
-
-    /**
      * Ending endpoint pointer.
      */
     protected Point target;
+
+    /**
+     * Flag for algorithm running state.
+     */
+    protected volatile boolean isRunning = false;
 
     /**
      * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
@@ -234,5 +234,7 @@ public abstract class PathFinder implements AbstractAlgorithm {
         }
 
     }
+
+    // TODO: A Star PriorityQueue
 
 }

@@ -10,7 +10,7 @@ import javax.swing.Timer;
  * <code>java.awt.Component</code>.
  *
  * @see javax.swing.JPopupMenu JPopupMenu
- * @see javax.swing.event.PopupMenuListener PopupMenuListener
+ * @see java.beans.PropertyChangeListener PropertyChangeListener
  */
 public class FocusedPopup extends JPopupMenu {
 

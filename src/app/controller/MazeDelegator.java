@@ -28,7 +28,8 @@ import utils.JWrapper;
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
  * pivotal <code>app.controller.MazeDelegator</code> component, handling
- * multiple pivotal interactions, implementing <code>java.io.Serializable</code>.
+ * multiple pivotal interactions, implementing
+ * <code>java.io.Serializable</code>.
  *
  * @author JoshGoA
  * @version 0.1
@@ -75,7 +76,8 @@ public class MazeDelegator implements Serializable {
     /**
      * Create a new isolated pipeline component.
      */
-    public MazeDelegator() { }
+    public MazeDelegator() {
+    }
 
     /**
      * Create a new two-sided <code>app.model.MazePanel</code> and
@@ -83,34 +85,43 @@ public class MazeDelegator implements Serializable {
      * <code>app.controller.MazeDelegator</code> component.
      *
      * @param panel MazePanel
-     * @param frame  MazeFrame
+     * @param frame MazeFrame
      */
     public MazeDelegator(final MazePanel panel, final MazeFrame frame) {
         this.setPanel(panel);
         this.setFrame(frame);
     }
 
-    // TODO: Fix serialization
+    /**
+     * Read <code>app.model.MazePanel</code> from stream.
+     */
     public final void readMaze() {
         try {
-            final FileInputStream file = new FileInputStream("test.ser");
+            final FileInputStream file = new FileInputStream(MazePanel.class.getResource("ser/maze.ser").getPath());
             final ObjectInputStream in = new ObjectInputStream(file);
-            this.panel.override((MazePanel) in.readObject());
+            final MazePanel other = (MazePanel) in.readObject();
             in.close();
             file.close();
-        } catch (IOException | ClassNotFoundException e) {
+            this.panel.override(other);
+        } catch (final IOException | ClassNotFoundException e) {
             JWrapper.dispatchException(e);
         }
     }
 
+    /**
+     * Store <code>app.model.MazePanel</code> in stream.
+     */
     public final void writeMaze() {
         try {
-            final FileOutputStream file = new FileOutputStream("test.ser");
+            // TODO: Clear CellPanel selection and do not throw InterruptedException
+            this.panel.assertIsRunning();
+            final FileOutputStream file = new FileOutputStream(MazePanel.class.getResource("ser/maze.ser").getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
+            this.clear();
             out.writeObject(this.panel);
             out.close();
             file.close();
-        } catch (final IOException e) {
+        } catch (final InterruptedException |IOException e) {
             JWrapper.dispatchException(e);
         }
     }
@@ -194,7 +205,7 @@ public class MazeDelegator implements Serializable {
      * Run current <code>app.model.PathFinder</code> instance.
      */
     public final void awakePathFinder() {
-        this.frame.requestFocus();
+        this.frame.requestFocusInWindow();
         this.panel.awakePathFinder();
     }
 
@@ -238,7 +249,7 @@ public class MazeDelegator implements Serializable {
      * Run current <code>app.model.Generator</code> instance.
      */
     public final void awakeGenerator() {
-        this.frame.requestFocus();
+        this.frame.requestFocusInWindow();
         this.panel.awakeGenerator();
     }
 

@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     /**
      * Selected flag for menu.
      */
-    public static boolean selected = false;
+    public transient static boolean selected = false;
 
     /**
      * Ancestor <code>app.model.MazePanel</code> pointer.
@@ -231,40 +232,6 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.inner == null) ? 0 : this.inner.hashCode());
-        result = prime * result + ((this.seed == null) ? 0 : this.seed.hashCode());
-        result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (this.getClass() != obj.getClass())
-            return false;
-        CellPanel other = (CellPanel) obj;
-        if (this.inner == null) {
-            if (other.inner != null)
-                return false;
-        } else if (!this.inner.equals(other.inner))
-            return false;
-        if (this.seed == null) {
-            if (other.seed != null)
-                return false;
-        } else if (!this.seed.equals(other.seed))
-            return false;
-        if (this.state != other.state)
-            return false;
-        return true;
-    }
-
-    @Override
     public final String toString() {
         return String.format("CellPanel [state: %s, seed: (%d, %d)]", this.state, this.seed.x, this.seed.y);
     }
@@ -276,7 +243,9 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
      * @see app.model.components.CellPanel CellPanel
      * @see java.awt.event.MouseAdapter MouseAdapter
      */
-    private final class CellPanelListener extends MouseAdapter {
+    private final class CellPanelListener extends MouseAdapter implements Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         @Override
         public synchronized final void mousePressed(final MouseEvent e) {
