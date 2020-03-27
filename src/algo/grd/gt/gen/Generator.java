@@ -1,22 +1,14 @@
-package app.model;
+package algo.grd.gt.gen;
 
-import java.awt.Point;
 import java.io.Serializable;
 import java.security.spec.AlgorithmParameterSpec;
 
-import app.controller.components.AbstractCell;
-import app.controller.components.AbstractCell.CellState;
-import app.controller.components.AbstractEuclideanAlgorithm;
+import algo.grd.GridAlgorithm;
+import algo.grd.dsa.AbstractCell;
+import algo.grd.dsa.AbstractCell.CellState;
 import utils.JWrapper;
 
-public abstract class Generator extends AbstractEuclideanAlgorithm {
-
-    // TODO: Spec
-    private class GeneratorSpec implements AlgorithmParameterSpec, Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-    }
+public abstract class Generator<T extends AbstractCell<T>> extends GridAlgorithm<T> {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,10 +25,9 @@ public abstract class Generator extends AbstractEuclideanAlgorithm {
      * @param grid T[][]
      * @throws InterruptedException
      */
-    protected abstract <T extends AbstractCell<T>> void generate(final T[][] grid) throws InterruptedException;
+    protected abstract void generate(final T[][] grid) throws InterruptedException;
 
-    @Override
-    public final <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end) {
+    public final void awake() {
         new Thread(() -> {
             try {
                 this.generate(grid);
@@ -44,6 +35,11 @@ public abstract class Generator extends AbstractEuclideanAlgorithm {
                 JWrapper.dispatchException(e);
             }
         }).start();
+    }
+
+    @Override
+    public final void run() {
+        this.awake();
     }
 
     /**
@@ -68,12 +64,12 @@ public abstract class Generator extends AbstractEuclideanAlgorithm {
         this.density = density;
     }
 
-    public static final class BackTracker extends Generator {
+    public static final class BackTracker<T extends AbstractCell<T>> extends Generator<T> {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public final <T extends AbstractCell<T>> void generate(final T[][] grid) {
+        public final void generate(final T[][] grid) {
 
         }
 
@@ -84,12 +80,12 @@ public abstract class Generator extends AbstractEuclideanAlgorithm {
 
     }
 
-    public static final class Random extends Generator {
+    public static final class Random<T extends AbstractCell<T>> extends Generator<T> {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public final <T extends AbstractCell<T>> void generate(final T[][] grid) throws InterruptedException {
+        public final  void generate(final T[][] grid) throws InterruptedException {
             for (final T[] cells : grid)
                 for (final T cell : cells) {
                     if (Math.random() < (float) super.density / 100)

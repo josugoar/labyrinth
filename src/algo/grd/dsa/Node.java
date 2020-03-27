@@ -1,20 +1,19 @@
-package app.model.components;
+package algo.grd.dsa;
 
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Objects;
 
-import app.controller.components.AbstractCell;
-import app.controller.State;
+import algo.State;
 
 /**
  * <code>app.controller.components.AbstractCell</code> helper for
- * <code>app.controller.components.AbstractEuclideanAlgorithm</code> tasks, which
+ * <code>app.controller.components.GridAlgorithm</code> tasks, which
  * stores multiple parent and outer pointers of different iteration generations.
  *
  * @param <T> AbstractCell<T>
  * @see app.controller.components.AbstractCell AbstractCell
- * @see app.controller.components.AbstractEuclideanAlgorithm AbstractEuclideanAlgorithm
+ * @see app.controller.components.GridAlgorithm GridAlgorithm
  */
 public final class Node<T extends AbstractCell<T>> implements Serializable {
 
@@ -92,6 +91,18 @@ public final class Node<T extends AbstractCell<T>> implements Serializable {
      */
     public Node(final T outer) {
         this(null, outer);
+    }
+
+    /**
+     * Iterate over all parents of
+     * <code>app.controller.components.AbstractCell</code>
+     * <code>app.model.components.Node</code>.
+     */
+    public final void traverse() {
+        if (this.parent != null) {
+            this.setState(NodeState.PATH);
+            this.parent.traverse();
+        }
     }
 
     /**

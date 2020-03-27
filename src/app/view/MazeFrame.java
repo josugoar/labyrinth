@@ -40,9 +40,9 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import algo.grd.gt.gen.Generator;
+import algo.grd.gt.pfdr.PathFinder;
 import app.controller.MazeDelegator;
-import app.model.Generator;
-import app.model.PathFinder;
 import app.model.components.CellPanel;
 import app.view.components.FocusedPopup;
 import app.view.components.IconifiedButton;
@@ -107,13 +107,15 @@ public class MazeFrame extends JFrame {
     }
 
     {
-        this.addKeyListener(new KeyAdapter() {
+        this.addKeyListener (new KeyAdapter() {
             // Change cursor state depending on user input key
             @Override
             public final void keyPressed(final KeyEvent e) {
                 // Enable draw state
                 if (e.isShiftDown())
-                    MazeFrame.this.delegator.dispatchKey();
+                    MazeFrame.this.delegator.dispatchShift();
+                else if (e.getKeyCode() == KeyEvent.VK_SPACE)
+                    MazeFrame.this.delegator.dispatchSpace();
             }
             @Override
             public final void keyReleased(final KeyEvent e) {
@@ -267,7 +269,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(0, 250, MazeFrame.this.delegator.getDelay(PathFinder.class)) {
+                                                                this.add(new RangedSlider(0, 250, 100) {
                                                                     // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
@@ -367,7 +369,7 @@ public class MazeFrame extends JFrame {
                                             // rd_btn_mni_pathfinderDijkstra
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new PathFinder.Dijkstra()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new PathFinder.Dijkstra<CellPanel>()));
                                             }
                                         });
                                     }
@@ -390,7 +392,7 @@ public class MazeFrame extends JFrame {
                                             // rd_btn_mni_generatorBackTracker
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.BackTracker()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.BackTracker<CellPanel>()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("DFS", null, false) {
@@ -411,7 +413,7 @@ public class MazeFrame extends JFrame {
                                             // rd_btn_mni_generatorRandom
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Random()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Random<CellPanel>()));
                                             }
                                         });
                                     }

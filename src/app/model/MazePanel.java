@@ -12,8 +12,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
+import algo.grd.dsa.AbstractCell.CellState;
+import algo.grd.gt.gen.Generator;
+import algo.grd.gt.pfdr.PathFinder;
 import app.controller.MazeDelegator;
-import app.controller.components.AbstractCell.CellState;
 import app.model.components.CellPanel;
 
 /**
@@ -64,14 +66,14 @@ public class MazePanel extends JPanel {
      *
      * @see app.model.PathFinder PathFinder
      */
-    private transient PathFinder pathfinder = new PathFinder.Dijkstra();
+    private transient PathFinder<CellPanel> pathfinder = new PathFinder.Dijkstra<CellPanel>();
 
     /**
      * Current maze generation <code>app.model.Generator</code> algorithm.
      *
      * @see app.model.Generator Generator
      */
-    private transient Generator generator = new Generator.Random();
+    private transient Generator<CellPanel> generator = new Generator.Random<CellPanel>();
 
     {
         this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
@@ -175,7 +177,7 @@ public class MazePanel extends JPanel {
     }
 
     /**
-     * Return euclidean dimension rectangle box for different sizes.
+     * Return epean dimension rectangle box for different sizes.
      *
      * @return Dimension
      */
@@ -328,14 +330,14 @@ public class MazePanel extends JPanel {
      *
      * @return PathFinder
      */
-    public final PathFinder getPathFinder() {
+    public final PathFinder<CellPanel> getPathFinder() {
         return this.pathfinder;
     }
 
     /**
      * Set current <code>app.model.PathFinder</code> instance.
      */
-    public final void setPathFinder(final PathFinder pathfinder) {
+    public final void setPathFinder(final PathFinder<CellPanel> pathfinder) {
         this.pathfinder = Objects.requireNonNull(pathfinder, "'pathfinder' must not be null");
     }
 
@@ -357,14 +359,14 @@ public class MazePanel extends JPanel {
      *
      * @return Generator
      */
-    public final Generator getGenerator() {
+    public final Generator<CellPanel> getGenerator() {
         return this.generator;
     }
 
     /**
      * Set current <code>app.model.Generator</code> instance.
      */
-    public final void setGenerator(final Generator generator) {
+    public final void setGenerator(final Generator<CellPanel> generator) {
         this.generator = Objects.requireNonNull(generator, "'generator' must not be null");
     }
 
@@ -376,9 +378,8 @@ public class MazePanel extends JPanel {
     public final void awakeGenerator() throws InterruptedException {
         this.assertIsRunning();
         this.reset();
-        this.generator.awake(this.getGrid(),
-                (this.start != null) ? this.start.getSeed() : null,
-                (this.end != null) ? this.start.getSeed() : null);
+        this.generator.awake();
+        // this.generator.awake(this.getGrid());
     }
 
     /**

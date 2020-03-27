@@ -1,15 +1,14 @@
-package app.controller.components;
+package algo.grd.dsa;
 
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
-import app.controller.State;
-import app.model.components.Node;
+import algo.State;
 
 /**
- * CellPanel interface wrapper with inneer
+ * Cell interface wrapper with inner
  * <code>app.model.components.Node</code> pointer, implementing
  * <code>java.io.Serializable</code>.
  *

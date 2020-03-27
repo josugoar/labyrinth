@@ -12,7 +12,8 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-import app.controller.components.AbstractCell;
+import algo.grd.dsa.AbstractCell;
+import algo.grd.dsa.Node;
 import app.model.MazePanel;
 import utils.JWrapper;
 
@@ -35,7 +36,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     private transient static boolean focused = false;
 
     /**
-     * Slected <code>focused</code> pointer.
+     * Selected <code>app.model.components.CellPanel</code> pointer.
      */
     private static CellPanel selected = null;
 
@@ -47,14 +48,14 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
     public MazePanel ancestor;
 
     /**
-     * Euclidean space coordinate <code>java.awt.Point</code>.
+     * Euclidean plane coordinate <code>java.awt.Point</code>.
      *
      * @see java.awt.Point Point
      */
     private final Point seed;
 
     /**
-     * Tree-like graph neighbor pointer storage.
+     * Graph neighbor pointer storage.
      */
     private Set<CellPanel> neighbors;
 

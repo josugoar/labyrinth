@@ -15,11 +15,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
-import app.controller.components.AbstractCell.CellState;
-import app.controller.components.AbstractEuclideanAlgorithm;
-import app.model.Generator;
+import algo.grd.GridAlgorithm;
+import algo.grd.dsa.AbstractCell;
+import algo.grd.dsa.AbstractCell.CellState;
+import algo.grd.gt.gen.Generator;
+import algo.grd.gt.pfdr.PathFinder;
 import app.model.MazePanel;
-import app.model.PathFinder;
 import app.model.components.CellPanel;
 import app.view.MazeFrame;
 import utils.JWrapper;
@@ -184,23 +185,23 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Request current <code>app.model.PathFinder</code> instance.
+     * Request current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
      *
      * @return PathFinder
      */
-    public final PathFinder getPathFinder() {
+    public final PathFinder<CellPanel> getPathFinder() {
         return this.panel.getPathFinder();
     }
 
     /**
-     * Update current <code>app.model.PathFinder</code> instance.
+     * Update current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
      */
-    public final void setPathFinder(final PathFinder pathfinder) {
+    public final void setPathFinder(final PathFinder<CellPanel> pathfinder) {
         this.panel.setPathFinder(pathfinder);
     }
 
     /**
-     * Run current <code>app.model.PathFinder</code> instance.
+     * Run current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
      */
     public final void awakePathFinder() {
         this.frame.requestFocusInWindow();
@@ -216,14 +217,14 @@ public class MazeDelegator implements Serializable {
      *
      * @return Generator
      */
-    public final Generator getGenerator() {
+    public final Generator<CellPanel> getGenerator() {
         return this.panel.getGenerator();
     }
 
     /**
      * Update current <code>app.model.Generator</code> instance.
      */
-    public final void setGenerator(final Generator generator) {
+    public final void setGenerator(final Generator<CellPanel> generator) {
         this.panel.setGenerator(generator);
     }
 
@@ -244,7 +245,7 @@ public class MazeDelegator implements Serializable {
      *
      * @return Integer
      */
-    public final Integer getDelay(Class<? extends AbstractEuclideanAlgorithm> algorithm) {
+    public final Integer getDelay(Class<? extends GridAlgorithm<? extends AbstractCell<?>>> algorithm) {
         try {
             if (algorithm.equals(PathFinder.class))
                 return this.panel.getPathFinder().getDelay();
@@ -322,10 +323,19 @@ public class MazeDelegator implements Serializable {
     /**
      * Dispatch <code>java.awt.Cursor</code> <code>java.awt.event.KeyEvent</code>.
      */
-    public final void dispatchKey() {
+    public final void dispatchShift() {
         try {
             this.panel.assertIsRunning();
             this.frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+        } catch (final InterruptedException e) {
+            JWrapper.dispatchException(e);
+        }
+    }
+
+    // TODO
+    public final void dispatchSpace() {
+        try {
+            this.panel.getPathFinder().setWaiting(!this.panel.getPathFinder().isWaiting());
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }

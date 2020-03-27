@@ -1,4 +1,4 @@
-package app.controller;
+package algo;
 
 import java.io.Serializable;
 
