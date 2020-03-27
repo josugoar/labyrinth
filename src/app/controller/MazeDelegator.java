@@ -16,10 +16,9 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 
 import algo.grd.GridAlgorithm;
-import algo.grd.dsa.AbstractCell;
 import algo.grd.dsa.AbstractCell.CellState;
-import algo.grd.gt.gen.Generator;
-import algo.grd.gt.pfdr.PathFinder;
+import algo.grd.gt.Generator;
+import algo.grd.gt.PathFinder;
 import app.model.MazePanel;
 import app.model.components.CellPanel;
 import app.view.MazeFrame;
@@ -114,7 +113,7 @@ public class MazeDelegator implements Serializable {
      */
     public final void writeMaze() {
         try {
-            this.panel.assertIsRunning();
+            this.panel.assertRunning();
             final FileOutputStream file = new FileOutputStream(MazePanel.class.getResource("ser/maze.ser").getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
             CellPanel.setSelected(null);
@@ -185,7 +184,7 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Request current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
+     * Request current <code>algo.grd.gt.PathFinder</code> instance.
      *
      * @return PathFinder
      */
@@ -194,14 +193,14 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Update current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
+     * Update current <code>algo.grd.gt.PathFinder</code> instance.
      */
     public final void setPathFinder(final PathFinder<CellPanel> pathfinder) {
         this.panel.setPathFinder(pathfinder);
     }
 
     /**
-     * Run current <code>algo.grd.gt.pfdr.PathFinder</code> instance.
+     * Run current <code>algo.grd.gt.PathFinder</code> instance.
      */
     public final void awakePathFinder() {
         this.frame.requestFocusInWindow();
@@ -245,7 +244,7 @@ public class MazeDelegator implements Serializable {
      *
      * @return Integer
      */
-    public final Integer getDelay(Class<? extends GridAlgorithm<? extends AbstractCell<?>>> algorithm) {
+    public final <T extends GridAlgorithm<?>> Integer getDelay(Class<T> algorithm) {
         try {
             if (algorithm.equals(PathFinder.class))
                 return this.panel.getPathFinder().getDelay();
@@ -325,20 +324,21 @@ public class MazeDelegator implements Serializable {
      */
     public final void dispatchShift() {
         try {
-            this.panel.assertIsRunning();
+            this.panel.assertRunning();
             this.frame.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }
     }
 
-    // TODO
+    /**
+     * Dispatch <code>algo.AbstractAlgorithm.isWaiting()</code> state.
+     */
     public final void dispatchSpace() {
-        try {
+        if (this.panel.getPathFinder().isRunning())
             this.panel.getPathFinder().setWaiting(!this.panel.getPathFinder().isWaiting());
-        } catch (final InterruptedException e) {
-            JWrapper.dispatchException(e);
-        }
+        else if (this.panel.getGenerator().isRunning())
+            this.panel.getGenerator().setWaiting(!this.panel.getGenerator().isWaiting());
     }
 
     /**

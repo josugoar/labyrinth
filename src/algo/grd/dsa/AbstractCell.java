@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
-import algo.State;
+import algo.grd.State;
 
 /**
  * Cell interface wrapper with inner
@@ -72,6 +72,8 @@ public abstract interface AbstractCell<T extends AbstractCell<T>> extends Serial
      * @param state CellState
      */
     public void setState(final CellState state);
+
+    // TODO: Move neighbors to Node
 
     /**
      * Return current <code>app.controller.components.AbstractCell</code> neighbor

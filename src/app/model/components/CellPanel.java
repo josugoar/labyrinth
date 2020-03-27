@@ -282,7 +282,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
             try {
                 // Check for draw state
                 if (e.isShiftDown()) {
-                    CellPanel.this.ancestor.assertIsRunning();
+                    CellPanel.this.ancestor.assertRunning();
                     // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
                         CellPanel.this.setState(CellState.OBSTACLE);
@@ -291,7 +291,7 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                         CellPanel.this.setState(CellState.EMPTY);
                     // Check for popup state
                 } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-                    CellPanel.this.ancestor.assertIsRunning();
+                    CellPanel.this.ancestor.assertRunning();
                     CellPanel.this.ancestor.releaseCellPopup(CellPanel.this).show(CellPanel.this, e.getX(), e.getY());
                 }
             } catch (final InterruptedException l) {
@@ -308,11 +308,11 @@ public class CellPanel extends JPanel implements AbstractCell<CellPanel> {
                 if (e.isShiftDown()) {
                     // Left input
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
-                        CellPanel.this.ancestor.assertIsRunning();
+                        CellPanel.this.ancestor.assertRunning();
                         CellPanel.this.setState(CellState.OBSTACLE);
                         // Right input
                     } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
-                        CellPanel.this.ancestor.assertIsRunning();
+                        CellPanel.this.ancestor.assertRunning();
                         CellPanel.this.setState(CellState.EMPTY);
                     }
                 }

@@ -40,8 +40,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import algo.grd.gt.gen.Generator;
-import algo.grd.gt.pfdr.PathFinder;
+import algo.grd.gt.PathFinder;
+import algo.grd.gt.gen.BackTracker;
+import algo.grd.gt.gen.Randomizer;
+import algo.grd.gt.pfdr.Dijkstra;
 import app.controller.MazeDelegator;
 import app.model.components.CellPanel;
 import app.view.components.FocusedPopup;
@@ -269,7 +271,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(0, 250, 100) {
+                                                                this.add(new RangedSlider(0, 250, MazeFrame.this.delegator.getDelay(PathFinder.class)) {
                                                                     // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
@@ -355,21 +357,21 @@ public class MazeFrame extends JFrame {
                                             // rd_btn_mni_pathfinderAStar
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new PathFinder.AStar()));
+                                                // this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new AStar()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("BFS", null, false) {
                                             // rd_btn_mni_pathfinderBFS
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new PathFinder.BFS()));
+                                                // this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new BFS()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("Dijkstra", null, true) {
                                             // rd_btn_mni_pathfinderDijkstra
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new PathFinder.Dijkstra<CellPanel>()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setPathFinder(new Dijkstra<CellPanel>()));
                                             }
                                         });
                                     }
@@ -392,28 +394,28 @@ public class MazeFrame extends JFrame {
                                             // rd_btn_mni_generatorBackTracker
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.BackTracker<CellPanel>()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new BackTracker<CellPanel>()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("DFS", null, false) {
                                             // rd_btn_mni_generatorDFS
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.DFS()));
+                                                // this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new DFS()));
                                             }
                                         });
                                         this.add(new JRadioButtonMenuItem("Prim", null, false) {
                                             // rd_btn_mni_generatorPrim
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                // this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Prim()));
+                                                // this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Prim()));
                                             }
                                         });
-                                        this.add(new JRadioButtonMenuItem("Random", null, true) {
-                                            // rd_btn_mni_generatorRandom
+                                        this.add(new JRadioButtonMenuItem("Randomizer", null, true) {
+                                            // rd_btn_mni_generatorRandomizer
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Generator.Random<CellPanel>()));
+                                                this.addItemListener(e -> MazeFrame.this.delegator.setGenerator(new Randomizer<CellPanel>()));
                                             }
                                         });
                                     }

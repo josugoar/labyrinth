@@ -18,7 +18,6 @@ import utils.JWrapper;
  */
 public abstract class AbstractAlgorithm implements AlgorithmMethod, Runnable, Serializable {
 
-    // TODO: Spec
     private class GeneratorSpec implements AlgorithmParameterSpec, Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -69,12 +68,18 @@ public abstract class AbstractAlgorithm implements AlgorithmMethod, Runnable, Se
      */
     public synchronized void setRunning(final boolean running) {
         if (!running)
-            try {
-                this.setWaiting(false);
-            } catch (final InterruptedException e) {
-                JWrapper.dispatchException(e);
-            }
+            this.setWaiting(false);
         this.running = running;
+    }
+
+    /**
+     * Assert current running state.
+     *
+     * @throws InterruptedException if (running)
+     */
+    public final void assertRunning() throws InterruptedException {
+        if (this.running)
+            throw new InterruptedException("Invalid input while running...");
     }
 
     /**
@@ -90,16 +95,33 @@ public abstract class AbstractAlgorithm implements AlgorithmMethod, Runnable, Se
      * Set current waiting state.
      *
      * @param waiting boolean
-     * @throws InterruptedException if (waiting && !running)
      */
-    public synchronized void setWaiting(final boolean waiting) throws InterruptedException {
-        if (waiting && !this.running)
-            throw new InterruptedException("Algorithm must first be running...");
-        if (!waiting)
-            synchronized (lock) {
-                this.lock.notifyAll();
+    public synchronized void setWaiting(final boolean waiting) {
+        try {
+            if (waiting && !this.running)
+                throw new InterruptedException("Algorithm is not running...");
+            if (!waiting)
+                synchronized (lock) {
+                    this.lock.notifyAll();
+                }
+            this.waiting = waiting;
+        } catch (final InterruptedException e) {
+            JWrapper.dispatchException(e);
+        }
+    }
+
+    /**
+     * Assert current waiting state.
+     */
+    protected final void assertWaiting() {
+        if (this.waiting)
+            synchronized (this.lock) {
+                try {
+                    this.lock.wait();
+                } catch (final InterruptedException e) {
+                    JWrapper.dispatchException(e);
+                }
             }
-        this.waiting = waiting;
     }
 
     /**

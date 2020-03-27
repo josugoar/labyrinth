@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.Objects;
 
-import algo.State;
+import algo.grd.State;
 
 /**
  * <code>app.controller.components.AbstractCell</code> helper for

@@ -1,5 +1,7 @@
 package algo.grd;
 
+import java.util.Objects;
+
 import algo.AbstractAlgorithm;
 import algo.grd.dsa.AbstractCell;
 
@@ -7,6 +9,7 @@ import algo.grd.dsa.AbstractCell;
  * Euclidean plane algorithm abstract class wrapper, extending
  * <code>algo.AbstractAlgorithm</code>.
  *
+ * @param <T> AbstractCell<T>
  * @see algo.AbstractAlgorithm AbstractAlgorithm
  */
 public abstract class GridAlgorithm<T extends AbstractCell<T>> extends AbstractAlgorithm {
@@ -19,7 +22,7 @@ public abstract class GridAlgorithm<T extends AbstractCell<T>> extends AbstractA
     protected T[][] grid = null;
 
     /**
-     * Return current epean plane grid.
+     * Return current euclidean plane grid.
      *
      * @return T[][]
      */
@@ -34,9 +37,8 @@ public abstract class GridAlgorithm<T extends AbstractCell<T>> extends AbstractA
      * @throws InterruptedException if (running)
      */
     public synchronized void setGrid(final T[][] grid) throws InterruptedException {
-        if (this.running)
-            throw new InterruptedException("Cannot modify grid while running...");
-        this.grid = grid;
+        this.assertRunning();
+        this.grid = Objects.requireNonNull(grid, "'grid' must not be null");
     }
 
 }

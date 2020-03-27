@@ -13,8 +13,10 @@ import javax.swing.JPopupMenu;
 import javax.swing.border.EtchedBorder;
 
 import algo.grd.dsa.AbstractCell.CellState;
-import algo.grd.gt.gen.Generator;
-import algo.grd.gt.pfdr.PathFinder;
+import algo.grd.gt.Generator;
+import algo.grd.gt.PathFinder;
+import algo.grd.gt.gen.Randomizer;
+import algo.grd.gt.pfdr.Dijkstra;
 import app.controller.MazeDelegator;
 import app.model.components.CellPanel;
 
@@ -66,14 +68,14 @@ public class MazePanel extends JPanel {
      *
      * @see app.model.PathFinder PathFinder
      */
-    private transient PathFinder<CellPanel> pathfinder = new PathFinder.Dijkstra<CellPanel>();
+    private transient PathFinder<CellPanel> pathfinder = new Dijkstra<CellPanel>();
 
     /**
      * Current maze generation <code>app.model.Generator</code> algorithm.
      *
      * @see app.model.Generator Generator
      */
-    private transient Generator<CellPanel> generator = new Generator.Random<CellPanel>();
+    private transient Generator<CellPanel> generator = new Randomizer<CellPanel>();
 
     {
         this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
@@ -124,6 +126,7 @@ public class MazePanel extends JPanel {
      */
     public final void reset() {
         this.pathfinder.setRunning(false);
+        this.generator.setRunning(false);
         this.setStart(null);
         this.setEnd(null);
         this.setGrid(this.dimension, this.dimension);
@@ -347,7 +350,7 @@ public class MazePanel extends JPanel {
      * @throws InterruptedException if (pathfinder.isRunning() || generator.isRunning())
      */
     public final void awakePathFinder() throws InterruptedException {
-        this.assertIsRunning();
+        this.assertRunning();
         this.clear();
         this.pathfinder.awake(this.getGrid(),
                 (this.start != null) ? this.start.getSeed() : null,
@@ -376,10 +379,9 @@ public class MazePanel extends JPanel {
      * @throws InterruptedException if (pathfinder.isRunning() || generator.isRunning())
      */
     public final void awakeGenerator() throws InterruptedException {
-        this.assertIsRunning();
+        this.assertRunning();
         this.reset();
-        this.generator.awake();
-        // this.generator.awake(this.getGrid());
+        this.generator.awake(this.grid);
     }
 
     /**
@@ -389,9 +391,9 @@ public class MazePanel extends JPanel {
      * @throws InterruptedException if (ancestor.getPathFinder().getIsRunning() ||
      *                              ancestor.getGenerator().getIsRunning())
      */
-    public final void assertIsRunning() throws InterruptedException {
-        if (this.pathfinder.isRunning() || this.generator.isRunning())
-            throw new InterruptedException("Invalid input while running...");
+    public final void assertRunning() throws InterruptedException {
+        this.pathfinder.assertRunning();
+        this.generator.assertRunning();
     }
 
 }
