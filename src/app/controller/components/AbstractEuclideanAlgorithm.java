@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 import javax.xml.crypto.AlgorithmMethod;
 
-import app.view.components.RangedSlider.BoundedRange;
-
 /**
  * Abstract algorithm abstract class wrapper, implementing
  * <code>javax.xml.crypto.AlgorithmMethod</code> and
@@ -15,28 +13,27 @@ import app.view.components.RangedSlider.BoundedRange;
  * @see javax.xml.crypto.AlgorithmMethod AlgorithmMethod
  * @see java.io.Serializable Serializable
  */
-public abstract class AbstractAlgorithm implements AlgorithmMethod, Serializable {
+public abstract class AbstractEuclideanAlgorithm implements AlgorithmMethod, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Flag for algorithm running state.
+     * Volatile flag for algorithm running state.
      */
     protected volatile boolean running = false;
 
     /**
-     * Delay <code>app.view.components.RangedSlider.BoundedRange</code> between draw
-     * cycles.
-     *
-     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
+     * Delay reference for visualizing running process.
      */
-    protected final BoundedRange delay = new BoundedRange(0, 250, 100);
+    protected int delay = 100;
 
     /**
      * Awake algorithm on given euclidean space.
      *
-     * @param <T>  AbstractCell<T>
-     * @param grid T[][]
+     * @param <T>   AbstractCell<T>
+     * @param grid  T[][]
+     * @param start Point
+     * @param end   Point
      */
     public abstract <T extends AbstractCell<T>> void awake(final T[][] grid, final Point start, final Point end);
 
@@ -50,30 +47,30 @@ public abstract class AbstractAlgorithm implements AlgorithmMethod, Serializable
     }
 
     /**
-     * Set current running state.
+     * Set current running state synchronously.
      *
      * @param isRunning boolean
      */
-    public final void setRunning(final boolean running) {
+    public synchronized void setRunning(final boolean running) {
         this.running = running;
     }
 
     /**
-     * Return current delay <code>BoundedRange</code>.
+     * Return current delay reference.
      *
-     * @return BoundedRange
+     * @return int
      */
-    public final BoundedRange getDelay() {
+    public final int getDelay() {
         return this.delay;
     }
 
     /**
-     * Set current delay <code>BoundedRange</code> value.
+     * Set current delay reference.
      *
      * @param delay int
      */
-    public final void setDelay(final int delay) {
-        this.delay.setValue(delay);
+    public synchronized void setDelay(final int delay) {
+        this.delay = delay;
     }
 
     @Override
@@ -82,7 +79,7 @@ public abstract class AbstractAlgorithm implements AlgorithmMethod, Serializable
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return this.getAlgorithm();
     }
 

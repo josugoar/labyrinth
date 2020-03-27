@@ -4,13 +4,12 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.security.spec.AlgorithmParameterSpec;
 
-import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell;
 import app.controller.components.AbstractCell.CellState;
-import app.view.components.RangedSlider.BoundedRange;
+import app.controller.components.AbstractEuclideanAlgorithm;
 import utils.JWrapper;
 
-public abstract class Generator extends AbstractAlgorithm {
+public abstract class Generator extends AbstractEuclideanAlgorithm {
 
     // TODO: Spec
     private class GeneratorSpec implements AlgorithmParameterSpec, Serializable {
@@ -24,10 +23,8 @@ public abstract class Generator extends AbstractAlgorithm {
     /**
      * Maze <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
      * <code>app.model.Generator</code> density.
-     *
-     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
      */
-    private final BoundedRange density = new BoundedRange(1, 99, 50);
+    private int density = 50;
 
     /**
      * Generate obstacle structure in grid.
@@ -50,21 +47,25 @@ public abstract class Generator extends AbstractAlgorithm {
     }
 
     /**
-     * Return current density <code>BoundedRange</code>.
+     * Return current maze
+     * <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
+     * <code>app.model.Generator</code> density.
      *
-     * @return BoundedRange
+     * @return int
      */
-    public final BoundedRange getDensity() {
+    public final int getDensity() {
         return this.density;
     }
 
     /**
-     * Set current density <code>BoundedRange</code> value.
+     * Set current maze
+     * <code>app.model.components.CellPanel.CellState.OBSTACLE</code>
+     * <code>app.model.Generator</code> density.
      *
-     * @param delay int
+     * @param density int
      */
     public final void setDensity(final int density) {
-        this.density.setValue(density);
+        this.density = density;
     }
 
     public static final class BackTracker extends Generator {
@@ -91,10 +92,10 @@ public abstract class Generator extends AbstractAlgorithm {
         public final <T extends AbstractCell<T>> void generate(final T[][] grid) throws InterruptedException {
             for (final T[] cells : grid)
                 for (final T cell : cells) {
-                    if (Math.random() < (float) super.density.getValue() / 100)
+                    if (Math.random() < (float) super.density / 100)
                         cell.setState(CellState.OBSTACLE);
                     // Delay iteration
-                    Thread.sleep(super.delay.getValue());
+                    Thread.sleep(super.delay);
                 }
         }
 

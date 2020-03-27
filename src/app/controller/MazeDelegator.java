@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
-import java.util.Objects;
 
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -16,14 +15,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.Timer;
 
-import app.controller.components.AbstractAlgorithm;
 import app.controller.components.AbstractCell.CellState;
+import app.controller.components.AbstractEuclideanAlgorithm;
 import app.model.Generator;
 import app.model.MazePanel;
 import app.model.PathFinder;
 import app.model.components.CellPanel;
 import app.view.MazeFrame;
-import app.view.components.RangedSlider.BoundedRange;
 import utils.JWrapper;
 
 /**
@@ -75,12 +73,6 @@ public class MazeDelegator implements Serializable {
     private CellState mode = CellState.OBSTACLE;
 
     /**
-     * Create a new isolated pipeline component.
-     */
-    public MazeDelegator() {
-    }
-
-    /**
      * Create a new two-sided <code>app.model.MazePanel</code> and
      * <code>app.view.MazeFrame</code> interaction
      * <code>app.controller.MazeDelegator</code> component.
@@ -91,6 +83,13 @@ public class MazeDelegator implements Serializable {
     public MazeDelegator(final MazePanel panel, final MazeFrame frame) {
         this.setPanel(panel);
         this.setFrame(frame);
+    }
+
+    /**
+     * Create a new isolated pipeline component.
+     */
+    public MazeDelegator() {
+        this(null, null);
     }
 
     /**
@@ -122,7 +121,7 @@ public class MazeDelegator implements Serializable {
             out.writeObject(this.panel);
             out.close();
             file.close();
-        } catch (final InterruptedException |IOException e) {
+        } catch (final InterruptedException | IOException e) {
             JWrapper.dispatchException(e);
         }
     }
@@ -142,7 +141,7 @@ public class MazeDelegator implements Serializable {
      * @param panel MazePanel
      */
     public final void setPanel(final MazePanel panel) {
-        this.panel = Objects.requireNonNull(panel, "'panel' must not be null");
+        this.panel = panel;
     }
 
     /**
@@ -166,24 +165,22 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Return current dimension
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current dimension.
      *
-     * @return BoundedRange
+     * @return int
      */
-    public final BoundedRange getDimension() {
+    public final int getDimension() {
         return this.panel.getDimension();
     }
 
     /**
-     * Set current dimension
-     * <code>app.view.components.RangedSlider.BoundedRange</code> value and fire
+     * Set current dimension and fire
      * <code>app.model.MazePanel.setGrid(int rows, int cols)</code> event.
      *
-     * @param val int
+     * @param dimension int
      */
-    public final void setDimension(final int val) {
-        this.panel.setDimension(val);
+    public final void setDimension(final int dimension) {
+        this.panel.setDimension(dimension);
     }
 
     /**
@@ -207,7 +204,11 @@ public class MazeDelegator implements Serializable {
      */
     public final void awakePathFinder() {
         this.frame.requestFocusInWindow();
-        this.panel.awakePathFinder();
+        try {
+            this.panel.awakePathFinder();
+        } catch (InterruptedException e) {
+            JWrapper.dispatchException(e);
+        }
     }
 
     /**
@@ -231,27 +232,34 @@ public class MazeDelegator implements Serializable {
      */
     public final void awakeGenerator() {
         this.frame.requestFocusInWindow();
-        this.panel.awakeGenerator();
+        try {
+            this.panel.awakeGenerator();
+        } catch (InterruptedException e) {
+            JWrapper.dispatchException(e);
+        }
     }
 
     /**
-     * Return current delay
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current algorithms delay.
      *
-     * @return BoundedRange
+     * @return Integer
      */
-    public final BoundedRange getDelay(Class<? extends AbstractAlgorithm> algorithm) {
-        if (algorithm.equals(PathFinder.class))
-            return this.panel.getPathFinder().getDelay();
-        else if (algorithm.equals(Generator.class))
-            return this.panel.getGenerator().getDelay();
-        else
+    public final Integer getDelay(Class<? extends AbstractEuclideanAlgorithm> algorithm) {
+        try {
+            if (algorithm.equals(PathFinder.class))
+                return this.panel.getPathFinder().getDelay();
+            else if (algorithm.equals(Generator.class))
+                return this.panel.getGenerator().getDelay();
+            else
+                throw new UnsupportedClassVersionError("Algorithm not supported...");
+        } catch (final UnsupportedClassVersionError e) {
+            JWrapper.dispatchException(e);
             return null;
+        }
     }
 
     /**
-     * Set current delay <code>app.view.components.RangedSlider.BoundedRange</code>
-     * value.
+     * Set current algorithms delay.
      *
      * @param delay int
      */
@@ -261,18 +269,16 @@ public class MazeDelegator implements Serializable {
     }
 
     /**
-     * Return current density
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current density.
      *
-     * @return BoundedRange
+     * @return int
      */
-    public final BoundedRange getDensity() {
+    public final int getDensity() {
         return this.panel.getGenerator().getDensity();
     }
 
     /**
-     * Set current density
-     * <code>app.view.components.RangedSlider.BoundedRange</code> value.
+     * Set current density.
      *
      * @param density int
      */
@@ -295,7 +301,7 @@ public class MazeDelegator implements Serializable {
      * @param frame MazeFrame
      */
     public final void setFrame(final MazeFrame frame) {
-        this.frame = Objects.requireNonNull(frame, "'frame' must not be null");
+        this.frame = frame;
     }
 
     /**

@@ -25,13 +25,24 @@ public class RangedSlider extends JSlider {
     }
 
     /**
+     * Create a new <code>javax.swing.JSlider</code> wrapper.
+     *
+     * @param min int
+     * @param max int
+     * @param val int
+     */
+    public RangedSlider(final int min, final int max, final int val) {
+        super(min, max, val);
+    }
+
+    /**
      * Create a new <code>javax.swing.JSlider</code>
      * <code>app.view.components.RangedSlider.BoundedRange</code> wrapper.
      *
      * @param range app.view.components.RangedSlider.BoundedRange BoundedRange
      */
     public RangedSlider(final BoundedRange range) {
-        super(range.getMin(), range.getMax(), range.getValue());
+        this(range.getMin(), range.getMax(), range.getValue());
     }
 
     /**

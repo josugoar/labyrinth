@@ -244,7 +244,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_dimensionSelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(MazeFrame.this.delegator.getDimension()) {
+                                                                this.add(new RangedSlider(10, 50, MazeFrame.this.delegator.getDimension()) {
                                                                     // sld_dimensionSelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
@@ -267,7 +267,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_delaySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(MazeFrame.this.delegator.getDelay(PathFinder.class)) {
+                                                                this.add(new RangedSlider(0, 250, MazeFrame.this.delegator.getDelay(PathFinder.class)) {
                                                                     // sld_delaySelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
@@ -287,7 +287,7 @@ public class MazeFrame extends JFrame {
                                                             // pmn_densitySelector
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new RangedSlider(MazeFrame.this.delegator.getDensity()) {
+                                                                this.add(new RangedSlider(1, 99, MazeFrame.this.delegator.getDensity()) {
                                                                     // sld_densitySelector
                                                                     private static final long serialVersionUID = 1L;
                                                                     {

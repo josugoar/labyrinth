@@ -6,7 +6,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.Timer;
 
 /**
- * <code>javax.swing.JPopupMenu</code> that return focus to given
+ * <code>javax.swing.JPopupMenu</code> that returns focus to given
  * <code>java.awt.Component</code>.
  *
  * @see javax.swing.JPopupMenu JPopupMenu

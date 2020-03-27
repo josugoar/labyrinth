@@ -15,7 +15,6 @@ import javax.swing.border.EtchedBorder;
 import app.controller.MazeDelegator;
 import app.controller.components.AbstractCell.CellState;
 import app.model.components.CellPanel;
-import app.view.components.RangedSlider.BoundedRange;
 
 /**
  * Graphical-User-Inteface (GUI) Model-View-Controller (MVC) architecture
@@ -41,12 +40,9 @@ public class MazePanel extends JPanel {
     private transient MazeDelegator delegator;
 
     /**
-     * <code>app.model.MazePanel</code> dimension resizing
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
-     *
-     * @see app.view.components.RangedSlider.BoundedRange BoundedRange
+     * <code>app.model.MazePanel</code> dimension.
      */
-    private final BoundedRange dimension = new BoundedRange(10, 50, 20);
+    private int dimension = 20;
 
     /**
      * Bi-dimensional <code>app.model.components.CellPanel</code> array.
@@ -90,7 +86,7 @@ public class MazePanel extends JPanel {
      */
     public MazePanel(final MazeDelegator delegator) {
         this.setDelegator(delegator);
-        this.setGrid(this.dimension.getValue(), this.dimension.getValue());
+        this.reset();
     }
 
     /**
@@ -122,15 +118,13 @@ public class MazePanel extends JPanel {
     }
 
     /**
-     * Reset grid with identical row and column values.
-     *
-     * @throws ClassCastException if (!(getLayout() instanceof GridLayout))
+     * Reset start, end and grid with identical row and column values.
      */
-    public final void reset() throws ClassCastException {
-        if (!(this.getLayout() instanceof GridLayout))
-            throw new ClassCastException("GridLayout might not have been initialized");
+    public final void reset() {
         this.pathfinder.setRunning(false);
-        this.setGrid(((GridLayout) this.getLayout()).getRows(), ((GridLayout) this.getLayout()).getColumns());
+        this.setStart(null);
+        this.setEnd(null);
+        this.setGrid(this.dimension, this.dimension);
     }
 
     /**
@@ -172,12 +166,11 @@ public class MazePanel extends JPanel {
     }
 
     /**
-     * Return current dimension
-     * <code>app.view.components.RangedSlider.BoundedRange</code>.
+     * Return current dimension.
      *
-     * @return BoundedRange
+     * @return int
      */
-    public final BoundedRange getDimension() {
+    public final int getDimension() {
         return this.dimension;
     }
 
@@ -187,24 +180,22 @@ public class MazePanel extends JPanel {
      * @return Dimension
      */
     public final Dimension getEucliadeanDimension() {
-        return new Dimension(this.dimension.getValue(), this.dimension.getValue());
+        return new Dimension(this.dimension, this.dimension);
     }
 
     /**
-     * Set current dimension
-     * <code>app.view.components.RangedSlider.BoundedRange</code> value and fire
-     * <code>app.model.MazePanel.setGrid(int rows, int cols)</code> event.
+     * Set current dimension and reset grid.
      *
-     * @param val int
+     * @param dimension int
      */
-    public final void setDimension(final int val) {
-        this.dimension.setValue(val);
-        this.setGrid(this.dimension.getValue(), this.dimension.getValue());
+    public final void setDimension(final int dimension) {
+        this.dimension = dimension;
         this.reset();
     }
 
     /**
-     * Return current grid <code>app.model.components.CellPanel</code> structure.
+     * Return current grid <code>app.model.components.CellPanel</code> row and
+     * column structure.
      *
      * @return CellPanel[][]
      */
@@ -350,8 +341,11 @@ public class MazePanel extends JPanel {
 
     /**
      * Fire <code>app.model.PathFinder.awake(CellPanel[][] grid)</code> event.
+     *
+     * @throws InterruptedException if (pathfinder.isRunning() || generator.isRunning())
      */
-    public final void awakePathFinder() {
+    public final void awakePathFinder() throws InterruptedException {
+        this.assertIsRunning();
         this.clear();
         this.pathfinder.awake(this.getGrid(),
                 (this.start != null) ? this.start.getSeed() : null,
@@ -376,8 +370,11 @@ public class MazePanel extends JPanel {
 
     /**
      * Fire <code>app.model.Generator.awake(CellPanel[][] grid)</code> event.
+     *
+     * @throws InterruptedException if (pathfinder.isRunning() || generator.isRunning())
      */
-    public final void awakeGenerator() {
+    public final void awakeGenerator() throws InterruptedException {
+        this.assertIsRunning();
         this.reset();
         this.generator.awake(this.getGrid(),
                 (this.start != null) ? this.start.getSeed() : null,

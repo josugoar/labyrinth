@@ -5,7 +5,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.HashSet;
 import java.util.Set;
 
-import app.controller.components.AbstractAlgorithm;
+import app.controller.components.AbstractEuclideanAlgorithm;
 import app.controller.components.AbstractCell;
 import app.model.components.Node;
 import app.model.components.Node.NodeState;
@@ -13,18 +13,20 @@ import utils.JWrapper;
 
 /**
  * PathFinding algorithm abstract wrapper, implementing
- * <code>app.controller.components.AbstractAlgorithm</code>.
+ * <code>app.controller.components.AbstractEuclideanAlgorithm</code>.
  *
- * @see app.controller.components.AbstractAlgorithm AbstractAlgorithm
+ * @see app.controller.components.AbstractEuclideanAlgorithm AbstractEuclideanAlgorithm
  * @see app.controller.components.AbstractCell AbstractCell
  * @see app.model.components.Node Node
  */
-public abstract class PathFinder extends AbstractAlgorithm {
+public abstract class PathFinder extends AbstractEuclideanAlgorithm {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Ending endpoint pointer.
+     * Target endpoint pointer.
+     *
+     * @see java.awt.Point Point
      */
     protected Point target;
 
@@ -100,7 +102,7 @@ public abstract class PathFinder extends AbstractAlgorithm {
     }
 
     /**
-     * Store target for later comparisons.
+     * Store target endpoint pointer.
      *
      * @param target Point
      */
@@ -178,7 +180,7 @@ public abstract class PathFinder extends AbstractAlgorithm {
             if (newGen.size() == 0)
                 throw new StackOverflowError("No solution...");
             // Delay iteration
-            Thread.sleep(super.delay.getValue());
+            Thread.sleep(super.delay);
             // Call method recursively until convergence
             return this.advance(grid, newGen);
         }

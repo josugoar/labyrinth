@@ -9,12 +9,12 @@ import app.controller.State;
 
 /**
  * <code>app.controller.components.AbstractCell</code> helper for
- * <code>app.controller.components.AbstractAlgorithm</code> tasks, which
+ * <code>app.controller.components.AbstractEuclideanAlgorithm</code> tasks, which
  * stores multiple parent and outer pointers of different iteration generations.
  *
  * @param <T> AbstractCell<T>
  * @see app.controller.components.AbstractCell AbstractCell
- * @see app.controller.components.AbstractAlgorithm AbstractAlgorithm
+ * @see app.controller.components.AbstractEuclideanAlgorithm AbstractEuclideanAlgorithm
  */
 public final class Node<T extends AbstractCell<T>> implements Serializable {
 
