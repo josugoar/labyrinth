@@ -35,7 +35,7 @@ public interface JWrapper {
 
     /**
      * Dispatch generic <code>java.lang.Throwable</code> by printing in error output
-     * steam.
+     * stream.
      *
      * @param e Throwable
      */

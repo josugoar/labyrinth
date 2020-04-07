@@ -1,4 +1,4 @@
-import app.Maze;
+import app.maze.Maze;
 
 public class Run {
 
