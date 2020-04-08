@@ -65,8 +65,6 @@ public final class MazeView extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String DEFAULT_UI = UIManager.getCrossPlatformLookAndFeelClassName();
-
     public JTree tree;
 
     public JLabel label;
@@ -74,11 +72,11 @@ public final class MazeView extends JFrame {
     {
         // Set Cross-Platform Look-And-Feel
         try {
-            UIManager.setLookAndFeel(MazeView.DEFAULT_UI);
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
             System.err.println("Unsupported look and feel...");
         }
-        // Return focus on JPopup close
+        // Do not consume JPopupMenu event on close
         UIManager.put("PopupMenu.consumeEventOnClose", false);
     }
 
@@ -92,7 +90,7 @@ public final class MazeView extends JFrame {
             }
             @Override
             public final void keyReleased(final KeyEvent e) {
-                // Disable draw state
+                // Reset Cursor state
                 MazeView.this.setCursor(Cursor.getDefaultCursor());
             }
         });
@@ -139,10 +137,7 @@ public final class MazeView extends JFrame {
                                         this.setCellRenderer(new DefaultTreeCellRenderer() {
                                             private static final long serialVersionUID = 1L;
                                             @Override
-                                            public Component getTreeCellRendererComponent(final JTree tree,
-                                                    final Object value, final boolean selected,
-                                                    final boolean expanded, final boolean leaf,
-                                                    final int row, final boolean hasFocus) {
+                                            public final Component getTreeCellRendererComponent(final JTree tree, final Object value,final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                                                 super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
                                                 MazeView.this.mzController.dispatchCell(this, value);
                                                 return this;
@@ -212,13 +207,13 @@ public final class MazeView extends JFrame {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-                                                this.add(new ButtonDecorator("Dimension",
-                                                        new ImageIcon(MazeView.class.getResource("assets/dimensionIcon.gif"))) {
+                                                this.add(new ButtonDecorator("Dimension", new ImageIcon(MazeView.class.getResource("assets/dimensionIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> new PopupDecorator(MazeView.this) {
                                                             private static final long serialVersionUID = 1L;
                                                             {
+                                                                UIManager.put("PopupMenu.consumeEventOnClose", false);
                                                                 this.add(new SliderDecorator(10, 50, 20) {
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
@@ -233,8 +228,7 @@ public final class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new ButtonDecorator("Delay",
-                                                        new ImageIcon(MazeView.class.getResource("assets/delayIcon.gif"))) {
+                                                this.add(new ButtonDecorator("Delay", new ImageIcon(MazeView.class.getResource("assets/delayIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> new PopupDecorator(MazeView.this) {
@@ -250,8 +244,7 @@ public final class MazeView extends JFrame {
                                                         }.show(this, -100, 2));
                                                     }
                                                 });
-                                                this.add(new ButtonDecorator("Density",
-                                                        new ImageIcon(MazeView.class.getResource("assets/densityIcon.gif"))) {
+                                                this.add(new ButtonDecorator("Density", new ImageIcon(MazeView.class.getResource("assets/densityIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> new PopupDecorator(MazeView.this) {
@@ -278,15 +271,13 @@ public final class MazeView extends JFrame {
                                             private static final long serialVersionUID = 1L;
                                             {
                                                 this.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-                                                this.add(new ButtonDecorator("Run PathFinder",
-                                                        new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
+                                                this.add(new ButtonDecorator("Run PathFinder", new ImageIcon(MazeView.class.getResource("assets/pathfinderRunIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> MazeView.this.mzController.getProcess().awake(PathFinder.class));
                                                     }
                                                 });
-                                                this.add(new ButtonDecorator("Run Generator",
-                                                        new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif"))) {
+                                                this.add(new ButtonDecorator("Run Generator", new ImageIcon(MazeView.class.getResource("assets/generatorRunIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
                                                         this.addActionListener(e -> MazeView.this.mzController.getProcess().awake(Generator.class));
@@ -516,17 +507,17 @@ public final class MazeView extends JFrame {
             {
                 this.addPopupMenuListener(new PopupMenuListener() {
                     @Override
-                    public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+                    public final void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
                         CellSubject.select(cellSubject);
                         CellSubject.focus(cellSubject);
                     }
                     @Override
-                    public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+                    public final void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
                         CellSubject.select(null);
                         CellSubject.focus(null);
                     }
                     @Override
-                    public void popupMenuCanceled(final PopupMenuEvent e) {
+                    public final void popupMenuCanceled(final PopupMenuEvent e) {
                         CellSubject.select(null);
                         CellSubject.focus(null);
                     }
@@ -555,7 +546,11 @@ public final class MazeView extends JFrame {
         return this.label;
     }
 
-    private MazeController mzController;
+    private transient MazeController mzController;
+
+    public final MazeController getController() {
+        return this.mzController;
+    }
 
     public final void setController(final MazeController MazeController) {
         this.mzController = MazeController;

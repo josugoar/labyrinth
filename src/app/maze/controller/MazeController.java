@@ -1,5 +1,6 @@
 package app.maze.controller;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
@@ -21,8 +22,8 @@ import javax.swing.tree.TreePath;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.components.cell.subject.CellSubject;
 import app.maze.controller.components.MazeProcess;
+import app.maze.controller.components.panel.flyweight.MazeFlyweight;
 import app.maze.model.MazeModel;
-import app.maze.model.components.flyweight.MazeFlyweight;
 import app.maze.view.MazeView;
 import utils.JWrapper;
 
@@ -30,9 +31,9 @@ public final class MazeController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public final MazeFlyweight mzFlyweight;
+    private MazeFlyweight mzFlyweight;
 
-    public final MazeProcess mzProcess;
+    private final MazeProcess mzProcess;
 
     {
         this.mzFlyweight = new MazeFlyweight(this);
@@ -53,8 +54,8 @@ public final class MazeController implements Serializable {
         this.mzProcess.interrupt();
         // Reset endpoints
         this.mzModel.reset();
-        // Override panel
-        this.mzFlyweight.override();
+        // Reset panel
+        this.mzFlyweight.reset();
     }
 
     public final void clear() {
@@ -71,7 +72,8 @@ public final class MazeController implements Serializable {
     public final void collapse() {
         final JTree tree = this.mzView.getTree();
         // Get expanded rows
-        final Enumeration<TreePath> expanded = tree.getExpandedDescendants(this.mzModel.getRoot() == null ? null : new TreePath(this.mzModel.getRoot()));
+        final Enumeration<TreePath> expanded = tree
+                .getExpandedDescendants(this.mzModel.getRoot() == null ? null : new TreePath(this.mzModel.getRoot()));
         // Get old root
         final CellObserver oldRoot = (CellObserver) this.mzModel.getRoot();
         // Delete model
@@ -123,16 +125,23 @@ public final class MazeController implements Serializable {
         try {
             final FileInputStream file = new FileInputStream(MazeModel.class.getResource("components/ser/maze.ser").getPath());
             final ObjectInputStream in = new ObjectInputStream(file);
-            // Read serialized file
-            final MazeModel other = (MazeModel) in.readObject();
-            in.close();
-            file.close();
+            // Read serialized object
+            final MazeFlyweight otherFlyweight = (MazeFlyweight) in.readObject();
             // Interrupt algorithm
             this.mzProcess.interrupt();
             // Override serialized class
-            this.mzModel = other;
-            // Override panel
-            this.mzFlyweight.override();
+            this.mzFlyweight.setReferences(otherFlyweight.reference);
+            this.mzFlyweight.removeAll();
+            for (final Component component : otherFlyweight.getComponents()) {
+                ((CellSubject) component).setController(this);
+                ((CellSubject) component).getObserver().setController(this);
+                this.mzFlyweight.add(component);
+            }
+            this.mzModel.setRoot((CellObserver) in.readObject());
+            this.mzModel.setTarget((CellObserver) in.readObject());
+            in.close();
+            file.close();
+            this.collapse();
         } catch (final IOException | ClassNotFoundException e) {
             JWrapper.dispatchException(e);
         }
@@ -144,11 +153,14 @@ public final class MazeController implements Serializable {
             this.mzProcess.assertRunning();
             final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource("components/ser/maze.ser").getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
+            // Unselect cell
             CellSubject.select(null);
             // Remove node parent relationships
             this.mzModel.clear();
             // Serialize class
-            out.writeObject(this.mzModel);
+            out.writeObject(this.mzFlyweight);
+            out.writeObject(this.mzModel.getRoot());
+            out.writeObject(this.mzModel.getTarget());
             out.close();
             file.close();
         } catch (final InterruptedException | IOException e) {
@@ -159,6 +171,7 @@ public final class MazeController implements Serializable {
     public final void setDimension(final int dimension) {
         // Reset endpoints
         this.mzModel.reset();
+        // Resize panel
         this.mzFlyweight.setDimension(dimension, dimension);
     }
 
@@ -170,7 +183,7 @@ public final class MazeController implements Serializable {
         return this.mzProcess;
     }
 
-    public MazeModel mzModel;
+    private MazeModel mzModel;
 
     public final MazeModel getModel() {
         return this.mzModel;
@@ -180,7 +193,7 @@ public final class MazeController implements Serializable {
         this.mzModel = mzModel;
     }
 
-    public MazeView mzView;
+    private MazeView mzView;
 
     public final MazeView getView() {
         return this.mzView;

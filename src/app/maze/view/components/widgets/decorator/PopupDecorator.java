@@ -11,7 +11,7 @@ public class PopupDecorator extends JPopupMenu {
 
     public PopupDecorator(final Component component) {
         super(null);
-        // Return focus after state change
+        // Return focus after visibility change
         this.addPropertyChangeListener("visible", e -> {
             new Timer(1, l -> {
                 component.requestFocusInWindow();

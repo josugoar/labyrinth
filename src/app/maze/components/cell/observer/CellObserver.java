@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import app.maze.model.components.flyweight.MazeFlyweight;
+import app.maze.controller.MazeController;
 
 public final class CellObserver extends DefaultMutableTreeNode {
 
@@ -18,8 +18,8 @@ public final class CellObserver extends DefaultMutableTreeNode {
 
     private boolean walkable = true;
 
-    public CellObserver(final MazeFlyweight mzFlyweight) {
-        this.setFlyweight(mzFlyweight);
+    public CellObserver(final MazeController mzController) {
+        this.setController(mzController);
     }
 
     public CellObserver() {
@@ -67,10 +67,10 @@ public final class CellObserver extends DefaultMutableTreeNode {
         this.walkable = walkable;
         if (this.walkable) {
             // Ignore if no root
-            if (this.mzFlyweight.getRoot() == null)
+            if (this.mzController.getModel().getRoot() == null)
                 return;
             // Update neighbors
-            for (final CellObserver neighbor : this.mzFlyweight.getNeighbors((this))) {
+            for (final CellObserver neighbor : this.mzController.getFlyweight().getNeighbors((this))) {
                 if (!neighbor.isWalkable())
                     continue;
                 if (this.children != null && !this.children.contains(neighbor))
@@ -79,40 +79,43 @@ public final class CellObserver extends DefaultMutableTreeNode {
                     neighbor.add(this);
             }
             // Override root
-            if (this.equals(this.mzFlyweight.getRoot())) {
-                this.mzFlyweight.setRoot(null);
-                this.mzFlyweight.notifyRootChange();
-            }
-            this.mzFlyweight.notifyInsertion(this, IntStream.range(0, this.getChildCount()).toArray());
+            if (this.equals(this.mzController.getModel().getRoot()))
+                this.mzController.getModel().setRoot(null);
+            this.mzController.getModel().nodesWereInserted(this, IntStream.range(0, this.getChildCount()).toArray());
         } else {
             // Ignore if no children
-            if (this.getChildCount() != 0) {
-                // Remove neighbors
-                for (final Object child : this.children)
-                    ((CellObserver) child).children.remove(this);
-                final int[] oldIndex = IntStream.range(0, this.getChildCount()).toArray();
-                final Object[] oldChildren = this.children.toArray();
-                this.removeAllChildren();
-                this.mzFlyweight.notifyRemoval(this, oldIndex, oldChildren);
+            if (this.getChildCount() == 0) {
+                this.mzController.getModel().nodesWereRemoved(this, new int[0], new Object[0]);
+                return;
             }
-            this.mzFlyweight.notifyRemoval(this, new int[0], new Object[0]);
+            // Remove neighbors
+            for (final Object child : this.children)
+                ((CellObserver) child).children.remove(this);
+            final int[] oldIndex = IntStream.range(0, this.getChildCount()).toArray();
+            final Object[] oldChildren = this.children.toArray();
+            this.removeAllChildren();
+            this.mzController.getModel().nodesWereRemoved(this, oldIndex, oldChildren);
         }
     }
 
-    public MazeFlyweight mzFlyweight;
+    public MazeController mzController;
 
-    public final void setFlyweight(final MazeFlyweight mzFlyweight) {
-        this.mzFlyweight = mzFlyweight;
+    public final MazeController getController() {
+        return this.mzController;
+    }
+
+    public final void setController(final MazeController mzController) {
+        this.mzController = mzController;
     }
 
     @Override
-    public void setParent(MutableTreeNode newParent) {
+    public final void setParent(MutableTreeNode newParent) {
         super.setParent(newParent);
-        this.mzFlyweight.notifyChange(this);
+        this.mzController.getModel().nodeChanged(this);
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return String.format("Neighbors: %d", this.getChildCount());
     }
 

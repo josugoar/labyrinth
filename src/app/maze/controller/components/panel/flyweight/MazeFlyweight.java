@@ -1,9 +1,10 @@
-package app.maze.model.components.flyweight;
-// TODO: Declare component
+package app.maze.controller.components.panel.flyweight;
+
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,13 +16,12 @@ import javax.swing.JPanel;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.components.cell.subject.CellSubject;
 import app.maze.controller.MazeController;
-import utils.Delegate;
 
 public final class MazeFlyweight extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private List<CellObserver> reference = new ArrayList<CellObserver>(0);
+    public List<CellObserver> reference = new ArrayList<CellObserver>(0);
 
     private boolean periodic = false;
 
@@ -30,22 +30,7 @@ public final class MazeFlyweight extends JPanel {
     {
         // Enable double buffer to prevent popping
         this.setDoubleBuffered(true);
-        // Update draw for each Component change
-        this.addContainerListener(new ContainerListener() {
-            private final void update(final Component component) {
-                component.revalidate();
-                component.repaint();
-            }
-            @Override
-            public void componentAdded(final ContainerEvent e) {
-                this.update((Component) e.getSource());
-            }
-
-            @Override
-            public void componentRemoved(final ContainerEvent e) {
-                this.update((Component) e.getSource());
-            }
-        });
+        this.addContainerListener(new FlyweightListener());
     }
 
     public MazeFlyweight(final MazeController mzController) {
@@ -58,7 +43,7 @@ public final class MazeFlyweight extends JPanel {
         this(null);
     }
 
-    public final void override() {
+    public final void reset() {
         // Override Component
         this.setDimension(this.getDimension()[0], this.getDimension()[1]);
     }
@@ -123,13 +108,20 @@ public final class MazeFlyweight extends JPanel {
         this.setLayout(new GridLayout(width, height));
         // Insert new cell relationships
         for (int i = 0; i < width * height; i++) {
-            this.reference.add(new CellObserver(this));
+            // TODO: Pass MazeController
+            this.reference.add(new CellObserver(this.mzController));
             this.add(new CellSubject(this.mzController, this.reference.get(i)));
         }
     }
 
     public final CellObserver[] getReferences() {
         return this.reference.toArray(new CellObserver[0]);
+    }
+
+    public final void setReferences(final List<CellObserver> reference) throws ArrayIndexOutOfBoundsException {
+        if (reference.size() != this.reference.size())
+            throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
+        this.reference = reference;
     }
 
     public final boolean isEdged() {
@@ -148,40 +140,32 @@ public final class MazeFlyweight extends JPanel {
         this.periodic = periodic;
     }
 
-    public MazeController mzController;
+    private transient MazeController mzController;
 
     public final void setController(final MazeController mzController) {
         this.mzController = mzController;
     }
 
-    @Delegate(target = MazeController.class)
-    public final CellObserver getRoot() {
-        return (CellObserver) this.mzController.getModel().getRoot();
-    }
+    private final class FlyweightListener implements ContainerListener, Serializable {
 
-    @Delegate(target = MazeController.class)
-    public final void setRoot(final CellObserver root) {
-        this.mzController.getModel().setRoot(root);
-    }
+        private static final long serialVersionUID = 1L;
 
-    @Delegate(target = MazeController.class)
-    public final void notifyRootChange() {
-        this.mzController.getModel().reload();
-    }
+        private final void update(final Component component) {
+            // Update draw for each Component change
+            component.revalidate();
+            component.repaint();
+        }
 
-    @Delegate(target = MazeController.class)
-    public final void notifyRemoval(final CellObserver node, final int[] childIndices, final Object[] removedChildren) {
-        this.mzController.getModel().nodesWereRemoved(node, childIndices, removedChildren);
-    }
+        @Override
+        public void componentAdded(final ContainerEvent e) {
+            this.update((Component) e.getSource());
+        }
 
-    @Delegate(target = MazeController.class)
-    public final void notifyInsertion(final CellObserver node, final int[] childIndices) {
-        this.mzController.getModel().nodesWereInserted(node, childIndices);
-    }
+        @Override
+        public void componentRemoved(final ContainerEvent e) {
+            this.update((Component) e.getSource());
+        }
 
-    @Delegate(target = MazeController.class)
-    public final void notifyChange(final CellObserver node) {
-        this.mzController.getModel().nodeChanged(node);
-    }
+    };
 
 }
