@@ -21,7 +21,7 @@ public final class MazeFlyweight extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    public List<CellObserver> reference = new ArrayList<CellObserver>(0);
+    private List<CellObserver> reference = new ArrayList<CellObserver>(0);
 
     private boolean periodic = false;
 
@@ -44,7 +44,7 @@ public final class MazeFlyweight extends JPanel {
     }
 
     public final void reset() {
-        // Override Component
+        // Override dimension
         this.setDimension(this.getDimension()[0], this.getDimension()[1]);
     }
 
@@ -92,7 +92,9 @@ public final class MazeFlyweight extends JPanel {
     }
 
     public final CellObserver[] getNeighbors(final CellObserver o) throws ArrayIndexOutOfBoundsException {
-        return this.neighbor(Arrays.asList(this.getReferences()).indexOf(o)).stream().map(i -> this.getReferences()[i]).toArray(CellObserver[]::new);
+        return this.neighbor(Arrays.asList(this.getReferences()).indexOf(o)).stream()
+                .map(i -> this.getReferences()[i])
+                .toArray(CellObserver[]::new);
     }
 
     public final int[] getDimension() {
@@ -108,7 +110,6 @@ public final class MazeFlyweight extends JPanel {
         this.setLayout(new GridLayout(width, height));
         // Insert new cell relationships
         for (int i = 0; i < width * height; i++) {
-            // TODO: Pass MazeController
             this.reference.add(new CellObserver(this.mzController));
             this.add(new CellSubject(this.mzController, this.reference.get(i)));
         }
@@ -166,6 +167,6 @@ public final class MazeFlyweight extends JPanel {
             this.update((Component) e.getSource());
         }
 
-    };
+    }
 
 }

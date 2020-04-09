@@ -35,6 +35,7 @@ public final class CellSubject extends JPanel {
 
     }
 
+    // TODO: Atomic reference
     private transient static CellSubject selected = null;
 
     private transient static CellSubject focused = null;
@@ -53,7 +54,8 @@ public final class CellSubject extends JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    private final Consumer<Color> update = (Consumer<Color> & Serializable) color -> this.setBorder(BorderFactory.createLineBorder(color));
+    private final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
+            this.setBorder(BorderFactory.createLineBorder(color));
 
     public final void walk(final boolean walk) {
         final Consumer<Color> update = this.update.andThen(this::setBackground);

@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.crypto.AlgorithmMethod;
 
@@ -26,7 +27,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     /**
      * Volatile flag for algorithm running state.
      */
-    // TODO: AtomicBoolean
+    // TODO: AtomicBoolean volatile ¿?
     protected volatile boolean running = false;
 
     /**
@@ -49,7 +50,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @return boolean
      */
-    protected final boolean isRunning() {
+    public final boolean isRunning() {
         return this.running;
     }
 
@@ -58,9 +59,10 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @param running boolean
      */
-    protected synchronized void setRunning(final boolean running) {
+    public synchronized void setRunning(final boolean running) {
         if (!running)
             this.setWaiting(false);
+        // TODO: Atomic
         this.running = running;
     }
 
@@ -69,7 +71,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @throws InterruptedException if (running)
      */
-    protected final void assertRunning() throws InterruptedException {
+    public final void assertRunning() throws InterruptedException {
         if (this.running)
             throw new InterruptedException("Invalid input while running...");
     }
@@ -79,7 +81,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @return boolean
      */
-    protected final boolean isWaiting() {
+    public final boolean isWaiting() {
         return this.waiting;
     }
 
@@ -88,7 +90,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @param waiting boolean
      */
-    protected synchronized void setWaiting(final boolean waiting) {
+    public synchronized void setWaiting(final boolean waiting) {
         try {
             if (waiting && !this.running)
                 throw new InterruptedException("Algorithm is not running...");
@@ -105,7 +107,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     /**
      * Assert current waiting state.
      */
-    protected final void assertWaiting() {
+    public final void assertWaiting() {
         if (this.waiting)
             synchronized (this.lock) {
                 try {
@@ -121,7 +123,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @return int
      */
-    protected final int getDelay() {
+    public final int getDelay() {
         return this.delay;
     }
 
@@ -130,7 +132,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
      *
      * @param delay int
      */
-    protected synchronized void setDelay(final int delay) {
+    public synchronized void setDelay(final int delay) {
         this.delay = delay;
     }
 

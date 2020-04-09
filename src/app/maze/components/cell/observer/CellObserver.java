@@ -98,7 +98,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
         }
     }
 
-    public MazeController mzController;
+    public transient MazeController mzController;
 
     public final MazeController getController() {
         return this.mzController;

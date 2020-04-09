@@ -1,5 +1,7 @@
 package app.maze.components.algorithm.generator;
 
+import javax.swing.tree.TreeNode;
+
 import app.maze.components.cell.observer.CellObserver;
 import utils.AlgorithmManager;
 import utils.JWrapper;
@@ -12,15 +14,15 @@ public abstract class Generator extends AlgorithmManager {
 
     protected abstract void generate() throws InterruptedException;
 
-    public final void awake(final T[][] grid) {
-        try {
-            // Set grid
-            this.setGrid(grid);
-            // Run Thread
-            new Thread(this).start();
-        } catch (final NullPointerException | InterruptedException e) {
-            JWrapper.dispatchException(e);
-        }
+    public final void awake(final Object[][] grid) {
+        // try {
+        //     // Set grid
+        //     this.setGrid(grid);
+        //     // Run Thread
+        //     new Thread(this).start();
+        // } catch (final NullPointerException | InterruptedException e) {
+        //     JWrapper.dispatchException(e);
+        // }
     }
 
     @Override

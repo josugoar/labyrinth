@@ -62,11 +62,13 @@ public final class MazeModel extends DefaultTreeModel {
         }
     }
 
-    public final TreeNode getTarget() {
+    public final Object getTarget() {
         return this.target;
     }
 
-    private final BiConsumer<CellObserver, State> update = (node, state) -> this.mzController.getFlyweight().request(node).setBackground(state.getColor());
+    @SuppressWarnings("unchecked")
+    private final BiConsumer<CellObserver, State> update = (BiConsumer<CellObserver, State> & Serializable) (node, state) ->
+            this.mzController.getFlyweight().request(node).setBackground(state.getColor());
 
     public final void setTarget(final TreeNode target) {
         // Override target

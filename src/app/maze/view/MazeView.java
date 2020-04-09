@@ -144,16 +144,16 @@ public final class MazeView extends JFrame {
                                             }
                                         });
                                         this.addTreeSelectionListener(e -> {
-                                            if (CellSubject.getSelected() == null)
-                                                if (e.getNewLeadSelectionPath() != null)
-                                                    CellSubject.focus((MazeView.this.mzController.getFlyweight().request((CellObserver) e.getNewLeadSelectionPath().getLastPathComponent())));
                                             MazeView.this.requestFocusInWindow();
+                                            if (CellSubject.getSelected() != null || e.getNewLeadSelectionPath() == null)
+                                                return;
+                                            CellSubject.focus((MazeView.this.mzController.getFlyweight().request((CellObserver) e.getNewLeadSelectionPath().getLastPathComponent())));
                                         });
                                     }
                                 }, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        this.setMinimumSize(new Dimension(130, this.getMinimumSize().height));
+                                        this.setMinimumSize(new Dimension(135, this.getMinimumSize().height));
                                     }
                                 });
                             }
@@ -509,17 +509,14 @@ public final class MazeView extends JFrame {
                     @Override
                     public final void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
                         CellSubject.select(cellSubject);
-                        CellSubject.focus(cellSubject);
                     }
                     @Override
                     public final void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
                         CellSubject.select(null);
-                        CellSubject.focus(null);
                     }
                     @Override
                     public final void popupMenuCanceled(final PopupMenuEvent e) {
                         CellSubject.select(null);
-                        CellSubject.focus(null);
                     }
                 });
                 this.add(new JMenuItem("Start", new ImageIcon(MazeView.class.getResource("assets/startIcon.gif"))) {
