@@ -11,6 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.security.InvalidParameterException;
 import java.util.Enumeration;
+import java.util.Objects;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -105,9 +106,8 @@ public final class MazeView extends JFrame {
 
     public final void display() {
         try {
-            this.initHierarchy();
-            this.initView();
-            // Set JFrame visible
+            this.initComponent();
+            this.initFrame();
             this.setVisible(true);
         } catch (final NullPointerException e) {
             JWrapper.dispatchException(e);
@@ -116,9 +116,7 @@ public final class MazeView extends JFrame {
 
     private JSplitPane split;
 
-    private final void initHierarchy() throws NullPointerException {
-        if (this.mzController == null)
-            throw new NullPointerException("MazeController might not have been initialized...");
+    private final void initComponent() throws NullPointerException {
         this.add(new JPanel(new BorderLayout(0, 0)) {
             private static final long serialVersionUID = 1L;
             {
@@ -131,8 +129,9 @@ public final class MazeView extends JFrame {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         MazeView.this.tree = this;
-                                        this.setFocusable(false);
                                         this.setShowsRootHandles(true);
+                                        this.setFocusable(false);
+                                        this.setDoubleBuffered(true);
                                         this.setCellRenderer(new DefaultTreeCellRenderer() {
                                             private static final long serialVersionUID = 1L;
                                             @Override
@@ -219,7 +218,7 @@ public final class MazeView extends JFrame {
                                                                         this.addChangeListener(e -> {
                                                                             if (((JSlider) e.getSource()).getValueIsAdjusting())
                                                                                 return;
-                                                                            MazeView.this.mzController.setDimension(((JSlider) e.getSource()).getValue());
+                                                                            MazeView.this.mzController.resize(((JSlider) e.getSource()).getValue());
                                                                         });
                                                                     }
                                                                 });
@@ -442,7 +441,7 @@ public final class MazeView extends JFrame {
                                         this.addActionListener(e -> MazeView.this.mzController.getFlyweight().setPeriodic(!MazeView.this.mzController.getFlyweight().isPeriodic()));
                                     }
                                 });
-                                this.add(new JCheckBoxMenuItem("Edged", null, true) {
+                                this.add(new JCheckBoxMenuItem("Edged", null, false) {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         this.addActionListener(e -> MazeView.this.mzController.getFlyweight().setEdged(!MazeView.this.mzController.getFlyweight().isEdged()));
@@ -493,7 +492,7 @@ public final class MazeView extends JFrame {
         }, BorderLayout.NORTH);
     }
 
-    private final void initView() {
+    private final void initFrame() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setMinimumSize(new Dimension(450, 525));
         this.setLocationRelativeTo(null);
@@ -501,17 +500,14 @@ public final class MazeView extends JFrame {
         this.pack();
     }
 
-    public final JPopupMenu releasePopup(final CellSubject cellSubject) throws InvalidParameterException {
-        if (cellSubject == null)
-            throw new InvalidParameterException("Invalid CellSubject...");
-        // Create new JPopup to returns focus to MazeView
+    public final JPopupMenu releasePopup(final CellSubject cell) throws InvalidParameterException {
         return new JPopupMenu() {
             private static final long serialVersionUID = 1L;
             {
                 this.addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public final void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-                        CellSubject.select(cellSubject);
+                        CellSubject.select(Objects.requireNonNull(cell, "CellSubject must not be null..."));
                     }
                     @Override
                     public final void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
@@ -525,13 +521,13 @@ public final class MazeView extends JFrame {
                 this.add(new JMenuItem("Start", new ImageIcon(MazeView.class.getResource("assets/startIcon.gif"))) {
                     private static final long serialVersionUID = 1L;
                     {
-                        this.addActionListener(e -> MazeView.this.mzController.getModel().setRoot(cellSubject.getObserver()));
+                        this.addActionListener(e -> MazeView.this.mzController.getModel().setRoot(cell.getObserver()));
                     }
                 });
                 this.add(new JMenuItem("End", new ImageIcon(MazeView.class.getResource("assets/endIcon.gif"))) {
                     private static final long serialVersionUID = 1L;
                     {
-                        this.addActionListener(e -> MazeView.this.mzController.getModel().setTarget(cellSubject.getObserver()));
+                        this.addActionListener(e -> MazeView.this.mzController.getModel().setTarget(cell.getObserver()));
                     }
                 });
             }

@@ -8,8 +8,8 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
+import app.maze.components.cell.State;
 import app.maze.components.cell.observer.CellObserver;
-import app.maze.components.cell.subject.CellSubject.State;
 import app.maze.controller.MazeController;
 
 public final class MazeModel extends DefaultTreeModel {
@@ -39,12 +39,27 @@ public final class MazeModel extends DefaultTreeModel {
         this.mzController.collapse();
     }
 
+    private final void clear(final CellObserver node) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            final CellObserver child = (CellObserver) node.getChildAt(i);
+            // Ignore if no parent
+            if (child.isOrphan())
+                continue;
+            // Reset state
+            if (!child.equals(this.root) && !child.equals(this.target))
+                this.update.accept(child, State.WALKABLE);
+            // Remove parent and children parent
+            child.setParent(null);
+            this.clear(child);
+        }
+    }
+
     public final void clear() {
         // Ignore if no root
         if (this.root == null)
             return;
         // Remove node parent relationships
-        ((CellObserver) this.root).clear();
+        this.clear((CellObserver) this.root);
     }
 
     public final void initNeighbors(final CellObserver node) {
@@ -125,7 +140,7 @@ public final class MazeModel extends DefaultTreeModel {
         }
     }
 
-    private final class ModelListener implements TreeModelListener, Serializable {
+    private static final class ModelListener implements TreeModelListener, Serializable {
 
         private static final long serialVersionUID = 1L;
 
@@ -139,7 +154,7 @@ public final class MazeModel extends DefaultTreeModel {
             }
             final CellObserver root = (CellObserver) e.getTreePath().getLastPathComponent();
             // Remove node relationships
-            root.reset();
+            root.override();
             // Initialize all node neighbors
             mzModel.initNeighbors(root);
             // Collapse tree
@@ -156,7 +171,7 @@ public final class MazeModel extends DefaultTreeModel {
                 return;
             // Remove node relationships
             for (final Object children : e.getChildren())
-                ((CellObserver) children).reset();
+                ((CellObserver) children).override();
             // Reset root
             mzModel.root = null;
             mzModel.reload();
@@ -170,15 +185,8 @@ public final class MazeModel extends DefaultTreeModel {
 
         @Override
         public final void treeNodesChanged(final TreeModelEvent e) {
-            // Ignore if no children
-            if (e.getChildren() == null)
-                return;
-            final MazeModel mzModel = (MazeModel) e.getSource();
-            for (final Object node : e.getChildren()) {
-                if (!node.equals(mzModel.getRoot()) && !node.equals(mzModel.getTarget()))
-                    // Node changed
-                    mzModel.update.accept((CellObserver) node, State.VISITED);
-            }
+            // Collapse tree
+            ((MazeModel) e.getSource()).mzController.collapse();
         }
 
     };

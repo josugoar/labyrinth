@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -17,7 +18,7 @@ import app.maze.components.cell.observer.CellObserver;
 import app.maze.components.cell.subject.CellSubject;
 import app.maze.controller.MazeController;
 
-public final class MazeFlyweight extends JPanel {
+public final class PanelFlyweight extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,18 +29,18 @@ public final class MazeFlyweight extends JPanel {
     private boolean edged = false;
 
     {
-        // Enable double buffer to prevent popping
+        // Set double buffer to prevent popping
         this.setDoubleBuffered(true);
         this.addContainerListener(new FlyweightListener());
     }
 
-    public MazeFlyweight(final MazeController mzController) {
+    public PanelFlyweight(final MazeController mzController) {
         this.setController(mzController);
         // Initialize default dimension
         this.setDimension(20, 20);
     }
 
-    public MazeFlyweight() {
+    public PanelFlyweight() {
         this(null);
     }
 
@@ -48,14 +49,14 @@ public final class MazeFlyweight extends JPanel {
         this.setDimension(this.getDimension()[0], this.getDimension()[1]);
     }
 
-    public final int transform(final int x, final int y) {
+    private final int transform(final int x, final int y) {
         // Transform from 2D to 1D
         return x >= 0 && x < this.getDimension()[0] && y >= 0 && y < this.getDimension()[1]
                 ? x * this.getDimension()[0] + y
                 : -1;
     }
 
-    public final int[] transform(final int i) {
+    private final int[] transform(final int i) {
         // Transform from 1D to 2D
         return i >= 0 && i < this.getComponentCount()
                 ? new int[] { (i - i % this.getDimension()[0]) / this.getDimension()[0], i % this.getDimension()[0] }
@@ -120,7 +121,7 @@ public final class MazeFlyweight extends JPanel {
     }
 
     public final void setReferences(final List<CellObserver> reference) throws ArrayIndexOutOfBoundsException {
-        if (reference.size() != this.reference.size())
+        if (Objects.requireNonNull(reference, "Reference must not be null...").size() != this.reference.size())
             throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
         this.reference = reference;
     }
@@ -131,6 +132,7 @@ public final class MazeFlyweight extends JPanel {
 
     public final void setEdged(final boolean edged) {
         this.edged = edged;
+        this.mzController.reset();
     }
 
     public final boolean isPeriodic() {
@@ -139,6 +141,7 @@ public final class MazeFlyweight extends JPanel {
 
     public final void setPeriodic(final boolean periodic) {
         this.periodic = periodic;
+        this.mzController.reset();
     }
 
     private transient MazeController mzController;
@@ -147,7 +150,7 @@ public final class MazeFlyweight extends JPanel {
         this.mzController = mzController;
     }
 
-    private final class FlyweightListener implements ContainerListener, Serializable {
+    private static final class FlyweightListener implements ContainerListener, Serializable {
 
         private static final long serialVersionUID = 1L;
 

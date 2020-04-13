@@ -8,8 +8,8 @@ import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
+import app.maze.components.cell.State;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.controller.MazeController;
 import utils.JWrapper;
@@ -17,28 +17,6 @@ import utils.JWrapper;
 public final class CellSubject extends JPanel {
 
     private static final long serialVersionUID = 1L;
-
-    public static enum State {
-
-        // Cell State enumeration
-        WALKABLE(UIManager.getColor("Panel.background")),
-        UNWALKABLE(Color.BLACK),
-        ROOT(Color.RED),
-        TARGET(Color.GREEN),
-        VISITED(Color.CYAN),
-        GERMINATED(Color.BLUE);
-
-        private final Color color;
-
-        private State(final Color color) {
-            this.color = color;
-        }
-
-        public final Color getColor() {
-            return this.color;
-        }
-
-    }
 
     // TODO: Atomic reference
     private transient static CellSubject selected = null;
@@ -131,7 +109,7 @@ public final class CellSubject extends JPanel {
         this.clObserver = clObserver;
     }
 
-    private final class SubjectListener extends MouseAdapter implements Serializable {
+    private static final class SubjectListener extends MouseAdapter implements Serializable {
 
         private static final long serialVersionUID = 1L;
 

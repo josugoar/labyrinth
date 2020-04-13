@@ -31,7 +31,7 @@ public abstract class PathFinder extends AlgorithmManager {
         try {
             if (start == null)
                 throw new NullPointerException("No starting node found...");
-            // Set enpoints
+            // Set endpoints
             this.setStart(start);
             this.setTarget(target);
             // Run Thread
@@ -55,17 +55,15 @@ public abstract class PathFinder extends AlgorithmManager {
                     // Set running
                     PathFinder.this.setRunning(true);
                 }
-                // Traverse entire MutableTreeNode structure
             });
-            TreeNode parent = target.getParent();
-            while (parent != null) {
+            // Traverse entire MutableTreeNode structure
+            for (TreeNode parent = target.getParent(); parent.getParent() != null; parent = parent.getParent())
                 for (final PathFinderListener listener : this.listeners)
                     listener.nodeTraversed(parent);
-                parent = parent.getParent();
-            }
         } catch (final NullPointerException | StackOverflowError | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
+            // End running
             this.setRunning(false);
         }
     }

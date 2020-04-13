@@ -23,7 +23,7 @@ public class Dijkstra extends PathFinder {
         // Germinate generation
         for (PathFinderListener listener : this.listeners)
             for (MutableTreeNode node : currGen)
-                listener.nodeGerminated(node);
+                listener.nodeVisited(node);
         // Initialize new empty generation
         final Set<MutableTreeNode> newGen = new HashSet<MutableTreeNode>(0);
         // Range through current generaton nodes cell neighbors
@@ -46,7 +46,7 @@ public class Dijkstra extends PathFinder {
                     this.visited.add(child);
                     // Visit generation
                     for (PathFinderListener listener : this.listeners)
-                        listener.nodeVisited(child);
+                        listener.nodeGerminated(child);
                 }
                 if (child.equals(this.start))
                     child.setParent(null);

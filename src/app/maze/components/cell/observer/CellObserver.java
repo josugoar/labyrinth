@@ -1,13 +1,11 @@
 package app.maze.components.cell.observer;
 
-import java.awt.Color;
 import java.util.Vector;
 import java.util.stream.IntStream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import app.maze.components.cell.subject.CellSubject.State;
 import app.maze.controller.MazeController;
 
 public final class CellObserver extends DefaultMutableTreeNode {
@@ -28,7 +26,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
         this(null);
     }
 
-    public final void reset() {
+    public final void override() {
         // Ignore if no children
         if (this.getChildCount() == 0)
             return;
@@ -36,20 +34,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
         final Object[] oldChildren = this.children.toArray();
         this.removeAllChildren();
         for (final Object oldChild : oldChildren)
-            ((CellObserver) oldChild).reset();
-    }
-
-    public final void clear() {
-        for (final Object child : this.children) {
-            if (!child.equals(this.mzController.getModel().getRoot()) && !child.equals(this.mzController.getModel().getTarget()))
-                this.mzController.getFlyweight().request((CellObserver) child).setBackground(State.WALKABLE.getColor());
-            // Ignore if no parent
-            if (((CellObserver) child).getParent() == null)
-                continue;
-            // Remove parent and children parent
-            ((CellObserver) child).setParent(null);
-            ((CellObserver) child).clear();
-        }
+            ((CellObserver) oldChild).override();
     }
 
     @Override
@@ -60,7 +45,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
     }
 
     public final boolean isOrphan() {
-        return this.parent == null ? false : true;
+        return this.parent == null ? true : false;
     }
 
     public final boolean isWalkable() {
@@ -111,12 +96,6 @@ public final class CellObserver extends DefaultMutableTreeNode {
 
     public final void setController(final MazeController mzController) {
         this.mzController = mzController;
-    }
-
-    @Override
-    public final void setParent(final MutableTreeNode newParent) {
-        super.setParent(newParent);
-        this.mzController.getModel().nodeChanged(this);
     }
 
     @Override
