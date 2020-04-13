@@ -383,7 +383,7 @@ public final class MazeView extends JFrame {
                                 this.setMnemonic(KeyEvent.VK_O);
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
                                 this.addActionListener(e -> {
-                                    MazeView.this.mzController.readMaze();
+                                    MazeView.this.mzController.readMaze("components/ser/maze.ser");
                                     // TODO: Open
                                     final int returnVal = new JFileChooser().showOpenDialog(MazeView.this);
                                 });
@@ -396,7 +396,7 @@ public final class MazeView extends JFrame {
                                 this.setMnemonic(KeyEvent.VK_S);
                                 this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
                                 this.addActionListener(e -> {
-                                    MazeView.this.mzController.writeMaze();
+                                    MazeView.this.mzController.writeMaze("components/ser/maze.ser");
                                     // TODO: Save
                                     final int returnVal = new JFileChooser().showSaveDialog(MazeView.this);
                                 });

@@ -21,6 +21,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import app.maze.components.cell.State;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.components.cell.subject.CellSubject;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
@@ -79,6 +80,9 @@ public final class MazeController implements Serializable {
             tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No root node...")));
         else
             tree.setModel(this.mzModel);
+        // Validate change
+        tree.revalidate();
+        tree.repaint();
         // Ignore if no expanded descendants
         if (expanded == null)
             return;
@@ -93,8 +97,6 @@ public final class MazeController implements Serializable {
             this.mzProcess.assertRunning();
             // Remove node parent relationships
             this.mzModel.clear();
-            // Collapse tree
-            this.collapse();
             // Unselect cell
             CellSubject.select(null);
         } catch (final InterruptedException | NullPointerException e) {
@@ -118,31 +120,33 @@ public final class MazeController implements Serializable {
             this.mzProcess.await();
     }
 
-    // TODO: Refactor
     public final void dispatchCell(final DefaultTreeCellRenderer renderer, final Object node) {
         Objects.requireNonNull(renderer, "DefaultTreeCellRenderer must not be null...");
         // Assert node
-        if (Objects.requireNonNull(node, "Object must not be null...") instanceof CellObserver)
+        if (Objects.requireNonNull(node, "Object must not be null...") instanceof CellObserver) {
+            final Color color = this.mzFlyweight.request((CellObserver) node).getBackground();
+            String file = "emptyIcon.gif";
             // Root node
-            if (node.equals(this.mzModel.getRoot()))
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/startIcon.gif")));
+            if (color == State.ROOT.getColor())
+                file = "startIcon.gif";
             // Target node
-            else if (node.equals(this.mzModel.getTarget()))
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/endIcon.gif")));
+            else if (color == State.TARGET.getColor())
+                file = "endIcon.gif";
             // Empty node
-            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.BLUE)
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/build_var_obj.png")));
-            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.CYAN)
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/color.gif")));
-            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.YELLOW)
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/unstable-status.png")));
-            else
-                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/emptyIcon.gif")));
+            else if (color == State.GERMINATED.getColor())
+                // TODO: Convert to .gif
+                file = "germinatedIcon.png";
+            else if (color == State.VISITED.getColor())
+                file = "visitedIcon.gif";
+            else if (color == State.PATH.getColor())
+                file = "pathIcon.gif";
+            renderer.setIcon(new ImageIcon(MazeView.class.getResource(String.format("assets/%s", file))));
+        }
     }
 
-    public final void readMaze() {
+    public final void readMaze(final String path) {
         try {
-            final FileInputStream file = new FileInputStream(MazeModel.class.getResource("components/ser/maze.ser").getPath());
+            final FileInputStream file = new FileInputStream(MazeModel.class.getResource(path).getPath());
             final ObjectInputStream in = new ObjectInputStream(file);
             // Read serialized object
             final PanelFlyweight otherFlyweight = (PanelFlyweight) in.readObject();
@@ -171,11 +175,11 @@ public final class MazeController implements Serializable {
         }
     }
 
-    public final void writeMaze() {
+    public final void writeMaze(final String path) {
         try {
             // Assert running algorithm
             this.mzProcess.assertRunning();
-            final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource("components/ser/maze.ser").getPath());
+            final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource(path).getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
             // Unselect cell
             CellSubject.select(null);

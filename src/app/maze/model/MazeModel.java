@@ -60,6 +60,8 @@ public final class MazeModel extends DefaultTreeModel {
             return;
         // Remove node parent relationships
         this.clear((CellObserver) this.root);
+        // Collapse tree
+        this.mzController.collapse();
     }
 
     public final void initNeighbors(final CellObserver node) {
