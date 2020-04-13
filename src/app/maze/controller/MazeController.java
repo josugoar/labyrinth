@@ -1,5 +1,6 @@
 package app.maze.controller;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
@@ -38,7 +39,7 @@ public final class MazeController implements Serializable {
 
     {
         this.mzFlyweight = new MazeFlyweight(this);
-        this.mzProcess = new MazeProcess();
+        this.mzProcess = new MazeProcess(this);
     }
 
     public MazeController(final MazeModel mzModel, final MazeView mzView) {
@@ -74,8 +75,8 @@ public final class MazeController implements Serializable {
         final JTree tree = this.mzView.getTree();
         final Object oldRoot = this.mzModel.getRoot();
         final Enumeration<TreePath> expanded = tree.getExpandedDescendants(oldRoot == null ? null : new TreePath(oldRoot));
-        // Delete model
-        tree.setModel(null);
+        tree.repaint();
+        tree.revalidate();
         // Reset model
         if (oldRoot == null)
             tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No root node...")));
@@ -101,7 +102,7 @@ public final class MazeController implements Serializable {
             }
         else if (e.getKeyCode() == KeyEvent.VK_SPACE)
             // Play/Pause algorithm
-            this.mzProcess.setWaiting(!this.mzProcess.isWaiting());
+            this.mzProcess.await();
     }
 
     public final void dispatchCell(final DefaultTreeCellRenderer renderer, final Object node) {
@@ -115,6 +116,12 @@ public final class MazeController implements Serializable {
             else if (node.equals(this.mzModel.getTarget()))
                 renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/endIcon.gif")));
             // Empty node
+            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.BLUE)
+                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/build_var_obj.png")));
+            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.CYAN)
+                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/color.gif")));
+            else if (this.mzFlyweight.request((CellObserver) node).getBackground() == Color.YELLOW)
+                renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/unstable-status.png")));
             else
                 renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/emptyIcon.gif")));
     }
@@ -171,8 +178,8 @@ public final class MazeController implements Serializable {
     }
 
     public final void setDimension(final int dimension) {
-        // Reset endpoints
-        this.mzModel.reset();
+        // Reset structure
+        this.reset();
         // Resize panel
         this.mzFlyweight.setDimension(dimension, dimension);
     }

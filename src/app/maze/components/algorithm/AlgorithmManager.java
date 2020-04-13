@@ -1,9 +1,10 @@
-package utils;
+package app.maze.components.algorithm;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.crypto.AlgorithmMethod;
+
+import utils.JWrapper;
 
 /**
  * Generic algorithm abstract class wrapper, implementing
@@ -16,6 +17,8 @@ import javax.xml.crypto.AlgorithmMethod;
  */
 public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Serializable {
 
+    // TODO: AtomicBoolean volatile ???
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -27,7 +30,6 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     /**
      * Volatile flag for algorithm running state.
      */
-    // TODO: AtomicBoolean volatile ¿?
     protected volatile boolean running = false;
 
     /**
@@ -46,6 +48,13 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     protected abstract void awake();
 
     /**
+     * Start <code>java.lang.Thread</code> execution.
+     */
+    protected final void start() {
+        new Thread(this).start();
+    }
+
+    /**
      * Return current running state.
      *
      * @return boolean
@@ -62,7 +71,6 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     public synchronized void setRunning(final boolean running) {
         if (!running)
             this.setWaiting(false);
-        // TODO: Atomic
         this.running = running;
     }
 
@@ -139,6 +147,11 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
     @Override
     public final String getAlgorithm() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public final void run() {
+        this.awake();
     }
 
     @Override

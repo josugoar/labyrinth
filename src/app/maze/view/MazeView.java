@@ -57,8 +57,6 @@ import app.maze.components.cell.observer.CellObserver;
 import app.maze.components.cell.subject.CellSubject;
 import app.maze.controller.MazeController;
 import app.maze.view.components.widgets.decorator.ButtonDecorator;
-import app.maze.view.components.widgets.decorator.PopupDecorator;
-import app.maze.view.components.widgets.decorator.SliderDecorator;
 import utils.JWrapper;
 
 public final class MazeView extends JFrame {
@@ -133,6 +131,7 @@ public final class MazeView extends JFrame {
                                     private static final long serialVersionUID = 1L;
                                     {
                                         MazeView.this.tree = this;
+                                        this.setFocusable(false);
                                         this.setShowsRootHandles(true);
                                         this.setCellRenderer(new DefaultTreeCellRenderer() {
                                             private static final long serialVersionUID = 1L;
@@ -144,7 +143,6 @@ public final class MazeView extends JFrame {
                                             }
                                         });
                                         this.addTreeSelectionListener(e -> {
-                                            MazeView.this.requestFocusInWindow();
                                             if (CellSubject.getSelected() != null || e.getNewLeadSelectionPath() == null)
                                                 return;
                                             CellSubject.focus((MazeView.this.mzController.getFlyweight().request((CellObserver) e.getNewLeadSelectionPath().getLastPathComponent())));
@@ -210,13 +208,14 @@ public final class MazeView extends JFrame {
                                                 this.add(new ButtonDecorator("Dimension", new ImageIcon(MazeView.class.getResource("assets/dimensionIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new PopupDecorator(MazeView.this) {
+                                                        this.addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                UIManager.put("PopupMenu.consumeEventOnClose", false);
-                                                                this.add(new SliderDecorator(10, 50, 20) {
+                                                                this.setFocusable(false);
+                                                                this.add(new JSlider(10, 50, 20) {
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
+                                                                        this.setPreferredSize(new Dimension(100, this.getPreferredSize().height));
                                                                         this.addChangeListener(e -> {
                                                                             if (((JSlider) e.getSource()).getValueIsAdjusting())
                                                                                 return;
@@ -231,12 +230,14 @@ public final class MazeView extends JFrame {
                                                 this.add(new ButtonDecorator("Delay", new ImageIcon(MazeView.class.getResource("assets/delayIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new PopupDecorator(MazeView.this) {
+                                                        this.addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new SliderDecorator(0, 250, 100) {
+                                                                this.setFocusable(false);
+                                                                this.add(new JSlider(0, 250, 100) {
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
+                                                                        this.setPreferredSize(new Dimension(100, this.getPreferredSize().height));
                                                                         this.addChangeListener(e -> MazeView.this.mzController.getProcess().setDelay(((JSlider) e.getSource()).getValue()));
                                                                     }
                                                                 });
@@ -247,12 +248,14 @@ public final class MazeView extends JFrame {
                                                 this.add(new ButtonDecorator("Density", new ImageIcon(MazeView.class.getResource("assets/densityIcon.gif"))) {
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        this.addActionListener(e -> new PopupDecorator(MazeView.this) {
+                                                        this.addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
-                                                                this.add(new SliderDecorator(1, 99, 50) {
+                                                                this.setFocusable(false);
+                                                                this.add(new JSlider(1, 99, 50) {
                                                                     private static final long serialVersionUID = 1L;
                                                                     {
+                                                                        this.setPreferredSize(new Dimension(100, this.getPreferredSize().height));
                                                                         this.addChangeListener(e -> MazeView.this.mzController.getProcess().setDensity(((JSlider) e.getSource()).getValue()));
                                                                     }
                                                                 });
@@ -549,8 +552,8 @@ public final class MazeView extends JFrame {
         return this.mzController;
     }
 
-    public final void setController(final MazeController MazeController) {
-        this.mzController = MazeController;
+    public final void setController(final MazeController mzController) {
+        this.mzController = mzController;
     }
 
 }

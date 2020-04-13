@@ -1,32 +1,41 @@
 package app.maze.components.algorithm.pathfinder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import app.maze.components.cell.observer.CellObserver;
-import utils.AlgorithmManager;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+
+import app.maze.components.algorithm.AlgorithmManager;
 import utils.JWrapper;
 
 public abstract class PathFinder extends AlgorithmManager {
 
     private static final long serialVersionUID = 1L;
 
-    protected CellObserver start = null;
+    protected List<PathFinderListener> listeners = new ArrayList<PathFinderListener>(0);
 
-    protected CellObserver target = null;
+    protected Set<MutableTreeNode> visited;
 
-    protected abstract CellObserver advance(final Set<CellObserver> currGen) throws StackOverflowError, InterruptedException;
+    protected MutableTreeNode start = null;
 
-    public final void awake(final CellObserver start, final CellObserver target) {
+    protected MutableTreeNode target = null;
+
+    protected abstract MutableTreeNode advance(final Set<MutableTreeNode> currGen)
+            throws StackOverflowError, InterruptedException;
+
+    public final void find(final MutableTreeNode start, final MutableTreeNode target) {
         try {
             if (start == null)
                 throw new NullPointerException("No starting node found...");
-            // Set grid and enpoints
+            // Set enpoints
             this.setStart(start);
             this.setTarget(target);
             // Run Thread
-            new Thread(this).start();
+            this.start();
         } catch (final NullPointerException e) {
             JWrapper.dispatchException(e);
         }
@@ -37,7 +46,8 @@ public abstract class PathFinder extends AlgorithmManager {
         try {
             if (this.start == null)
                 throw new NullPointerException("PathFinder is not initialized...");
-            this.advance(new HashSet<CellObserver>() {
+            this.visited = new HashSet<MutableTreeNode>(0);
+            final MutableTreeNode target = this.advance(new HashSet<MutableTreeNode>() {
                 private static final long serialVersionUID = 1L;
                 {
                     // Construct first generation
@@ -45,8 +55,14 @@ public abstract class PathFinder extends AlgorithmManager {
                     // Set running
                     PathFinder.this.setRunning(true);
                 }
-                // Traverse entire CellObserver structure
-            }).getPath(); // TODO: Return TreePath
+                // Traverse entire MutableTreeNode structure
+            });
+            TreeNode parent = target.getParent();
+            while (parent != null) {
+                for (final PathFinderListener listener : this.listeners)
+                    listener.nodeTraversed(parent);
+                parent = parent.getParent();
+            }
         } catch (final NullPointerException | StackOverflowError | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
@@ -54,16 +70,15 @@ public abstract class PathFinder extends AlgorithmManager {
         }
     }
 
-    @Override
-    public final void run() {
-        this.awake();
+    public final void addListener(final PathFinderListener listener) {
+        this.listeners.add(Objects.requireNonNull(listener, "PathFinderListener must not be null..."));
     }
 
-    public final CellObserver getStart() {
+    public final MutableTreeNode getStart() {
         return this.start;
     }
 
-    public synchronized final void setStart(final CellObserver start) {
+    public synchronized final void setStart(final MutableTreeNode start) {
         try {
             this.assertRunning();
             this.start = Objects.requireNonNull(start, "Start must not be null...");
@@ -72,11 +87,11 @@ public abstract class PathFinder extends AlgorithmManager {
         }
     }
 
-    public final CellObserver getTarget() {
+    public final MutableTreeNode getTarget() {
         return this.target;
     }
 
-    public synchronized final void setTarget(final CellObserver target) {
+    public synchronized final void setTarget(final MutableTreeNode target) {
         this.target = target;
     }
 

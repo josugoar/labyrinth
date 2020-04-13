@@ -1,11 +1,13 @@
 package app.maze.components.cell.observer;
 
+import java.awt.Color;
 import java.util.Vector;
 import java.util.stream.IntStream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
+import app.maze.components.cell.subject.CellSubject.State;
 import app.maze.controller.MazeController;
 
 public final class CellObserver extends DefaultMutableTreeNode {
@@ -38,13 +40,16 @@ public final class CellObserver extends DefaultMutableTreeNode {
     }
 
     public final void clear() {
-        for (final Object child : this.children)
+        for (final Object child : this.children) {
+            if (!child.equals(this.mzController.getModel().getRoot()) && !child.equals(this.mzController.getModel().getTarget()))
+                this.mzController.getFlyweight().request((CellObserver) child).setBackground(State.WALKABLE.getColor());
             // Ignore if no parent
-            if (((CellObserver) child).getParent() != null) {
-                // Remove parent and children parent
-                ((CellObserver) child).setParent(null);
-                ((CellObserver) child).clear();
-            }
+            if (((CellObserver) child).getParent() == null)
+                continue;
+            // Remove parent and children parent
+            ((CellObserver) child).setParent(null);
+            ((CellObserver) child).clear();
+        }
     }
 
     @Override
@@ -109,7 +114,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
     }
 
     @Override
-    public final void setParent(MutableTreeNode newParent) {
+    public final void setParent(final MutableTreeNode newParent) {
         super.setParent(newParent);
         this.mzController.getModel().nodeChanged(this);
     }

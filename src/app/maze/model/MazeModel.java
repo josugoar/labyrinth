@@ -168,16 +168,17 @@ public final class MazeModel extends DefaultTreeModel {
             ((MazeModel) e.getSource()).mzController.collapse();
         }
 
-        @SuppressWarnings("unused")
         @Override
         public final void treeNodesChanged(final TreeModelEvent e) {
-            // TODO: Path
             // Ignore if no children
             if (e.getChildren() == null)
                 return;
-            for (final Object node : e.getChildren())
-                // Node changed
-                return;
+            final MazeModel mzModel = (MazeModel) e.getSource();
+            for (final Object node : e.getChildren()) {
+                if (!node.equals(mzModel.getRoot()) && !node.equals(mzModel.getTarget()))
+                    // Node changed
+                    mzModel.update.accept((CellObserver) node, State.VISITED);
+            }
         }
 
     };

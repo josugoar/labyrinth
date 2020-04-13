@@ -9,7 +9,7 @@ public class BackTracker extends Generator {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void generate() throws InterruptedException {
+    public void generate() throws InterruptedException {
 
     }
 

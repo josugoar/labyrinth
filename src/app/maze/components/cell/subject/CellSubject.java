@@ -21,7 +21,12 @@ public final class CellSubject extends JPanel {
     public static enum State {
 
         // Cell State enumeration
-        WALKABLE(UIManager.getColor("Panel.background")), UNWALKABLE(Color.BLACK), ROOT(Color.RED), TARGET(Color.GREEN);
+        WALKABLE(UIManager.getColor("Panel.background")),
+        UNWALKABLE(Color.BLACK),
+        ROOT(Color.RED),
+        TARGET(Color.GREEN),
+        VISITED(Color.CYAN),
+        GERMINATED(Color.BLUE);
 
         private final Color color;
 
@@ -41,6 +46,7 @@ public final class CellSubject extends JPanel {
     private transient static CellSubject focused = null;
 
     {
+        this.setBorder(BorderFactory.createLineBorder(State.WALKABLE.getColor()));
         this.addMouseListener(new SubjectListener());
     }
 

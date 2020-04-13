@@ -1,9 +1,6 @@
 package app.maze.components.algorithm.generator;
 
-import javax.swing.tree.TreeNode;
-
-import app.maze.components.cell.observer.CellObserver;
-import utils.AlgorithmManager;
+import app.maze.components.algorithm.AlgorithmManager;
 import utils.JWrapper;
 
 public abstract class Generator extends AlgorithmManager {
@@ -35,11 +32,6 @@ public abstract class Generator extends AlgorithmManager {
         } finally {
             this.setRunning(false);
         }
-    }
-
-    @Override
-    public final void run() {
-        this.awake();
     }
 
     public final int getDensity() {
