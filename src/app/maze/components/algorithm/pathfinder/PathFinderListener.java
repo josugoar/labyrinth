@@ -22,7 +22,7 @@ public abstract interface PathFinderListener extends EventListener {
 
         private static final long serialVersionUID = 1L;
 
-        public PathFinderEvent(Object source) {
+        public PathFinderEvent(final Object source) {
             super(source);
         }
 

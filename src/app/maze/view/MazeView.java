@@ -269,21 +269,22 @@ public final class MazeView extends JFrame {
                                                 add(new ButtonDecorator("Dimension", "dimensionIcon.gif") {
                                                     private static final long serialVersionUID = 1L;
                                                     {
+                                                        final JSlider slider = new JSlider(10, 50, 20) {
+                                                            private static final long serialVersionUID = 1L;
+                                                            {
+                                                                setPreferredSize(new Dimension(100, getPreferredSize().height));
+                                                                addChangeListener(e -> {
+                                                                    if (getValueIsAdjusting())
+                                                                        return;
+                                                                    mzController.resize(getValue());
+                                                                });
+                                                            }
+                                                        };
                                                         addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 setFocusable(false);
-                                                                add(new JSlider(10, 50, 20) {
-                                                                    private static final long serialVersionUID = 1L;
-                                                                    {
-                                                                        setPreferredSize(new Dimension(100, getPreferredSize().height));
-                                                                        addChangeListener(e -> {
-                                                                            if (getValueIsAdjusting())
-                                                                                return;
-                                                                            mzController.resize(getValue());
-                                                                        });
-                                                                    }
-                                                                });
+                                                                add(slider);
                                                             }
                                                         }.show(this, -100, 2));
                                                     }
@@ -291,19 +292,20 @@ public final class MazeView extends JFrame {
                                                 add(new ButtonDecorator("Delay", "delayIcon.gif") {
                                                     private static final long serialVersionUID = 1L;
                                                     {
+                                                        final JSlider slider = new JSlider(0, 250, 100) {
+                                                            private static final long serialVersionUID = 1L;
+                                                            {
+                                                                setPreferredSize(new Dimension(100, getPreferredSize().height));
+                                                                addChangeListener(e -> {
+                                                                    manager.setDelay(getValue());
+                                                                });
+                                                            }
+                                                        };
                                                         addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 setFocusable(false);
-                                                                add(new JSlider(0, 250, 100) {
-                                                                    private static final long serialVersionUID = 1L;
-                                                                    {
-                                                                        setPreferredSize(new Dimension(100, getPreferredSize().height));
-                                                                        addChangeListener(e -> {
-                                                                            manager.setDelay(getValue());
-                                                                        });
-                                                                    }
-                                                                });
+                                                                add(slider);
                                                             }
                                                         }.show(this, -100, 2));
                                                     }
@@ -311,19 +313,20 @@ public final class MazeView extends JFrame {
                                                 add(new ButtonDecorator("Density", "densityIcon.gif") {
                                                     private static final long serialVersionUID = 1L;
                                                     {
+                                                        final JSlider slider = new JSlider(1, 99, 50) {
+                                                            private static final long serialVersionUID = 1L;
+                                                            {
+                                                                setPreferredSize(new Dimension(100, getPreferredSize().height));
+                                                                addChangeListener(e -> {
+                                                                    manager.setDensity(getValue());
+                                                                });
+                                                            }
+                                                        };
                                                         addActionListener(e -> new JPopupMenu() {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 setFocusable(false);
-                                                                add(new JSlider(1, 99, 50) {
-                                                                    private static final long serialVersionUID = 1L;
-                                                                    {
-                                                                        setPreferredSize(new Dimension(100, getPreferredSize().height));
-                                                                        addChangeListener(e -> {
-                                                                            manager.setDensity(getValue());
-                                                                        });
-                                                                    }
-                                                                });
+                                                                add(slider);
                                                             }
                                                         }.show(this, -100, 2));
                                                     }
