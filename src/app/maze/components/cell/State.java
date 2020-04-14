@@ -27,7 +27,7 @@ public enum State {
     }
 
     public final Color getColor() {
-        return this.color;
+        return color;
     }
 
 }

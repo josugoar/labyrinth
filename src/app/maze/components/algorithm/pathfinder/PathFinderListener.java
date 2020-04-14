@@ -1,6 +1,7 @@
 package app.maze.components.algorithm.pathfinder;
 
 import java.util.EventListener;
+import java.util.EventObject;
 
 import javax.swing.tree.TreeNode;
 
@@ -16,5 +17,15 @@ public abstract interface PathFinderListener extends EventListener {
     public abstract void nodeFound(final TreeNode node);
 
     public abstract void nodeTraversed(final TreeNode node);
+
+    public static final class PathFinderEvent extends EventObject {
+
+        private static final long serialVersionUID = 1L;
+
+        public PathFinderEvent(Object source) {
+            super(source);
+        }
+
+    }
 
 }

@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.swing.tree.MutableTreeNode;
 
 import app.maze.components.algorithm.pathfinder.PathFinder;
-import app.maze.components.algorithm.pathfinder.PathFinderListener;
 
 public class Dijkstra extends PathFinder {
 
@@ -21,9 +20,8 @@ public class Dijkstra extends PathFinder {
         if (!this.running)
             throw new InterruptedException("Invokation interrupted...");
         // Germinate generation
-        for (PathFinderListener listener : this.listeners)
-            for (MutableTreeNode node : currGen)
-                listener.nodeVisited(node);
+        for (MutableTreeNode node : currGen)
+            fireNodeVisited(node);
         // Initialize new empty generation
         final Set<MutableTreeNode> newGen = new HashSet<MutableTreeNode>(0);
         // Range through current generaton nodes cell neighbors
@@ -34,9 +32,8 @@ public class Dijkstra extends PathFinder {
                 if (child.equals(this.target)) {
                     child.setParent(node);
                     // Visit generation
-                    for (PathFinderListener listener : this.listeners)
-                        for (MutableTreeNode leaf : newGen)
-                            listener.nodeFound(leaf);
+                    for (MutableTreeNode leaf : newGen)
+                        fireNodeFound(leaf);
                     return child;
                 }
                 // Check visited
@@ -45,8 +42,7 @@ public class Dijkstra extends PathFinder {
                     child.setParent(node);
                     this.visited.add(child);
                     // Visit generation
-                    for (PathFinderListener listener : this.listeners)
-                        listener.nodeGerminated(child);
+                    fireNodeGerminated(child);
                 }
                 if (child.equals(this.start))
                     child.setParent(null);

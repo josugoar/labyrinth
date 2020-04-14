@@ -3,6 +3,7 @@ package app.maze.controller.components.process.manager;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
@@ -14,11 +15,11 @@ import app.maze.components.algorithm.pathfinder.traversers.Dijkstra;
 import app.maze.components.cell.State;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.controller.MazeController;
+import app.maze.controller.components.panel.flyweight.PanelFlyweight;
+import app.maze.model.MazeModel;
 import utils.JWrapper;
 
 public final class ProcessManager implements Serializable {
-
-    // TODO: Expand path when nodeFound
 
     private static final long serialVersionUID = 1L;
 
@@ -26,16 +27,16 @@ public final class ProcessManager implements Serializable {
 
     private Generator generator;
 
-    private final PathFinderListener listener = this.new ManagerListener();
+    private final PathFinderListener listener = new ManagerListener();
 
     {
         // Set default algorithms
-        this.setAlgorithm(new Dijkstra());
-        this.setAlgorithm(new BackTracker());
+        setAlgorithm(new Dijkstra());
+        setAlgorithm(new BackTracker());
     }
 
     public ProcessManager(final MazeController mzController) {
-        this.setController(mzController);
+        setController(mzController);
     }
 
     public ProcessManager() {
@@ -52,7 +53,7 @@ public final class ProcessManager implements Serializable {
 
     public final void await() {
         // Collapse tree
-        this.mzController.collapse();
+        mzController.collapse();
         // Set waiting state
         if (pathFinder.isRunning())
             pathFinder.setWaiting(!pathFinder.isWaiting());
@@ -62,15 +63,16 @@ public final class ProcessManager implements Serializable {
 
     public final void awake(final Class<? extends AlgorithmManager> algorithm) {
         try {
-            this.assertRunning();
+            // Assert running algorithm
+            assertRunning();
             if (algorithm.equals(PathFinder.class)) {
+                final MazeModel mzModel = mzController.getModel();
                 // Clear node parent relationships
-                this.mzController.clear();
-                pathFinder.find((CellObserver) this.mzController.getModel().getRoot(),
-                        (CellObserver) this.mzController.getModel().getTarget());
+                mzController.clear();
+                pathFinder.find((MutableTreeNode) mzModel.getRoot(), (MutableTreeNode) mzModel.getTarget());
             } else if (algorithm.equals(Generator.class)) {
                 // Reset structure
-                this.mzController.reset();
+                mzController.reset();
                 generator.awake(null);
             }
         } catch (final InterruptedException e) {
@@ -86,25 +88,25 @@ public final class ProcessManager implements Serializable {
     public final void setAlgorithm(final AlgorithmManager algorithm) {
         Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
         if (algorithm instanceof PathFinder) {
-            this.pathFinder = (PathFinder) algorithm;
-            this.pathFinder.addListener(this.listener);
+            pathFinder = (PathFinder) algorithm;
+            pathFinder.addListener(listener);
         } else if (algorithm instanceof Generator)
-            this.generator = (Generator) algorithm;
+            generator = (Generator) algorithm;
     }
 
     public final void setDelay(final int delay) {
-        this.pathFinder.setDelay(delay);
-        this.generator.setDelay(delay);
+        pathFinder.setDelay(delay);
+        generator.setDelay(delay);
     }
 
     public final void setDensity(final int density) {
-        this.generator.setDensity(density);
+        generator.setDensity(density);
     }
 
     private transient MazeController mzController;
 
     public final MazeController getController() {
-        return this.mzController;
+        return mzController;
     }
 
     public final void setController(final MazeController mzController) {
@@ -116,32 +118,34 @@ public final class ProcessManager implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private final void update(final CellObserver node, final State state) {
+            final MazeModel mzModel = mzController.getModel();
             // Ignore if root
-            if (node.equals(ProcessManager.this.mzController.getModel().getRoot()))
+            if (node.equals(mzModel.getRoot()))
                 return;
+            final PanelFlyweight flyweight = mzController.getFlyweight();
             // Node updated
-            ProcessManager.this.mzController.getFlyweight().request(node).setBackground(state.getColor());
+            flyweight.request(node).setBackground(state.getColor());
         }
 
         @Override
         public void nodeGerminated(final TreeNode node) {
-            this.update((CellObserver) node, State.GERMINATED);
+            update((CellObserver) node, State.GERMINATED);
         }
 
         @Override
         public void nodeVisited(final TreeNode node) {
-            this.update((CellObserver) node, State.VISITED);
+            update((CellObserver) node, State.VISITED);
         }
 
         @Override
         public void nodeFound(final TreeNode node) {
-            this.update((CellObserver) node, State.VISITED);
-            ProcessManager.this.mzController.collapse();
+            update((CellObserver) node, State.VISITED);
+            mzController.expand();
         }
 
         @Override
         public void nodeTraversed(final TreeNode node) {
-            this.update((CellObserver) node, State.PATH);
+            update((CellObserver) node, State.PATH);
         }
 
     }

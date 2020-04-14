@@ -12,41 +12,48 @@ import javax.swing.JPanel;
 import app.maze.components.cell.State;
 import app.maze.components.cell.observer.CellObserver;
 import app.maze.controller.MazeController;
+import app.maze.controller.components.process.manager.ProcessManager;
+import app.maze.view.MazeView;
 import utils.JWrapper;
+
+// TODO: Change Observer pattern
 
 public final class CellSubject extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // TODO: Atomic reference
     private transient static CellSubject selected = null;
 
     private transient static CellSubject focused = null;
 
+    // TODO: Refactor
+    @SuppressWarnings("unchecked")
+    private final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
+            setBorder(BorderFactory.createLineBorder(color));
+
     {
-        this.setBorder(BorderFactory.createLineBorder(State.WALKABLE.getColor()));
-        this.addMouseListener(new SubjectListener());
+        // Set default background
+        update.accept(State.WALKABLE.getColor());
+        addMouseListener(new SubjectListener());
     }
 
     public CellSubject(final MazeController mzController, final CellObserver clObserver) {
-        this.setController(mzController);
-        this.setObserver(clObserver);
+        setController(mzController);
+        setObserver(clObserver);
     }
 
     public CellSubject() {
         this(null, null);
     }
 
-    @SuppressWarnings("unchecked")
-    private final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
-            this.setBorder(BorderFactory.createLineBorder(color));
-
     public final void walk(final boolean walk) {
         final Consumer<Color> update = this.update.andThen(this::setBackground);
         try {
+            final ProcessManager manager = mzController.getManager();
             // Assert running algorithm
-            this.mzController.getProcess().assertRunning();
-            this.clObserver.setWalkable(walk);
+            manager.assertRunning();
+            // Update walkable state
+            clObserver.setWalkable(walk);
             // Update background
             if (walk)
                 update.accept(State.WALKABLE.getColor());
@@ -59,14 +66,14 @@ public final class CellSubject extends JPanel {
 
     public synchronized static void select(final CellSubject selected) {
         // Focus cell
-        CellSubject.focus(selected);
+        focus(selected);
         // Update selected cell
         CellSubject.selected = selected;
     }
 
     public synchronized static final void focus(final CellSubject focused) {
         // Ignore if selected
-        if (CellSubject.selected != null)
+        if (selected != null)
             return;
         // Unfocus cell
         if (CellSubject.focused != null)
@@ -82,17 +89,17 @@ public final class CellSubject extends JPanel {
     }
 
     public static CellSubject getSelected() {
-        return CellSubject.selected;
+        return selected;
     }
 
     public static final CellSubject getFocused() {
-        return CellSubject.focused;
+        return focused;
     }
 
     public transient MazeController mzController;
 
     public final MazeController getController() {
-        return this.mzController;
+        return mzController;
     }
 
     public final void setController(final MazeController mzController) {
@@ -102,36 +109,38 @@ public final class CellSubject extends JPanel {
     public CellObserver clObserver;
 
     public final CellObserver getObserver() {
-        return this.clObserver;
+        return clObserver;
     }
 
     public final void setObserver(final CellObserver clObserver) {
         this.clObserver = clObserver;
     }
 
-    private static final class SubjectListener extends MouseAdapter implements Serializable {
+    private final class SubjectListener extends MouseAdapter implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public synchronized final void mousePressed(final MouseEvent e) {
-            final CellSubject clSubject = (CellSubject) e.getSource();
+        public final void mousePressed(final MouseEvent e) {
             // Clear node parent relationships
-            clSubject.mzController.clear();
+            mzController.clear();
             try {
+                final ProcessManager manager = mzController.getManager();
                 if (e.isShiftDown()) {
                     // Assert running algorithm
-                    clSubject.mzController.getProcess().assertRunning();
+                    manager.assertRunning();
                     // Set node walkable state
                     if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
-                        clSubject.walk(false);
+                        walk(false);
                     // Set node unwalkable state
                     else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
-                        clSubject.walk(true);
+                        walk(true);
                 } else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0) {
+                    final MazeView mzView = mzController.getView();
+                    // Assert running algorithm
+                    manager.assertRunning();
                     // Release endpoint popup
-                    clSubject.mzController.getProcess().assertRunning();
-                    clSubject.mzController.getView().releasePopup(clSubject).show(clSubject, e.getX(), e.getY());
+                    mzView.releasePopup(CellSubject.this).show(CellSubject.this, e.getX(), e.getY());
                 }
             } catch (final InterruptedException l) {
                 JWrapper.dispatchException(l);
@@ -140,22 +149,26 @@ public final class CellSubject extends JPanel {
 
         @Override
         public synchronized final void mouseEntered(final MouseEvent e) {
-            final CellSubject clSubject = (CellSubject) e.getSource();
             // Focus cell
-            CellSubject.focus(clSubject);
+            focus(CellSubject.this);
             if (e.isShiftDown())
                 // Set node walkable state
                 if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)
-                    clSubject.walk(false);
+                    walk(false);
                 // Set node unwalkable state
                 else if ((e.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) != 0)
-                    clSubject.walk(true);
+                    walk(true);
         }
 
         @Override
         public synchronized final void mouseExited(final MouseEvent e) {
             // Unfocus cell
-            CellSubject.focus(null);
+            focus(null);
+            // Ignore if selected
+            if (selected != null)
+                return;
+            // Reset border
+            update.accept(State.WALKABLE.getColor());
         }
 
     };
