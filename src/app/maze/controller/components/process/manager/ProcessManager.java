@@ -13,9 +13,9 @@ import app.maze.components.algorithm.pathfinder.PathFinder;
 import app.maze.components.algorithm.pathfinder.PathFinderListener;
 import app.maze.components.algorithm.pathfinder.traversers.Dijkstra;
 import app.maze.components.cell.State;
-import app.maze.components.cell.observer.CellObserver;
+import app.maze.components.cell.composite.CellComposite;
+import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
-import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 import app.maze.model.MazeModel;
 import utils.JWrapper;
 
@@ -52,17 +52,21 @@ public final class ProcessManager implements Serializable {
     }
 
     public final void await() {
-        // Collapse tree
-        mzController.collapse();
         // Set waiting state
-        if (pathFinder.isRunning())
+        if (pathFinder.isRunning()) {
             pathFinder.setWaiting(!pathFinder.isWaiting());
-        else if (generator.isRunning())
+            // Collapse tree
+            mzController.collapse();
+        } else if (generator.isRunning()) {
             generator.setWaiting(!generator.isWaiting());
+            // Collapse tree
+            mzController.collapse();
+        }
     }
 
     public final void awake(final Class<? extends AlgorithmManager> algorithm) {
         try {
+            Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
             // Assert running algorithm
             assertRunning();
             if (algorithm.equals(PathFinder.class)) {
@@ -117,35 +121,40 @@ public final class ProcessManager implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
-        private final void update(final CellObserver node, final State state) {
+        private final void update(final CellComposite node, final State state) {
             final MazeModel mzModel = mzController.getModel();
             // Ignore if root
             if (node.equals(mzModel.getRoot()))
                 return;
-            final PanelFlyweight flyweight = mzController.getFlyweight();
-            // Node updated
-            flyweight.request(node).setBackground(state.getColor());
+            final CellView cell = (CellView) mzController.getFlyweight().request(node);
+            // Update background
+            cell.setBackground(state.getColor());
+            // Ignore if unfocused
+            if (CellView.getFocused() == null || !CellView.getFocused().equals(cell))
+                return;
+            // Update border
+            cell.update.accept(cell.getBackground());
         }
 
         @Override
         public void nodeGerminated(final TreeNode node) {
-            update((CellObserver) node, State.GERMINATED);
+            update((CellComposite) node, State.GERMINATED);
         }
 
         @Override
         public void nodeVisited(final TreeNode node) {
-            update((CellObserver) node, State.VISITED);
+            update((CellComposite) node, State.VISITED);
         }
 
         @Override
         public void nodeFound(final TreeNode node) {
-            update((CellObserver) node, State.VISITED);
+            update((CellComposite) node, State.VISITED);
             mzController.expand();
         }
 
         @Override
         public void nodeTraversed(final TreeNode node) {
-            update((CellObserver) node, State.PATH);
+            update((CellComposite) node, State.PATH);
         }
 
     }

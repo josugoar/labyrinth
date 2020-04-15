@@ -5,7 +5,7 @@ import java.util.Set;
 
 import app.maze.components.algorithm.pathfinder.PathFinder;
 import app.maze.components.algorithm.pathfinder.heuristics.Heuristic;
-import app.maze.components.cell.observer.CellObserver;
+import app.maze.components.cell.composite.CellComposite;
 
 public class AStar extends PathFinder {
 
@@ -14,7 +14,7 @@ public class AStar extends PathFinder {
     private final Heuristic heuristic = new Heuristic.EuclideanDistance();
 
     @Override
-    protected CellObserver advance(Set<CellObserver> currGen) throws StackOverflowError, InterruptedException {
+    protected CellComposite advance(Set<CellComposite> currGen) throws StackOverflowError, InterruptedException {
         return null;
     }
 

@@ -1,4 +1,4 @@
-package app.maze.components.cell.observer;
+package app.maze.components.cell.composite;
 
 import java.util.stream.IntStream;
 
@@ -9,17 +9,17 @@ import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 import app.maze.model.MazeModel;
 
-public final class CellObserver extends DefaultMutableTreeNode {
+public final class CellComposite extends DefaultMutableTreeNode {
 
     private static final long serialVersionUID = 1L;
 
     private boolean walkable = true;
 
-    public CellObserver(final MazeController mzController) {
+    public CellComposite(final MazeController mzController) {
         setController(mzController);
     }
 
-    public CellObserver() {
+    public CellComposite() {
         this(null);
     }
 
@@ -31,7 +31,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
         // Remove children and children children
         removeAllChildren();
         for (final Object oldChild : oldChildren)
-            ((CellObserver) oldChild).override();
+            ((CellComposite) oldChild).override();
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
                 return;
             final PanelFlyweight flyweight = mzController.getFlyweight();
             // Insert neighbors
-            for (final CellObserver neighbor : flyweight.getNeighbors((this))) {
+            for (final CellComposite neighbor : flyweight.getNeighbors((this))) {
                 if (!neighbor.isWalkable())
                     continue;
                 if (children != null && !children.contains(neighbor))
@@ -81,7 +81,7 @@ public final class CellObserver extends DefaultMutableTreeNode {
             }
             // Remove neighbors
             for (final Object child : this.children)
-                ((CellObserver) child).children.remove(this);
+                ((CellComposite) child).children.remove(this);
             final int[] oldIndex = IntStream.range(0, getChildCount()).toArray();
             final Object[] oldChildren = children.toArray();
             removeAllChildren();

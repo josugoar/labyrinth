@@ -1,4 +1,4 @@
-package app.maze.components.cell.subject;
+package app.maze.components.cell.view;
 
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
@@ -10,25 +10,23 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import app.maze.components.cell.State;
-import app.maze.components.cell.observer.CellObserver;
+import app.maze.components.cell.composite.CellComposite;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.process.manager.ProcessManager;
 import app.maze.view.MazeView;
 import utils.JWrapper;
 
-// TODO: Change Observer pattern
-
-public final class CellSubject extends JPanel {
+public final class CellView extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private transient static CellSubject selected = null;
+    private transient static CellView selected = null;
 
-    private transient static CellSubject focused = null;
+    private transient static CellView focused = null;
 
     // TODO: Refactor
     @SuppressWarnings("unchecked")
-    private final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
+    public final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
             setBorder(BorderFactory.createLineBorder(color));
 
     {
@@ -37,12 +35,12 @@ public final class CellSubject extends JPanel {
         addMouseListener(new SubjectListener());
     }
 
-    public CellSubject(final MazeController mzController, final CellObserver clObserver) {
+    public CellView(final MazeController mzController, final CellComposite clComposite) {
         setController(mzController);
-        setObserver(clObserver);
+        setComposite(clComposite);
     }
 
-    public CellSubject() {
+    public CellView() {
         this(null, null);
     }
 
@@ -53,7 +51,7 @@ public final class CellSubject extends JPanel {
             // Assert running algorithm
             manager.assertRunning();
             // Update walkable state
-            clObserver.setWalkable(walk);
+            clComposite.setWalkable(walk);
             // Update background
             if (walk)
                 update.accept(State.WALKABLE.getColor());
@@ -64,20 +62,20 @@ public final class CellSubject extends JPanel {
         }
     }
 
-    public synchronized static void select(final CellSubject selected) {
+    public synchronized static void select(final CellView selected) {
         // Focus cell
         focus(selected);
         // Update selected cell
-        CellSubject.selected = selected;
+        CellView.selected = selected;
     }
 
-    public synchronized static final void focus(final CellSubject focused) {
+    public synchronized static final void focus(final CellView focused) {
         // Ignore if selected
         if (selected != null)
             return;
         // Unfocus cell
-        if (CellSubject.focused != null)
-            CellSubject.focused.update.accept(State.WALKABLE.getColor());
+        if (CellView.focused != null)
+            CellView.focused.update.accept(State.WALKABLE.getColor());
         // Focus cell
         if (focused != null)
             if (focused.getBackground() == State.WALKABLE.getColor())
@@ -85,14 +83,14 @@ public final class CellSubject extends JPanel {
             else
                 focused.update.accept(focused.getBackground());
         // Update focused state
-        CellSubject.focused = focused;
+        CellView.focused = focused;
     }
 
-    public static CellSubject getSelected() {
+    public static CellView getSelected() {
         return selected;
     }
 
-    public static final CellSubject getFocused() {
+    public static final CellView getFocused() {
         return focused;
     }
 
@@ -106,14 +104,14 @@ public final class CellSubject extends JPanel {
         this.mzController = mzController;
     }
 
-    public CellObserver clObserver;
+    public CellComposite clComposite;
 
-    public final CellObserver getObserver() {
-        return clObserver;
+    public final CellComposite getComposite() {
+        return clComposite;
     }
 
-    public final void setObserver(final CellObserver clObserver) {
-        this.clObserver = clObserver;
+    public final void setComposite(final CellComposite clComposite) {
+        this.clComposite = clComposite;
     }
 
     private final class SubjectListener extends MouseAdapter implements Serializable {
@@ -140,7 +138,7 @@ public final class CellSubject extends JPanel {
                     // Assert running algorithm
                     manager.assertRunning();
                     // Release endpoint popup
-                    mzView.releasePopup(CellSubject.this).show(CellSubject.this, e.getX(), e.getY());
+                    mzView.releasePopup(CellView.this).show(CellView.this, e.getX(), e.getY());
                 }
             } catch (final InterruptedException l) {
                 JWrapper.dispatchException(l);
@@ -150,7 +148,7 @@ public final class CellSubject extends JPanel {
         @Override
         public synchronized final void mouseEntered(final MouseEvent e) {
             // Focus cell
-            focus(CellSubject.this);
+            focus(CellView.this);
             if (e.isShiftDown())
                 // Set node walkable state
                 if ((e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0)

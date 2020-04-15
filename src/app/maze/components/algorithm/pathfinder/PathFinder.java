@@ -75,6 +75,8 @@ public abstract class PathFinder extends AlgorithmManager {
         listeners.remove(PathFinderListener.class, l);
     }
 
+    // TODO: Refactor and add Thread for each fire
+
     protected final void fireNodeGerminated(TreeNode node) {
         Object[] listeners = this.listeners.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {

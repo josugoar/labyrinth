@@ -1,14 +1,16 @@
 package app.maze.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+import javax.swing.JComponent;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.cell.State;
-import app.maze.components.cell.observer.CellObserver;
+import app.maze.components.cell.composite.CellComposite;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 
@@ -31,10 +33,11 @@ public final class MazeModel extends DefaultTreeModel {
         this(null);
     }
 
-    private final void update(final CellObserver node, final State state) {
+    private final void update(final CellComposite node, final State state) {
+        Objects.requireNonNull(state, "State must not be null...");
         final PanelFlyweight flyweight = mzController.getFlyweight();
-        // Set state background
-        flyweight.request(node).setBackground(state.getColor());
+        // Update background
+        ((JComponent) flyweight.request(node)).setBackground(state.getColor());
     }
 
     public final void reset() {
@@ -45,9 +48,10 @@ public final class MazeModel extends DefaultTreeModel {
         mzController.collapse();
     }
 
-    private final void clear(final CellObserver node) {
+    private final void clear(final CellComposite node) {
+        // Range through children
         for (int i = 0; i < node.getChildCount(); i++) {
-            final CellObserver child = (CellObserver) node.getChildAt(i);
+            final CellComposite child = (CellComposite) node.getChildAt(i);
             // Ignore if no parent
             if (child.isOrphan())
                 continue;
@@ -65,18 +69,18 @@ public final class MazeModel extends DefaultTreeModel {
         if (root == null)
             return;
         // Remove node parent relationships
-        clear((CellObserver) root);
+        clear((CellComposite) root);
         // Collapse tree
         mzController.collapse();
     }
 
-    public final void initNeighbors(final CellObserver node) {
+    public final void initNeighbors(final CellComposite node) {
         // Ignore if not walkable or not leaf
         if (!node.isWalkable() || !node.isLeaf())
             return;
         final PanelFlyweight flyweight = mzController.getFlyweight();
         // Range through neighbors
-        for (final CellObserver neighbor : flyweight.getNeighbors(node)) {
+        for (final CellComposite neighbor : flyweight.getNeighbors(node)) {
             // Ignore if not walkable neighbor
             if (!neighbor.isWalkable())
                 continue;
@@ -93,22 +97,22 @@ public final class MazeModel extends DefaultTreeModel {
     public final void setTarget(final TreeNode target) {
         // Override target
         if (this.target != null && this.target.equals(target)) {
-            update((CellObserver) this.target, State.WALKABLE);
+            update((CellComposite) this.target, State.WALKABLE);
             this.target = null;
             mzController.collapse();
         } else {
             // Update walkable state
             if (target != null)
-                ((CellObserver) target).setWalkable(true);
+                ((CellComposite) target).setWalkable(true);
             // Get old target
             final TreeNode oldTarget = this.target;
             this.target = target;
             // Override old target
             if (oldTarget != null)
-                update((CellObserver) oldTarget, State.WALKABLE);
+                update((CellComposite) oldTarget, State.WALKABLE);
             // Set new target
             if (target != null)
-                update((CellObserver) target, State.TARGET);
+                update((CellComposite) target, State.TARGET);
         }
     }
 
@@ -126,22 +130,22 @@ public final class MazeModel extends DefaultTreeModel {
     public final void setRoot(final TreeNode root) {
         // Override root
         if (this.root != null && this.root.equals(root)) {
-            update((CellObserver) this.root, State.WALKABLE);
+            update((CellComposite) this.root, State.WALKABLE);
             this.root = null;
             mzController.collapse();
         } else {
             // Update walkable state
             if (root != null)
-                ((CellObserver) root).setWalkable(true);
+                ((CellComposite) root).setWalkable(true);
             // Get old root
             final TreeNode oldRoot = this.root;
             super.setRoot(root);
             // Override old root
             if (oldRoot != null)
-                update((CellObserver) oldRoot, State.WALKABLE);
+                update((CellComposite) oldRoot, State.WALKABLE);
             // Set new root
             if (root != null)
-                update((CellObserver) root, State.ROOT);
+                update((CellComposite) root, State.ROOT);
         }
     }
 
@@ -157,9 +161,9 @@ public final class MazeModel extends DefaultTreeModel {
                 return;
             }
             // Remove node relationships
-            ((CellObserver) root).override();
+            ((CellComposite) root).override();
             // Initialize all node neighbors
-            initNeighbors((CellObserver) root);
+            initNeighbors((CellComposite) root);
             // Collapse tree
             mzController.collapse();
         }
@@ -169,11 +173,11 @@ public final class MazeModel extends DefaultTreeModel {
             // Collapse tree
             mzController.collapse();
             // Ignore if root not removed
-            if (!((CellObserver) e.getTreePath().getLastPathComponent()).equals(root))
+            if (!((CellComposite) e.getTreePath().getLastPathComponent()).equals(root))
                 return;
             // Remove node relationships
             for (final Object children : e.getChildren())
-                ((CellObserver) children).override();
+                ((CellComposite) children).override();
             // Reset root
             root = null;
             reload();

@@ -1,20 +1,18 @@
-package app.maze.view.components.widgets.decorator;
+package app.maze.view.components.widget.decorator;
 
 import java.awt.Cursor;
 import java.awt.Insets;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
-import app.maze.view.MazeView;
+import app.maze.view.components.widget.factory.WidgetFactory;
 
 public class ButtonDecorator extends JButton {
 
     private static final long serialVersionUID = 1L;
 
     {
-        // Iconify JButton
         setFocusable(false);
         setContentAreaFilled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -22,7 +20,7 @@ public class ButtonDecorator extends JButton {
     }
 
     public ButtonDecorator(final String toolTipText, final String fileName) {
-        super("", new ImageIcon(MazeView.class.getResource("assets/" + fileName)));
+        super("", WidgetFactory.createIcon(fileName));
         setToolTipText(toolTipText);
     }
 

@@ -17,8 +17,6 @@ import utils.JWrapper;
  */
 public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Serializable {
 
-    // TODO: AtomicBoolean
-
     private static final long serialVersionUID = 1L;
 
     /**

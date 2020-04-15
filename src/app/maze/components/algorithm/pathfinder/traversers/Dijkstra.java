@@ -32,8 +32,9 @@ public class Dijkstra extends PathFinder {
                 if (child.equals(this.target)) {
                     child.setParent(node);
                     // Visit generation
-                    for (MutableTreeNode leaf : newGen)
-                        fireNodeFound(leaf);
+                    // TODO: Fix
+                    // for (MutableTreeNode leaf : newGen)
+                        fireNodeFound(node);
                     return child;
                 }
                 // Check visited

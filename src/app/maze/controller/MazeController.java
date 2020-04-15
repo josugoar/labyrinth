@@ -1,6 +1,7 @@
 package app.maze.controller;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
@@ -24,8 +24,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import app.maze.components.cell.State;
-import app.maze.components.cell.observer.CellObserver;
-import app.maze.components.cell.subject.CellSubject;
+import app.maze.components.cell.composite.CellComposite;
+import app.maze.components.cell.view.CellView;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 import app.maze.controller.components.process.manager.ProcessManager;
 import app.maze.model.MazeModel;
@@ -36,7 +36,7 @@ public final class MazeController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private PanelFlyweight flyweight;
+    private final PanelFlyweight flyweight;
 
     private final ProcessManager manager;
 
@@ -58,7 +58,7 @@ public final class MazeController implements Serializable {
         // Reset structure
         reset();
         // Resize panel
-        flyweight.setDimension(dimension, dimension);
+        flyweight.resetDimension(dimension, dimension);
     }
 
     public final void reset() {
@@ -84,9 +84,6 @@ public final class MazeController implements Serializable {
             tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("No root node...")));
         else
             tree.setModel(mzModel);
-        // Validate change
-        tree.revalidate();
-        tree.repaint();
         // Ignore if no expanded descendants
         if (expanded == null)
             return;
@@ -102,26 +99,32 @@ public final class MazeController implements Serializable {
             // Remove node parent relationships
             mzModel.clear();
             // Unselect cell
-            CellSubject.select(null);
+            CellView.select(null);
         } catch (final InterruptedException | NullPointerException e) {
             JWrapper.dispatchException(e);
         }
     }
 
-    // TODO: Fix collapse path first
     public final void expand() {
         final JTree tree = mzView.getTree();
-        tree.expandPath(new TreePath(new Object[] { mzModel.getRoot() }));
+        // Delete model
+        tree.setModel(null);
+        // Reset model
+        tree.setModel(mzModel);
+        // Initialize empty path
         List<Object> path = new ArrayList<Object>(0);
-        for (TreeNode parent = (TreeNode) mzModel.getTarget(); parent != null; parent = ((TreeNode) parent).getParent()) {
+        // Range through parent
+        for (TreeNode parent = ((TreeNode) mzModel.getTarget())
+                .getParent(); parent != null; parent = ((TreeNode) parent).getParent())
+            // Add parent to path
             path.add(parent);
-            }
+        // Reverse path
         Collections.reverse(path);
+        // Expand path
         tree.expandPath(new TreePath(path.toArray()));
     }
 
     public final void dispatchKey(final KeyEvent e) {
-        Objects.requireNonNull(e, "KeyEvent must not be null...");
         if (e.isShiftDown())
             try {
                 // Assert running algorithm
@@ -137,10 +140,10 @@ public final class MazeController implements Serializable {
     }
 
     public final void dispatchCell(final DefaultTreeCellRenderer renderer, final Object node) {
-        Objects.requireNonNull(renderer, "DefaultTreeCellRenderer must not be null...");
         // Assert node
-        if (Objects.requireNonNull(node, "Object must not be null...") instanceof CellObserver) {
-            final Color color = this.flyweight.request((CellObserver) node).getBackground();
+        if (node instanceof CellComposite) {
+            final Color color = ((Component) flyweight.request(node)).getBackground();
+            // Empty node
             String file = "emptyIcon.gif";
             // Root node
             if (color == State.ROOT.getColor())
@@ -150,8 +153,7 @@ public final class MazeController implements Serializable {
                 file = "endIcon.gif";
             // Empty node
             else if (color == State.GERMINATED.getColor())
-                // TODO: Convert to .gif
-                file = "germinatedIcon.png";
+                file = "germinatedIcon.gif";
             else if (color == State.VISITED.getColor())
                 file = "visitedIcon.gif";
             else if (color == State.PATH.getColor())
@@ -160,28 +162,33 @@ public final class MazeController implements Serializable {
         }
     }
 
+    // TODO: Update slider on dimension change
+
     public final void readMaze(final String path) {
         try {
             final FileInputStream file = new FileInputStream(MazeModel.class.getResource(path).getPath());
             final ObjectInputStream in = new ObjectInputStream(file);
             // Read serialized object
             final PanelFlyweight otherFlyweight = (PanelFlyweight) in.readObject();
-            final CellObserver otherRoot = (CellObserver) in.readObject();
-            final CellObserver otherTarget = (CellObserver) in.readObject();
+            final TreeNode otherRoot = (TreeNode) in.readObject();
+            final TreeNode otherTarget = (TreeNode) in.readObject();
             in.close();
             file.close();
             // Interrupt algorithm
             manager.interrupt();
             // Override panel
             flyweight.override(otherFlyweight);
-            // Override endpoints
+            // Reset endpoints
             mzModel.reset();
+            // Override endpoints
             mzModel.setRoot(otherRoot);
             mzModel.setTarget(otherTarget);
         } catch (final IOException | ClassNotFoundException e) {
             JWrapper.dispatchException(e);
         }
     }
+
+    // TODO: Fix large serializiation
 
     public final void writeMaze(final String path) {
         try {
@@ -190,10 +197,10 @@ public final class MazeController implements Serializable {
             final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource(path).getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
             // Unselect cell
-            CellSubject.select(null);
+            CellView.select(null);
             // Remove node parent relationships
             mzModel.clear();
-            // Serialize class
+            // Serialize object
             out.writeObject(flyweight);
             out.writeObject(mzModel.getRoot());
             out.writeObject(mzModel.getTarget());
