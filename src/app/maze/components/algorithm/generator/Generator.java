@@ -1,41 +1,63 @@
 package app.maze.components.algorithm.generator;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import app.maze.components.algorithm.AlgorithmManager;
+import app.maze.components.cell.Walkable;
 import utils.JWrapper;
 
 public abstract class Generator extends AlgorithmManager {
 
     private static final long serialVersionUID = 1L;
 
+    protected Set<Walkable> visited;
+
+    protected Walkable root;
+
     protected int density = 50;
 
-    protected abstract void generate() throws InterruptedException;
+    protected abstract void advance(final Walkable node) throws InterruptedException;
 
-    public final void awake(final Object[][] grid) {
-        // try {
-        //     // Set grid
-        //     this.setGrid(grid);
-        //     // Run Thread
-        //     new Thread(this).start();
-        // } catch (final NullPointerException | InterruptedException e) {
-        //     JWrapper.dispatchException(e);
-        // }
+    public final void generate(final Walkable start) {
+        try {
+            if (start == null)
+                throw new NullPointerException("No starting node found...");
+            // Set start
+            setRoot(start);
+            // Run Thread
+            start();
+        } catch (final NullPointerException e) {
+            JWrapper.dispatchException(e);
+        }
     }
 
     @Override
     protected final void awake() {
         try {
-            this.setRunning(true);
-            this.generate();
-        } catch (final InterruptedException e) {
+            if (root == null)
+                throw new NullPointerException("Generator is not initialized...");
+            visited = new HashSet<Walkable>(0);
+            setRunning(true);
+            advance(root);
+        } catch (final NullPointerException | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
-            this.setRunning(false);
+            setRunning(false);
         }
     }
 
+    public final Walkable getRoot() {
+        return root;
+    }
+
+    public final void setRoot(final Walkable root) {
+        this.root = Objects.requireNonNull(root, "Walkable must not be null...");
+    }
+
     public final int getDensity() {
-        return this.density;
+        return density;
     }
 
     public final void setDensity(final int density) {
@@ -46,20 +68,20 @@ public abstract class Generator extends AlgorithmManager {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + this.density;
+        result = prime * result + density;
         return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
-        if (this.getClass() != obj.getClass())
+        if (getClass() != obj.getClass())
             return false;
-        Generator other = (Generator) obj;
-        if (this.density != other.density)
+        final Generator other = (Generator) obj;
+        if (density != other.density)
             return false;
         return true;
     }

@@ -1,41 +1,56 @@
 package app.maze.components.algorithm.pathfinder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
+import javax.swing.event.EventListenerList;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
+import app.maze.components.algorithm.pathfinder.PathFinderListener.PathFinderEvent;
 import utils.JWrapper;
 
 public abstract class PathFinder extends AlgorithmManager {
 
     private static final long serialVersionUID = 1L;
 
-    protected List<PathFinderListener> listeners = new ArrayList<PathFinderListener>(0);
+    protected Set<TreeNode> visited;
 
-    protected Set<MutableTreeNode> visited;
+    protected final EventListenerList listeners = new EventListenerList();
 
-    protected MutableTreeNode start = null;
+    protected MutableTreeNode root = null;
 
     protected MutableTreeNode target = null;
 
-    protected abstract MutableTreeNode advance(final Set<MutableTreeNode> currGen)
+    protected abstract TreeNode advance(final Set<MutableTreeNode> currGen)
             throws StackOverflowError, InterruptedException;
+
+    protected final void traverse(final TreeNode node) {
+        final List<TreeNode> path = new ArrayList<TreeNode>(0);
+        // Traverse entire TreeNode minimum spanning tree
+        for (TreeNode parent = node.getParent(); parent.getParent() != null; parent = parent.getParent())
+            path.add(parent);
+        // Reverse TreeNodePath
+        Collections.reverse(path);
+        // Traverse generation
+        fireNodeTraversed(new PathFinderEvent(this, path.toArray(new TreeNode[0])));
+    }
 
     public final void find(final MutableTreeNode start, final MutableTreeNode target) {
         try {
             if (start == null)
                 throw new NullPointerException("No starting node found...");
-            // Set enpoints
-            this.setStart(start);
-            this.setTarget(target);
+            // Set endpoints
+            setRoot(start);
+            setTarget(target);
             // Run Thread
-            this.start();
+            start();
         } catch (final NullPointerException e) {
             JWrapper.dispatchException(e);
         }
@@ -44,51 +59,74 @@ public abstract class PathFinder extends AlgorithmManager {
     @Override
     protected final void awake() {
         try {
-            if (this.start == null)
+            if (root == null)
                 throw new NullPointerException("PathFinder is not initialized...");
-            this.visited = new HashSet<MutableTreeNode>(0);
-            final MutableTreeNode target = this.advance(new HashSet<MutableTreeNode>() {
+            visited = new HashSet<TreeNode>(0);
+            traverse(advance(new HashSet<MutableTreeNode>() {
                 private static final long serialVersionUID = 1L;
                 {
                     // Construct first generation
-                    this.add(PathFinder.this.start);
+                    add(root);
                     // Set running
-                    PathFinder.this.setRunning(true);
+                    setRunning(true);
                 }
-                // Traverse entire MutableTreeNode structure
-            });
-            TreeNode parent = target.getParent();
-            while (parent != null) {
-                for (final PathFinderListener listener : this.listeners)
-                    listener.nodeTraversed(parent);
-                parent = parent.getParent();
-            }
+            }));
         } catch (final NullPointerException | StackOverflowError | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
-            this.setRunning(false);
+            // End running
+            setRunning(false);
         }
     }
 
-    public final void addListener(final PathFinderListener listener) {
-        this.listeners.add(Objects.requireNonNull(listener, "PathFinderListener must not be null..."));
+    public final void addListener(final PathFinderListener l) {
+        listeners.add(PathFinderListener.class, l);
     }
 
-    public final MutableTreeNode getStart() {
-        return this.start;
+    public final void removeListener(final PathFinderListener l) {
+        listeners.remove(PathFinderListener.class, l);
     }
 
-    public synchronized final void setStart(final MutableTreeNode start) {
+    private void fireEvent(final PathFinderEvent e, final BiConsumer<PathFinderListener, PathFinderEvent> fire) {
+        Object[] listeners = this.listeners.getListenerList();
+        // Range through listeners
+        for (int i = listeners.length - 2; i >= 0; i -= 2)
+            if (listeners[i] == PathFinderListener.class)
+                // Accept event
+                fire.accept((PathFinderListener) listeners[i + 1], e);
+    }
+
+    protected final void fireNodeGerminated(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeGerminated(n));
+    }
+
+    protected final void fireNodeVisited(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeVisited(n));
+    }
+
+    protected final void fireNodeFound(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeFound(n));
+    }
+
+    protected final void fireNodeTraversed(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeTraversed(n));
+    }
+
+    public final TreeNode getRoot() {
+        return root;
+    }
+
+    public synchronized final void setRoot(final MutableTreeNode root) {
         try {
-            this.assertRunning();
-            this.start = Objects.requireNonNull(start, "Start must not be null...");
+            assertRunning();
+            this.root = Objects.requireNonNull(root, "Start must not be null...");
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }
     }
 
-    public final MutableTreeNode getTarget() {
-        return this.target;
+    public final TreeNode getTarget() {
+        return target;
     }
 
     public synchronized final void setTarget(final MutableTreeNode target) {
@@ -99,8 +137,8 @@ public abstract class PathFinder extends AlgorithmManager {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (this.running ? 1231 : 1237);
-        result = prime * result + ((this.target == null) ? 0 : this.target.hashCode());
+        result = prime * result + (running ? 1231 : 1237);
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
         return result;
     }
 
@@ -110,15 +148,15 @@ public abstract class PathFinder extends AlgorithmManager {
             return true;
         if (obj == null)
             return false;
-        if (this.getClass() != obj.getClass())
+        if (getClass() != obj.getClass())
             return false;
         final PathFinder other = (PathFinder) obj;
-        if (this.running != other.running)
+        if (running != other.running)
             return false;
-        if (this.target == null)
+        if (target == null)
             if (other.target != null)
                 return false;
-            else if (!this.target.equals(other.target))
+            else if (!target.equals(other.target))
                 return false;
         return true;
     }

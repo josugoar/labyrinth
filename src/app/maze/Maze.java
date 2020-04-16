@@ -39,9 +39,9 @@ public final class Maze extends Thread {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.MazeController == null) ? 0 : this.MazeController.hashCode());
-        result = prime * result + ((this.MazeModel == null) ? 0 : this.MazeModel.hashCode());
-        result = prime * result + ((this.MazeView == null) ? 0 : this.MazeView.hashCode());
+        result = prime * result + ((MazeController == null) ? 0 : MazeController.hashCode());
+        result = prime * result + ((MazeModel == null) ? 0 : MazeModel.hashCode());
+        result = prime * result + ((MazeView == null) ? 0 : MazeView.hashCode());
         return result;
     }
 
@@ -51,30 +51,30 @@ public final class Maze extends Thread {
             return true;
         if (obj == null)
             return false;
-        if (this.getClass() != obj.getClass())
+        if (getClass() != obj.getClass())
             return false;
         final Maze other = (Maze) obj;
-        if (this.MazeController == null)
+        if (MazeController == null)
             if (other.MazeController != null)
                 return false;
-            else if (!this.MazeController.equals(other.MazeController))
+            else if (!MazeController.equals(other.MazeController))
                 return false;
-        if (this.MazeModel == null)
+        if (MazeModel == null)
             if (other.MazeModel != null)
                 return false;
-            else if (!this.MazeModel.equals(other.MazeModel))
+            else if (!MazeModel.equals(other.MazeModel))
                 return false;
-        if (this.MazeView == null)
+        if (MazeView == null)
             if (other.MazeView != null)
                 return false;
-            else if (!this.MazeView.equals(other.MazeView))
+            else if (!MazeView.equals(other.MazeView))
                 return false;
         return true;
     }
 
     @Override
     public final String toString() {
-        return this.MazeController.toString();
+        return "Maze";
     }
 
 }

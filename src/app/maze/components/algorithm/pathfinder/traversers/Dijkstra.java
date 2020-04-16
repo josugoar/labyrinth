@@ -7,7 +7,7 @@ import java.util.Set;
 import javax.swing.tree.MutableTreeNode;
 
 import app.maze.components.algorithm.pathfinder.PathFinder;
-import app.maze.components.algorithm.pathfinder.PathFinderListener;
+import app.maze.components.algorithm.pathfinder.PathFinderListener.PathFinderEvent;
 
 public class Dijkstra extends PathFinder {
 
@@ -16,14 +16,12 @@ public class Dijkstra extends PathFinder {
     @Override
     protected final MutableTreeNode advance(final Set<MutableTreeNode> currGen) throws StackOverflowError, InterruptedException {
         // Check for waiting state
-        this.assertWaiting();
+        assertWaiting();
         // Check for running state
-        if (!this.running)
+        if (!running)
             throw new InterruptedException("Invokation interrupted...");
         // Germinate generation
-        for (PathFinderListener listener : this.listeners)
-            for (MutableTreeNode node : currGen)
-                listener.nodeGerminated(node);
+        fireNodeVisited(new PathFinderEvent(this, currGen.toArray(new MutableTreeNode[0])));
         // Initialize new empty generation
         final Set<MutableTreeNode> newGen = new HashSet<MutableTreeNode>(0);
         // Range through current generaton nodes cell neighbors
@@ -31,36 +29,33 @@ public class Dijkstra extends PathFinder {
             for (int i = 0; i < node.getChildCount(); i++) {
                 final MutableTreeNode child = (MutableTreeNode) node.getChildAt(i);
                 // Check endpoint
-                if (child.equals(this.target)) {
+                if (child.equals(target)) {
                     child.setParent(node);
                     // Visit generation
-                    for (PathFinderListener listener : this.listeners)
-                        for (MutableTreeNode leaf : newGen)
-                            listener.nodeFound(leaf);
+                    fireNodeFound(new PathFinderEvent(this, newGen.toArray(new MutableTreeNode[0])));
                     return child;
                 }
                 // Check visited
-                if (!this.visited.contains(child)) {
+                if (!visited.contains(child)) {
                     newGen.add(child);
                     child.setParent(node);
-                    this.visited.add(child);
+                    visited.add(child);
                     // Visit generation
-                    for (PathFinderListener listener : this.listeners)
-                        listener.nodeVisited(child);
+                    fireNodeGerminated(new PathFinderEvent(this, child));
                 }
-                if (child.equals(this.start))
+                if (child.equals(root))
                     child.setParent(null);
             }
         if (newGen.size() == 0)
             throw new StackOverflowError("No solution...");
         // Delay iteration
-        Thread.sleep(this.delay);
+        Thread.sleep(delay);
         // Call method recursively until convergence
-        return this.advance(newGen);
+        return advance(newGen);
     }
 
     @Override
-    public AlgorithmParameterSpec getParameterSpec() {
+    public final AlgorithmParameterSpec getParameterSpec() {
         return null;
     }
 

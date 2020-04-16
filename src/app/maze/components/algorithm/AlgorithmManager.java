@@ -17,13 +17,11 @@ import utils.JWrapper;
  */
 public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Serializable {
 
-    // TODO: AtomicBoolean volatile ???
-
     private static final long serialVersionUID = 1L;
 
     /**
      * Lock <code>java.lang.Object</code> for <code>java.lang.Thread</code>
-     * interruptions.
+     * lock synchronization.
      */
     protected Object lock = new Object();
 
