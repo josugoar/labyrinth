@@ -1,10 +1,14 @@
 package app.maze;
 
+import java.io.Serializable;
+
 import app.maze.controller.MazeController;
 import app.maze.model.MazeModel;
 import app.maze.view.MazeView;
 
-public final class Maze extends Thread {
+public final class Maze extends Thread implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final MazeModel MazeModel;
 
@@ -13,26 +17,26 @@ public final class Maze extends Thread {
     private final MazeController MazeController;
 
     public Maze() {
-        this.MazeModel = new MazeModel();
-        this.MazeView = new MazeView();
-        this.MazeController = new MazeController();
+        MazeModel = new MazeModel();
+        MazeView = new MazeView();
+        MazeController = new MazeController();
     }
 
     private final void initMaze() {
-        this.MazeModel.setController(this.MazeController);
-        this.MazeView.setController(this.MazeController);
-        this.MazeController.setModel(this.MazeModel);
-        this.MazeController.setView(this.MazeView);
+        MazeModel.setController(MazeController);
+        MazeView.setController(MazeController);
+        MazeController.setModel(MazeModel);
+        MazeController.setView(MazeView);
     }
 
     private final void runMaze() {
-        this.MazeView.display();
+        MazeView.display();
     }
 
     @Override
     public void run() {
-        this.initMaze();
-        this.runMaze();
+        initMaze();
+        runMaze();
     }
 
     @Override
