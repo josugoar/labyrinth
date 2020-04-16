@@ -1,5 +1,7 @@
 package app.maze.components.cell.composite;
 
+import java.util.Arrays;
+import java.util.Vector;
 import java.util.stream.IntStream;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -14,8 +16,6 @@ import app.maze.model.MazeModel;
 
 public final class CellComposite extends DefaultMutableTreeNode implements Walkable {
 
-    // TODO: Reference CellView
-
     private static final long serialVersionUID = 1L;
 
     private boolean walkable = true;
@@ -28,16 +28,16 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         this(null);
     }
 
+    @SuppressWarnings("unchecked")
     public final void override() {
         // Ignore if DefaultMutableTreeNode leaf
         if (isLeaf())
             return;
-        final Object[] oldChildren = children.toArray();
         // Remove MutableTreeNode children
-        removeAllChildren();
-        // Remove MutableTreeNode children children
-        for (final Object oldChild : oldChildren)
-            ((CellComposite) oldChild).override();
+        new Vector<CellComposite>(children).forEach(child -> {
+            removeAllChildren();
+            child.override();
+        });
     }
 
     @Override
@@ -56,6 +56,7 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         return walkable;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public final void setWalkable(final boolean walkable) {
         final MazeModel mzModel = mzController.getModel();
@@ -63,30 +64,31 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         // Update Walkable state
         this.walkable = walkable;
         if (walkable) {
+            final Object root = mzModel.getRoot();
             // Update CellView background
-            ((CellView) flyweight.request(this)).setBackground(State.WALKABLE);
+            clView.setState(State.WALKABLE);
             // Ignore if no TreeModel root
-            if (mzModel.getRoot() == null)
+            if (root == null)
                 return;
             // Insert CellComposite neighbors
-            for (final Object neighbor : flyweight.getNeighbors(this)) {
+            for (final CellComposite neighbor : Arrays.copyOf(flyweight.getNeighbors(this), getChildCount(), CellComposite[].class)) {
                 // Ignore if not Walkable
-                if (!((CellComposite) neighbor).isWalkable())
+                if (!neighbor.isWalkable())
                     continue;
                 // Add CellComposite neighbors if not MutableTreeNode children
                 if (children != null && !children.contains(neighbor))
-                    add((MutableTreeNode) neighbor);
-                if (((CellComposite) neighbor).children != null && !((CellComposite) neighbor).children.contains(this))
-                    ((DefaultMutableTreeNode) neighbor).add(this);
+                    add(neighbor);
+                if (neighbor.children != null && !neighbor.children.contains(this))
+                    neighbor.add(this);
             }
             // Override DefaultTreeModel root
-            if (equals(mzModel.getRoot()))
+            if (equals(root))
                 mzModel.setRoot(null);
             // Notify TreeModelListener insertion
             mzModel.nodesWereInserted(this, IntStream.range(0, getChildCount()).toArray());
         } else {
             // Update CellView background
-            ((CellView) flyweight.request(this)).setBackground(State.UNWALKABLE);
+            clView.setState(State.UNWALKABLE);
             // Ignore if DefaultMutableTreeNode leaf
             if (isLeaf()) {
                 // Notify TreeModelListener empty removal
@@ -94,8 +96,7 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
                 return;
             }
             // Remove CellComposite neighbors
-            for (final Object child : children)
-                ((CellComposite) child).children.remove(this);
+            new Vector<CellComposite>(children).forEach(child -> child.children.remove(this));
             // Get old DefaultMutableTreeNode enpoints
             final int[] oldIndex = IntStream.range(0, getChildCount()).toArray();
             final Object[] oldChildren = children.toArray();
@@ -106,7 +107,7 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         }
     }
 
-    public transient MazeController mzController;
+    private transient MazeController mzController;
 
     public final MazeController getController() {
         return mzController;
@@ -114,6 +115,16 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
 
     public final void setController(final MazeController mzController) {
         this.mzController = mzController;
+    }
+
+    private CellView clView;
+
+    public final CellView getView() {
+        return clView;
+    }
+
+    public final void setView(final CellView clView) {
+        this.clView = clView;
     }
 
     @Override

@@ -24,37 +24,35 @@ public final class CellView extends JPanel {
     private transient static CellView focused = null;
 
     @SuppressWarnings("unchecked")
-    public final Consumer<State> update = (Consumer<State> & Serializable) state ->
+    public final Consumer<State> focus = (Consumer<State> & Serializable) state ->
             setBorder(BorderFactory.createLineBorder(state.getColor()));
 
     {
-        // Set default State
-        update.accept(State.WALKABLE);
+        // Set default Border
+        focus.accept(State.WALKABLE);
         addMouseListener(new SubjectListener());
     }
 
-    public CellView(final MazeController mzController, final CellComposite clComposite) {
+    public CellView(final MazeController mzController) {
         setController(mzController);
-        setComposite(clComposite);
     }
 
     public CellView() {
-        this(null, null);
+        this(null);
     }
 
     public final void walk(final boolean walk) {
-        final Consumer<State> update = this.update.andThen(this::setBackground);
         try {
             final ProcessManager manager = mzController.getManager();
             // Assert running AlgorithmManager
             manager.assertRunning();
             // Update Walkable
             clComposite.setWalkable(walk);
-            // Update CellView
+            // Ignore if Walkable
             if (walk)
-                update.accept(State.WALKABLE);
-            else
-                update.accept(State.UNWALKABLE);
+                return;
+            // Update CellView
+            focus.andThen(this::setState).accept(State.UNWALKABLE);
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }
@@ -73,17 +71,25 @@ public final class CellView extends JPanel {
             return;
         // Unfocus CellView
         if (CellView.focused != null)
-            CellView.focused.update.accept(State.WALKABLE);
+            CellView.focused.focus.accept(State.WALKABLE);
         // Focus CellView
         if (focused != null) {
             final State state = State.getState(focused.getBackground());
-            if (state.equals(State.WALKABLE))
-                focused.update.accept(State.UNWALKABLE);
-            else
-                focused.update.accept(state);
+            switch (state) {
+                case WALKABLE:
+                    focused.focus.accept(State.UNWALKABLE);
+                    break;
+                default:
+                    focused.focus.accept(state);
+            }
         }
         // Update focused CellView
         CellView.focused = focused;
+    }
+
+    public final void setState(final State state) {
+        // Delegate JComponent background
+        setBackground(state.getColor());
     }
 
     public static CellView getSelected() {
@@ -94,12 +100,7 @@ public final class CellView extends JPanel {
         return focused;
     }
 
-    public final void setBackground(final State state) {
-        // Delegate JComponent background
-        setBackground(state.getColor());
-    }
-
-    public transient MazeController mzController;
+    private transient MazeController mzController;
 
     public final MazeController getController() {
         return mzController;
@@ -109,7 +110,7 @@ public final class CellView extends JPanel {
         this.mzController = mzController;
     }
 
-    public CellComposite clComposite;
+    private CellComposite clComposite;
 
     public final CellComposite getComposite() {
         return clComposite;
@@ -136,10 +137,13 @@ public final class CellView extends JPanel {
 
         @Override
         public final void mousePressed(final MouseEvent e) {
-            // Clear node parent relationships
-            mzController.clear();
             try {
                 final ProcessManager manager = mzController.getManager();
+                // Clear node parent relationships
+                mzController.clear();
+                // Focus CellView
+                focus(CellView.this);
+                // Check MouseEvent state
                 if (e.isShiftDown()) {
                     // Assert running AlgorithmManager
                     manager.assertRunning();
@@ -169,11 +173,6 @@ public final class CellView extends JPanel {
         public final void mouseExited(final MouseEvent e) {
             // Unfocus CellView
             focus(null);
-            // Ignore if selected CellView
-            if (selected != null)
-                return;
-            // Reset Border
-            update.accept(State.WALKABLE);
         }
 
     };

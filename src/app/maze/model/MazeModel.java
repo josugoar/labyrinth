@@ -1,9 +1,7 @@
 package app.maze.model;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-import javax.swing.BorderFactory;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -12,7 +10,6 @@ import javax.swing.tree.TreeNode;
 
 import app.maze.components.cell.State;
 import app.maze.components.cell.composite.CellComposite;
-import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 
@@ -35,22 +32,6 @@ public final class MazeModel extends DefaultTreeModel {
         this(null);
     }
 
-    // TODO: Find better solution
-
-    // private static final void update(final PanelFlyweight flyweight, final CellComposite node, final State state) {
-    //     Objects.requireNonNull(state, "State must not be null...");
-    //     final PanelFlyweight flyweight = mzController.getFlyweight();
-    //     // Update CellView background matching State
-    //     ((CellView) flyweight.request(node)).setBackground(state);
-    // }
-
-    private final void update(final CellComposite node, final State state) {
-        Objects.requireNonNull(state, "State must not be null...");
-        final PanelFlyweight flyweight = mzController.getFlyweight();
-        // Update CellView background matching State
-        ((CellView) flyweight.request(node)).setBackground(state);
-    }
-
     public final void reset() {
         // Reset endpoints
         root = null;
@@ -68,7 +49,7 @@ public final class MazeModel extends DefaultTreeModel {
                 continue;
             // Reset State
             if (!child.equals(root) && !child.equals(target))
-                update(child, State.WALKABLE);
+                child.getView().setState(State.WALKABLE);
             // Remove parent
             child.setParent(null);
             // Remove children parent
@@ -110,7 +91,7 @@ public final class MazeModel extends DefaultTreeModel {
     public final void setTarget(final TreeNode target) {
         // Override target
         if (this.target != null && this.target.equals(target)) {
-            update((CellComposite) this.target, State.WALKABLE);
+            ((CellComposite) this.target).getView().setState(State.WALKABLE);
             this.target = null;
             mzController.collapse();
         } else {
@@ -118,14 +99,14 @@ public final class MazeModel extends DefaultTreeModel {
             if (target != null)
                 ((CellComposite) target).setWalkable(true);
             // Get old target
-            final TreeNode oldTarget = this.target;
+            final CellComposite oldTarget = (CellComposite) this.target;
             this.target = target;
             // Override old target
             if (oldTarget != null)
-                update((CellComposite) oldTarget, State.WALKABLE);
+                oldTarget.getView().setState(State.WALKABLE);
             // Set new target
             if (target != null)
-                update((CellComposite) target, State.TARGET);
+                ((CellComposite) target).getView().setState(State.TARGET);
         }
     }
 
@@ -143,7 +124,7 @@ public final class MazeModel extends DefaultTreeModel {
     public final void setRoot(final TreeNode root) {
         // Override root
         if (this.root != null && this.root.equals(root)) {
-            update((CellComposite) this.root, State.WALKABLE);
+            ((CellComposite) this.root).getView().setState(State.WALKABLE);
             this.root = null;
             mzController.collapse();
         } else {
@@ -151,14 +132,14 @@ public final class MazeModel extends DefaultTreeModel {
             if (root != null)
                 ((CellComposite) root).setWalkable(true);
             // Get old root
-            final TreeNode oldRoot = this.root;
+            final CellComposite oldRoot = (CellComposite) this.root;
             super.setRoot(root);
             // Override old root
             if (oldRoot != null)
-                update((CellComposite) oldRoot, State.WALKABLE);
+                oldRoot.getView().setState(State.WALKABLE);
             // Set new root
             if (root != null)
-                update((CellComposite) root, State.ROOT);
+                ((CellComposite) root).getView().setState(State.ROOT);
         }
     }
 
@@ -193,7 +174,8 @@ public final class MazeModel extends DefaultTreeModel {
                 ((CellComposite) children).override();
             // Reset root
             root = null;
-            reload();
+            // Collapse JTree
+            mzController.collapse();
         }
 
         @Override

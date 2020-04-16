@@ -13,7 +13,6 @@ import app.maze.components.algorithm.pathfinder.PathFinder;
 import app.maze.components.algorithm.pathfinder.PathFinderListener;
 import app.maze.components.algorithm.pathfinder.traversers.Dijkstra;
 import app.maze.components.cell.State;
-import app.maze.components.cell.Walkable;
 import app.maze.components.cell.composite.CellComposite;
 import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
@@ -77,20 +76,18 @@ public final class ProcessManager implements Serializable {
                 // Fire PathFinder
                 pathFinder.find((MutableTreeNode) mzModel.getRoot(), (MutableTreeNode) mzModel.getTarget());
             } else if (algorithm.equals(Generator.class)) {
-                // TODO: Refactor (add button to set all nodes (un)walkable)
                 final CellComposite[] reference = mzController.getFlyweight().getReferences();
-                final Walkable oldRoot = (Walkable) mzModel.getRoot();
-                // // Reset structure
-                // mzController.reset();
-                // for (final CellComposite o : reference) {
-                //     o.setWalkable(false);
-                //     ((JComponent) mzController.getFlyweight().request(o)).setBackground(Color.BLACK);
-                // }
+                CellComposite root = (CellComposite) mzModel.getRoot();
+                // Select random CellComposite if no root
+                if (root == null) {
+                    root = reference[(int) (Math.random() * reference.length)];
+                    // Set TreeNode parent relationships
+                    mzModel.initNeighbors(root);
+                }
                 // Fire Generator
-                generator.generate(oldRoot == null
-                        ? reference[(int) (Math.random() * reference.length)]
-                        : oldRoot);
-                mzModel.setRoot(null);
+                generator.generate(root);
+                // Reset MazeModel endpoints
+                mzModel.reset();
             }
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
@@ -142,14 +139,14 @@ public final class ProcessManager implements Serializable {
             // Ignore if TreeModel root
             if (node.equals(mzModel.getRoot()))
                 return;
-            final CellView cell = (CellView) mzController.getFlyweight().request(node);
+            final CellView cell = node.getView();
             // Update CellView background
-            cell.setBackground(state);
+            cell.setState(state);
             // Ignore if unfocused CellView
             if (CellView.getFocused() == null || !CellView.getFocused().equals(cell))
                 return;
             // Update Border color
-            cell.update.accept(state);
+            cell.focus.accept(state);
         }
 
         private final void dispatchPathFinder(final PathFinderEvent e, final State state) {

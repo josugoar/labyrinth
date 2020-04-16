@@ -1,6 +1,5 @@
 package app.maze.controller;
 
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
@@ -137,6 +136,13 @@ public final class MazeController implements Serializable {
         else if (e.getKeyCode() == KeyEvent.VK_SPACE)
             // Set AlgorithmManager waiting state
             manager.await();
+        // Fill Walkable
+        else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            reset();
+            for (final CellComposite node : flyweight.getReferences())
+                node.setWalkable(false);
+        } else if (e.getKeyCode() == KeyEvent.VK_LEFT)
+            reset();
     }
 
     public final void dispatchCell(final DefaultTreeCellRenderer renderer, final Object node) {
@@ -145,7 +151,7 @@ public final class MazeController implements Serializable {
             return;
         String fileName = null;
         // Switch on State
-        switch (State.getState(((Component) flyweight.request(node)).getBackground())) {
+        switch (State.getState(((CellComposite) node).getView().getBackground())) {
             case WALKABLE:
                 fileName = "walkableIcon.gif";
                 break;
@@ -166,6 +172,9 @@ public final class MazeController implements Serializable {
                 break;
             default:
         }
+        // Ignore if no WidgetFactory file name
+        if (fileName == null)
+            return;
         renderer.setIcon(WidgetFactory.createIcon(fileName));
     }
 

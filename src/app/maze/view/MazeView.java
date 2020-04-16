@@ -51,6 +51,7 @@ import app.maze.components.algorithm.pathfinder.PathFinder;
 import app.maze.components.algorithm.pathfinder.traversers.AStar;
 import app.maze.components.algorithm.pathfinder.traversers.BFS;
 import app.maze.components.algorithm.pathfinder.traversers.Dijkstra;
+import app.maze.components.cell.composite.CellComposite;
 import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
@@ -210,7 +211,7 @@ public final class MazeView extends JFrame {
                                             CellView.select(null);
                                         else
                                             // Select CellView
-                                            CellView.select((CellView) flyweight.request(path.getLastPathComponent()));
+                                            CellView.select(((CellComposite) path.getLastPathComponent()).getView());
                                     });
                                 }
                             }, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) {

@@ -65,24 +65,31 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         // Initialize empty arrays
         Object[] in;
         Object[] out;
-        if (o instanceof CellComposite) {
-            in = getReferences();
-            out = getComponents();
-        } else if (o instanceof CellView) {
-            in = getComponents();
-            out = getReferences();
-        } else
-            throw new InvalidParameterException("Invalid Object...");
-        // Return Object other entry
+        synchronized (getTreeLock()) {
+            if (o instanceof CellComposite) {
+                in = getReferences();
+                out = getComponents();
+            } else if (o instanceof CellView) {
+                in = getComponents();
+                out = getReferences();
+            } else
+                throw new InvalidParameterException("Invalid Object...");
+        }
+        // Return other Object entry
         return out[Arrays.asList(in).indexOf(o)];
     }
 
-    public synchronized final void override(final PanelFlyweight other) {
+    public final void override(final PanelFlyweight other) {
         // Revert PanelFlyweight components with other dimension
         revert(other.getColumns(), other.getRows());
-        // Override Component in foreach to preserve iteration order
-        for (final CellView component : other.getComponents())
-            add(component.getComposite(), component);
+        // Get other PanelFlyweight components
+        synchronized (getTreeLock()) {
+            final CellComposite[] o1 = other.getReferences();
+            final CellView[] o2 = other.getComponents();
+            // Override PanelFlyweight components
+            for (int i = 0; i < other.getColumns() * other.getRows(); i++)
+                add(o1[i], o2[i]);
+        }
     }
 
     private final Set<Integer> neighbor(final int i) throws ArrayIndexOutOfBoundsException {
@@ -117,13 +124,14 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         if (o1 == null)
             o1 = new CellComposite(mzController);
         else if (o2 == null)
-            o2 = new CellView(mzController, o1);
+            o2 = new CellView(mzController);
         // Multiple Object relationships
         else {
             o1.setController(mzController);
             o2.setController(mzController);
-            o2.setComposite(o1);
         }
+        o1.setView(o2);
+        o2.setComposite(o1);
         // Add components
         reference.add(o1);
         add(o2);
@@ -147,7 +155,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
                 : new int[0];
     }
 
-    public synchronized final void resetDimension(final int width, final int height) {
+    public final void resetDimension(final int width, final int height) {
         // Revert PanelFlyweight components with new dimension
         revert(width, height);
         // Insert new Object relationships
@@ -162,8 +170,10 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         if (!(comp instanceof CellView))
             throw new InvalidParameterException("Component must be CellView...");
         // Prevent non-linked CellView from being added
-        if (getComponents().length + 1 != getReferences().length)
-            throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
+        synchronized (getTreeLock()) {
+            if (getComponents().length + 1 != getReferences().length)
+                throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
+        }
         super.addImpl(comp, constraints, index);
     }
 
@@ -171,12 +181,14 @@ public final class PanelFlyweight extends JPanel implements Transformable {
             throws InvalidParameterException, ArrayIndexOutOfBoundsException {
         // Initialize empty array
         Object[] a;
-        if (o instanceof CellComposite)
-            a = getReferences();
-        else if (o instanceof CellView)
-            a = getComponents();
-        else
-            throw new InvalidParameterException("Invalid Object...");
+        synchronized (getTreeLock()) {
+            if (o instanceof CellComposite)
+                a = getReferences();
+            else if (o instanceof CellView)
+                a = getComponents();
+            else
+                throw new InvalidParameterException("Invalid Object...");
+        }
         // Map index to Object neighbors
         return neighbor(Arrays.asList(a).indexOf(o)).stream().map(i -> a[i]).toArray();
     }
@@ -200,6 +212,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
 
     public final void setPeriodic(final boolean periodic) {
         this.periodic = periodic;
+        // Reset structure
         mzController.reset();
     }
 
@@ -209,6 +222,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
 
     public final void setEdged(final boolean edged) {
         this.edged = edged;
+        // Reset structure
         mzController.reset();
     }
 
