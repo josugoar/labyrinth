@@ -7,6 +7,7 @@ import javax.swing.JComponent;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.cell.State;
@@ -36,7 +37,7 @@ public final class MazeModel extends DefaultTreeModel {
     private final void update(final CellComposite node, final State state) {
         Objects.requireNonNull(state, "State must not be null...");
         final PanelFlyweight flyweight = mzController.getFlyweight();
-        // Update background
+        // Update background color matching State
         ((JComponent) flyweight.request(node)).setBackground(state.getColor());
     }
 
@@ -44,7 +45,7 @@ public final class MazeModel extends DefaultTreeModel {
         // Reset endpoints
         root = null;
         target = null;
-        // Collapse tree
+        // Collapse JTree
         mzController.collapse();
     }
 
@@ -52,14 +53,15 @@ public final class MazeModel extends DefaultTreeModel {
         // Range through children
         for (int i = 0; i < node.getChildCount(); i++) {
             final CellComposite child = (CellComposite) node.getChildAt(i);
-            // Ignore if no parent
+            // Ignore if orphan
             if (child.isOrphan())
                 continue;
-            // Reset state
+            // Reset State
             if (!child.equals(root) && !child.equals(target))
                 update(child, State.WALKABLE);
-            // Remove parent and children parent
+            // Remove parent
             child.setParent(null);
+            // Remove children parent
             clear(child);
         }
     }
@@ -70,7 +72,7 @@ public final class MazeModel extends DefaultTreeModel {
             return;
         // Remove node parent relationships
         clear((CellComposite) root);
-        // Collapse tree
+        // Collapse JTree
         mzController.collapse();
     }
 
@@ -80,13 +82,14 @@ public final class MazeModel extends DefaultTreeModel {
             return;
         final PanelFlyweight flyweight = mzController.getFlyweight();
         // Range through neighbors
-        for (final CellComposite neighbor : flyweight.getNeighbors(node)) {
+        for (final Object neighbor : flyweight.getNeighbors(node)) {
             // Ignore if not walkable neighbor
-            if (!neighbor.isWalkable())
+            if (!((CellComposite) neighbor).isWalkable())
                 continue;
             // Add children
-            node.add(neighbor);
-            initNeighbors(neighbor);
+            node.add((MutableTreeNode) neighbor);
+            // Add children children
+            initNeighbors((CellComposite) neighbor);
         }
     }
 
@@ -164,13 +167,13 @@ public final class MazeModel extends DefaultTreeModel {
             ((CellComposite) root).override();
             // Initialize all node neighbors
             initNeighbors((CellComposite) root);
-            // Collapse tree
+            // Collapse JTree
             mzController.collapse();
         }
 
         @Override
         public final void treeNodesRemoved(final TreeModelEvent e) {
-            // Collapse tree
+            // Collapse JTree
             mzController.collapse();
             // Ignore if root not removed
             if (!((CellComposite) e.getTreePath().getLastPathComponent()).equals(root))
@@ -185,7 +188,7 @@ public final class MazeModel extends DefaultTreeModel {
 
         @Override
         public final void treeNodesInserted(final TreeModelEvent e) {
-            // Collapse tree
+            // Collapse JTree
             mzController.collapse();
         }
 

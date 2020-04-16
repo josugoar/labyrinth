@@ -10,8 +10,10 @@ public class MenuDecorator extends JMenu {
 
     public MenuDecorator(final String text, final String fileName, final Integer mnemonic) {
         super(text);
+        // Ignore if no file name
         if (fileName != null)
             setIcon(WidgetFactory.createIcon(fileName));
+        // Ignore if no mnemonic
         if (mnemonic != null)
             setMnemonic(mnemonic);
     }

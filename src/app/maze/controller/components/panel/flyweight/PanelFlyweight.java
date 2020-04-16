@@ -22,8 +22,6 @@ import app.maze.controller.components.panel.Transformable;
 
 public final class PanelFlyweight extends JPanel implements Transformable {
 
-    // TODO: Iterable
-
     private static final long serialVersionUID = 1L;
 
     private List<CellComposite> reference = new ArrayList<CellComposite>(0);
@@ -49,13 +47,17 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         this(null);
     }
 
-    private final int transform(final int x, final int y) {
-        // Transform from 2D to 1D
-        return x >= 0 && x < getRows() && y >= 0 && y < getColumns() ? x * getRows() + y : -1;
+    private final void revert(final int width, final int height) {
+        // Remove Component to prevent overlapping
+        removeAll();
+        // Update LayoutManager to pack components
+        setLayout(new GridLayout(width, height));
+        // Override reference
+        reference = new ArrayList<CellComposite>(width * height);
     }
 
     public final void reset() {
-        // Override dimension
+        // Override dimension with current dimension
         resetDimension(getRows(), getColumns());
     }
 
@@ -71,18 +73,14 @@ public final class PanelFlyweight extends JPanel implements Transformable {
             out = getReferences();
         } else
             throw new InvalidParameterException("Invalid Object...");
-        // Return other representation
+        // Return other entry
         return out[Arrays.asList(in).indexOf(o)];
     }
 
     public synchronized final void override(final PanelFlyweight other) {
-        // Override reference
-        reference = other.reference;
-        // Remove components
-        removeAll();
-        // Update layout
-        setLayout(new GridLayout(other.getColumns(), other.getRows()));
-        // Override component
+        // Revert components with other dimension
+        revert(other.getColumns(), other.getRows());
+        // Override component in foreach to preserve iteration order
         for (final CellView component : other.getComponents())
             add(component.getComposite(), component);
     }
@@ -100,15 +98,15 @@ public final class PanelFlyweight extends JPanel implements Transformable {
                     col <= dim[1] + 1;
                     col += Math.abs((edged ? Math.abs(row - dim[0]) : 0) - 2))
                 // Periodic behaviour
-                if (transform(row, col) == -1) {
+                if (transform(new int[] { row, col }) == -1) {
                     if (!periodic)
                         continue;
-                    neighbors.add(transform(
+                    neighbors.add(transform(new int[] {
                             row < 0 || row > getRows() - 1 ? getRows() - Math.abs(row) : row,
-                            col < 0 || col > getColumns() - 1 ? getColumns() - Math.abs(col) : col));
-                    // Default behaviour
+                            col < 0 || col > getColumns() - 1 ? getColumns() - Math.abs(col) : col }));
+                // Default behaviour
                 } else
-                    neighbors.add(transform(row, col));
+                    neighbors.add(transform(new int[] { row, col }));
         return neighbors;
     }
 
@@ -117,16 +115,28 @@ public final class PanelFlyweight extends JPanel implements Transformable {
             throw new NullPointerException("CellComposite and CellView must not be null...");
         // Single relationships
         if (o1 == null)
-            o1 = new CellComposite();
+            o1 = new CellComposite(mzController);
         else if (o2 == null)
-            o2 = new CellView();
-        // Set relationships
-        o1.setController(mzController);
-        o2.setController(mzController);
-        o2.setComposite(o1);
-        // Add components
-        add(o2);
+            o2 = new CellView(mzController, o1);
+        // Multiple relationships
+        else {
+            o1.setController(mzController);
+            o2.setController(mzController);
+            o2.setComposite(o1);
+        }
+        // Add component
         reference.add(o1);
+        add(o2);
+    }
+
+    @Override
+    public final int transform(final int[] dim) throws ArrayIndexOutOfBoundsException {
+        if (dim.length != 2)
+            throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
+        // Transform from 2D to 1D
+        return dim[0] >= 0 && dim[0] < getRows() && dim[1] >= 0 && dim[1] < getColumns()
+                ? dim[0] * getRows() + dim[1]
+                : -1;
     }
 
     @Override
@@ -138,38 +148,50 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     }
 
     public synchronized final void resetDimension(final int width, final int height) {
-        // Override reference
-        reference = new ArrayList<CellComposite>(width * height);
-        // Remove components
-        removeAll();
-        // Override layout
-        setLayout(new GridLayout(width, height, 0, 0));
-        // Insert new cell relationships
+        // Revert component with new dimension
+        revert(width, height);
+        // Insert new Object relationships
         for (int i = 0; i < width * height; i++)
             add(new CellComposite(), new CellView());
     }
 
     @Override
-    protected final void addImpl(Component comp, Object constraints, int index) throws InvalidParameterException {
+    protected final void addImpl(Component comp, Object constraints, int index)
+            throws InvalidParameterException, ArrayIndexOutOfBoundsException {
+        // Prevent non-CellView Component from being added
         if (!(comp instanceof CellView))
             throw new InvalidParameterException("Component must be CellView...");
+        // Prevent non-linked CellView from being added
+        if (getComponents().length + 1 != getReferences().length)
+            throw new ArrayIndexOutOfBoundsException("Index out of bounds...");
         super.addImpl(comp, constraints, index);
     }
 
+    public final Object[] getNeighbors(final Object o)
+            throws InvalidParameterException, ArrayIndexOutOfBoundsException {
+        // Initialize empty array
+        Object[] a;
+        if (o instanceof CellComposite)
+            a = getReferences();
+        else if (o instanceof CellView)
+            a = getComponents();
+        else
+            throw new InvalidParameterException("Invalid Object...");
+        // Map index to Object neighbors
+        return neighbor(Arrays.asList(a).indexOf(o)).stream().map(i -> a[i]).toArray();
+    }
+
     public final CellComposite[] getReferences() {
+        // Return CellComposite only array
         return reference.toArray(new CellComposite[0]);
-    }
-
-    public final CellComposite[] getNeighbors(final CellComposite o) throws ArrayIndexOutOfBoundsException {
-        return neighbor(reference.indexOf(o)).stream().map(i -> reference.get(i)).toArray(CellComposite[]::new);
-    }
-
-    public final int getColumns() {
-        return ((GridLayout) getLayout()).getColumns();
     }
 
     public final int getRows() {
         return ((GridLayout) getLayout()).getRows();
+    }
+
+    public final int getColumns() {
+        return ((GridLayout) getLayout()).getColumns();
     }
 
     public final boolean isPeriodic() {
@@ -203,11 +225,13 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     @Override
     public CellView[] getComponents() {
         final Component[] component = super.getComponents();
+        // Return CellView only array
         return Arrays.copyOf(component, component.length, CellView[].class);
     }
 
     @Override
     public final void setLayout(final LayoutManager mgr) throws InvalidParameterException {
+        // Prevent from setting non-GridLayout LayoutManager
         if (!(mgr instanceof GridLayout))
             throw new InvalidParameterException("LayoutManager must be GridLayout...");
         super.setLayout(mgr);

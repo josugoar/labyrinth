@@ -2,14 +2,17 @@ package app.maze.components.cell.composite;
 
 import java.util.stream.IntStream;
 
+import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
+import app.maze.components.cell.State;
+import app.maze.components.cell.Walkable;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 import app.maze.model.MazeModel;
 
-public final class CellComposite extends DefaultMutableTreeNode {
+public final class CellComposite extends DefaultMutableTreeNode implements Walkable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,8 +31,9 @@ public final class CellComposite extends DefaultMutableTreeNode {
         if (isLeaf())
             return;
         final Object[] oldChildren = children.toArray();
-        // Remove children and children children
+        // Remove children
         removeAllChildren();
+        // Remove children children
         for (final Object oldChild : oldChildren)
             ((CellComposite) oldChild).override();
     }
@@ -45,27 +49,41 @@ public final class CellComposite extends DefaultMutableTreeNode {
         return parent == null ? true : false;
     }
 
+    public transient MazeController mzController;
+
+    public final MazeController getController() {
+        return mzController;
+    }
+
+    public final void setController(final MazeController mzController) {
+        this.mzController = mzController;
+    }
+
+    @Override
     public final boolean isWalkable() {
         return walkable;
     }
 
+    @Override
     public final void setWalkable(final boolean walkable) {
         final MazeModel mzModel = mzController.getModel();
         // Update walkable state
         this.walkable = walkable;
         if (walkable) {
+            // TODO: Refactor
+            ((JComponent) mzController.getFlyweight().request(this)).setBackground(State.WALKABLE.getColor());
             // Ignore if no root
             if (mzModel.getRoot() == null)
                 return;
             final PanelFlyweight flyweight = mzController.getFlyweight();
             // Insert neighbors
-            for (final CellComposite neighbor : flyweight.getNeighbors((this))) {
-                if (!neighbor.isWalkable())
+            for (final Object neighbor : flyweight.getNeighbors(this)) {
+                if (!((CellComposite) neighbor).isWalkable())
                     continue;
                 if (children != null && !children.contains(neighbor))
-                    add(neighbor);
-                if (neighbor.children != null && !neighbor.children.contains(this))
-                    neighbor.add(this);
+                    add((MutableTreeNode) neighbor);
+                if (((CellComposite) neighbor).children != null && !((CellComposite) neighbor).children.contains(this))
+                    ((DefaultMutableTreeNode) neighbor).add(this);
             }
             // Override root
             if (equals(mzModel.getRoot()))
@@ -73,6 +91,8 @@ public final class CellComposite extends DefaultMutableTreeNode {
             // Notify insertion
             mzModel.nodesWereInserted(this, IntStream.range(0, getChildCount()).toArray());
         } else {
+            // TODO: Refactor
+            ((JComponent) mzController.getFlyweight().request(this)).setBackground(State.UNWALKABLE.getColor());
             // Ignore if leaf
             if (isLeaf()) {
                 // Notify empty removal
@@ -88,16 +108,6 @@ public final class CellComposite extends DefaultMutableTreeNode {
             // Notify removal
             mzModel.nodesWereRemoved(this, oldIndex, oldChildren);
         }
-    }
-
-    public transient MazeController mzController;
-
-    public final MazeController getController() {
-        return mzController;
-    }
-
-    public final void setController(final MazeController mzController) {
-        this.mzController = mzController;
     }
 
     @Override

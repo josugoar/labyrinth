@@ -1,15 +1,18 @@
 package app.maze.components.algorithm.pathfinder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import javax.swing.event.EventListenerList;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
+import app.maze.components.algorithm.pathfinder.PathFinderListener.PathFinderEvent;
 import utils.JWrapper;
 
 public abstract class PathFinder extends AlgorithmManager {
@@ -26,6 +29,15 @@ public abstract class PathFinder extends AlgorithmManager {
 
     protected abstract TreeNode advance(final Set<MutableTreeNode> currGen)
             throws StackOverflowError, InterruptedException;
+
+    protected final void traverse(final TreeNode node) {
+        final List<TreeNode> path = new ArrayList<TreeNode>(0);
+        // Traverse entire TreeNode minimum spanning tree
+        for (TreeNode parent = node.getParent(); parent.getParent() != null; parent = parent.getParent())
+            path.add(parent);
+        // Traverse generation
+        fireNodeTraversed(new PathFinderEvent(this, path.toArray(new TreeNode[0])));
+    }
 
     public final void find(final MutableTreeNode start, final MutableTreeNode target) {
         try {
@@ -47,7 +59,7 @@ public abstract class PathFinder extends AlgorithmManager {
             if (start == null)
                 throw new NullPointerException("PathFinder is not initialized...");
             visited = new HashSet<TreeNode>(0);
-            final TreeNode target = advance(new HashSet<MutableTreeNode>() {
+            traverse(advance(new HashSet<MutableTreeNode>() {
                 private static final long serialVersionUID = 1L;
                 {
                     // Construct first generation
@@ -55,10 +67,7 @@ public abstract class PathFinder extends AlgorithmManager {
                     // Set running
                     setRunning(true);
                 }
-            });
-            // Traverse entire MutableTreeNode structure
-            for (TreeNode parent = target.getParent(); parent.getParent() != null; parent = parent.getParent())
-                fireNodeTraversed(parent);
+            }));
         } catch (final NullPointerException | StackOverflowError | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
@@ -75,50 +84,29 @@ public abstract class PathFinder extends AlgorithmManager {
         listeners.remove(PathFinderListener.class, l);
     }
 
-    // TODO: Refactor and add Thread for each fire
-
-    protected final void fireNodeGerminated(TreeNode node) {
+    private void fireEvent(final PathFinderEvent e, final BiConsumer<PathFinderListener, PathFinderEvent> fire) {
         Object[] listeners = this.listeners.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == PathFinderListener.class) {
-                if (node == null)
-                    node = new DefaultMutableTreeNode();
-                ((PathFinderListener) listeners[i + 1]).nodeGerminated(node);
-            }
-        }
+        // Range through listeners
+        for (int i = listeners.length - 2; i >= 0; i -= 2)
+            if (listeners[i] == PathFinderListener.class)
+                // Accept event
+                fire.accept((PathFinderListener) listeners[i + 1], e);
     }
 
-    protected final void fireNodeVisited(TreeNode node) {
-        Object[] listeners = this.listeners.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == PathFinderListener.class) {
-                if (node == null)
-                    node = new DefaultMutableTreeNode();
-                ((PathFinderListener) listeners[i + 1]).nodeVisited(node);
-            }
-        }
+    protected final void fireNodeGerminated(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeGerminated(n));
     }
 
-    protected final void fireNodeFound(TreeNode node) {
-        Object[] listeners = this.listeners.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == PathFinderListener.class) {
-                if (node == null)
-                    node = new DefaultMutableTreeNode();
-                ((PathFinderListener) listeners[i + 1]).nodeFound(node);
-            }
-        }
+    protected final void fireNodeVisited(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeVisited(n));
     }
 
-    protected final void fireNodeTraversed(TreeNode node) {
-        Object[] listeners = this.listeners.getListenerList();
-        for (int i = listeners.length - 2; i >= 0; i -= 2) {
-            if (listeners[i] == PathFinderListener.class) {
-                if (node == null)
-                    node = new DefaultMutableTreeNode();
-                ((PathFinderListener) listeners[i + 1]).nodeTraversed(node);
-            }
-        }
+    protected final void fireNodeFound(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeFound(n));
+    }
+
+    protected final void fireNodeTraversed(final PathFinderEvent e) {
+        fireEvent(e, (l, n) -> l.nodeTraversed(n));
     }
 
     public final TreeNode getStart() {

@@ -21,7 +21,7 @@ public abstract class AlgorithmManager implements AlgorithmMethod, Runnable, Ser
 
     /**
      * Lock <code>java.lang.Object</code> for <code>java.lang.Thread</code>
-     * interruptions.
+     * lock synchronization.
      */
     protected Object lock = new Object();
 

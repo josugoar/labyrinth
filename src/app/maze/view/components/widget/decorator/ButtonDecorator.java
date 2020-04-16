@@ -13,6 +13,7 @@ public class ButtonDecorator extends JButton {
     private static final long serialVersionUID = 1L;
 
     {
+        // Iconify JButton
         setFocusable(false);
         setContentAreaFilled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

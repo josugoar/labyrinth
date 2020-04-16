@@ -15,6 +15,7 @@ public final class WidgetFactory implements Serializable {
 
     public static final Icon createIcon(final String fileName) {
         Objects.requireNonNull(fileName, "Resource must not be null...");
+        // Construct new ImageIcon with given file name
         return new ImageIcon(MazeView.class.getResource("assets/" + fileName));
     }
 

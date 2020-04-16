@@ -70,6 +70,26 @@ public final class MazeController implements Serializable {
         flyweight.reset();
     }
 
+    public final void expand() {
+        final JTree tree = mzView.getTree();
+        // Delete model
+        tree.setModel(null);
+        // Reset model
+        tree.setModel(mzModel);
+        // Initialize empty path
+        List<Object> path = new ArrayList<Object>(0);
+        // Range through parent
+        for (TreeNode parent = ((TreeNode) mzModel.getTarget()).getParent();
+                parent != null;
+                parent = ((TreeNode) parent).getParent())
+            // Add parent to path
+            path.add(parent);
+        // Reverse path
+        Collections.reverse(path);
+        // Expand path
+        tree.expandPath(new TreePath(path.toArray()));
+    }
+
     public final void collapse() {
         final JTree tree = mzView.getTree();
         final Object oldRoot = mzModel.getRoot();
@@ -105,31 +125,12 @@ public final class MazeController implements Serializable {
         }
     }
 
-    public final void expand() {
-        final JTree tree = mzView.getTree();
-        // Delete model
-        tree.setModel(null);
-        // Reset model
-        tree.setModel(mzModel);
-        // Initialize empty path
-        List<Object> path = new ArrayList<Object>(0);
-        // Range through parent
-        for (TreeNode parent = ((TreeNode) mzModel.getTarget())
-                .getParent(); parent != null; parent = ((TreeNode) parent).getParent())
-            // Add parent to path
-            path.add(parent);
-        // Reverse path
-        Collections.reverse(path);
-        // Expand path
-        tree.expandPath(new TreePath(path.toArray()));
-    }
-
     public final void dispatchKey(final KeyEvent e) {
         if (e.isShiftDown())
             try {
                 // Assert running algorithm
                 manager.assertRunning();
-                // Change cursor state
+                // Change Cursor state
                 mzView.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
             } catch (final InterruptedException l) {
                 JWrapper.dispatchException(l);
@@ -151,11 +152,13 @@ public final class MazeController implements Serializable {
             // Target node
             else if (color == State.TARGET.getColor())
                 file = "endIcon.gif";
-            // Empty node
+            // Germinated node
             else if (color == State.GERMINATED.getColor())
                 file = "germinatedIcon.gif";
+            // Visited node
             else if (color == State.VISITED.getColor())
                 file = "visitedIcon.gif";
+            // Path node
             else if (color == State.PATH.getColor())
                 file = "pathIcon.gif";
             renderer.setIcon(new ImageIcon(MazeView.class.getResource("assets/" + file)));
@@ -178,7 +181,7 @@ public final class MazeController implements Serializable {
             manager.interrupt();
             // Override panel
             flyweight.override(otherFlyweight);
-            // Reset endpoints
+            // Reset endpoints to prevent overlapping
             mzModel.reset();
             // Override endpoints
             mzModel.setRoot(otherRoot);
@@ -188,24 +191,27 @@ public final class MazeController implements Serializable {
         }
     }
 
-    // TODO: Fix large serializiation
-
     public final void writeMaze(final String path) {
         try {
             // Assert running algorithm
             manager.assertRunning();
             final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource(path).getPath());
             final ObjectOutputStream out = new ObjectOutputStream(file);
+            final CellComposite root = (CellComposite) mzModel.getRoot();
             // Unselect cell
             CellView.select(null);
             // Remove node parent relationships
             mzModel.clear();
+            // Remove endpoint relationships to enable graph serialization
+            root.override();
             // Serialize object
             out.writeObject(flyweight);
-            out.writeObject(mzModel.getRoot());
+            out.writeObject(root);
             out.writeObject(mzModel.getTarget());
             out.close();
             file.close();
+            // Reset endpoint relationships
+            mzModel.initNeighbors(root);
         } catch (final InterruptedException | IOException e) {
             JWrapper.dispatchException(e);
         }

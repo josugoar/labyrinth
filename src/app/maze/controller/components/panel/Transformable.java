@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public abstract interface Transformable extends Serializable {
 
+    abstract int transform(final int[] dim);
+
     abstract int[] transform(final int i);
 
 }

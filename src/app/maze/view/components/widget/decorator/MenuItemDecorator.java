@@ -14,6 +14,7 @@ public class MenuItemDecorator extends JMenuItem {
 
     public MenuItemDecorator(final String text, final String fileName, final Integer mnemonic) {
         super(text, new ImageIcon(MazeView.class.getResource("assets/" + fileName)));
+        // Ignore if no mnemonic
         if (mnemonic == null)
             return;
         setMnemonic(mnemonic);

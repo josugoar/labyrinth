@@ -8,11 +8,12 @@ import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
 import app.maze.components.algorithm.generator.Generator;
-import app.maze.components.algorithm.generator.traversers.BackTracker;
+import app.maze.components.algorithm.generator.traversers.Randomizer;
 import app.maze.components.algorithm.pathfinder.PathFinder;
 import app.maze.components.algorithm.pathfinder.PathFinderListener;
 import app.maze.components.algorithm.pathfinder.traversers.Dijkstra;
 import app.maze.components.cell.State;
+import app.maze.components.cell.Walkable;
 import app.maze.components.cell.composite.CellComposite;
 import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
@@ -32,7 +33,7 @@ public final class ProcessManager implements Serializable {
     {
         // Set default algorithms
         setAlgorithm(new Dijkstra());
-        setAlgorithm(new BackTracker());
+        setAlgorithm(new Randomizer());
     }
 
     public ProcessManager(final MazeController mzController) {
@@ -55,11 +56,11 @@ public final class ProcessManager implements Serializable {
         // Set waiting state
         if (pathFinder.isRunning()) {
             pathFinder.setWaiting(!pathFinder.isWaiting());
-            // Collapse tree
+            // Collapse JTree
             mzController.collapse();
         } else if (generator.isRunning()) {
             generator.setWaiting(!generator.isWaiting());
-            // Collapse tree
+            // Collapse JTree
             mzController.collapse();
         }
     }
@@ -69,15 +70,27 @@ public final class ProcessManager implements Serializable {
             Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
             // Assert running algorithm
             assertRunning();
+            final MazeModel mzModel = mzController.getModel();
             if (algorithm.equals(PathFinder.class)) {
-                final MazeModel mzModel = mzController.getModel();
                 // Clear node parent relationships
                 mzController.clear();
+                // Fire PathFinder
                 pathFinder.find((MutableTreeNode) mzModel.getRoot(), (MutableTreeNode) mzModel.getTarget());
             } else if (algorithm.equals(Generator.class)) {
-                // Reset structure
-                mzController.reset();
-                generator.awake(null);
+                // TODO: Refactor
+                final CellComposite[] reference = mzController.getFlyweight().getReferences();
+                final Walkable oldRoot = (Walkable) mzModel.getRoot();
+                // // Reset structure
+                // mzController.reset();
+                // for (final CellComposite o : reference) {
+                //     o.setWalkable(false);
+                //     ((JComponent) mzController.getFlyweight().request(o)).setBackground(Color.BLACK);
+                // }
+                // Fire Generator
+                generator.generate(oldRoot == null
+                        ? reference[(int) (Math.random() * reference.length)]
+                        : oldRoot);
+                mzModel.setRoot(null);
             }
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
@@ -85,6 +98,7 @@ public final class ProcessManager implements Serializable {
     }
 
     public final void assertRunning() throws InterruptedException {
+        // Assert running algorithm
         pathFinder.assertRunning();
         generator.assertRunning();
     }
@@ -93,6 +107,7 @@ public final class ProcessManager implements Serializable {
         Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
         if (algorithm instanceof PathFinder) {
             pathFinder = (PathFinder) algorithm;
+            // Add default PathFinderListener to PathFinder
             pathFinder.addListener(listener);
         } else if (algorithm instanceof Generator)
             generator = (Generator) algorithm;
@@ -127,34 +142,46 @@ public final class ProcessManager implements Serializable {
             if (node.equals(mzModel.getRoot()))
                 return;
             final CellView cell = (CellView) mzController.getFlyweight().request(node);
-            // Update background
+            // Update background color
             cell.setBackground(state.getColor());
             // Ignore if unfocused
             if (CellView.getFocused() == null || !CellView.getFocused().equals(cell))
                 return;
-            // Update border
+            // Update border color
             cell.update.accept(cell.getBackground());
         }
 
-        @Override
-        public void nodeGerminated(final TreeNode node) {
-            update((CellComposite) node, State.GERMINATED);
+        private final void dispatchPathFinder(final PathFinderEvent e, final State state) {
+            final TreeNode[] gen = e.getGeneration();
+            // Update single node if no generation
+            if (gen == null)
+                update((CellComposite) e.getNode(), state);
+            // Update entire generation
+            else
+                for (final TreeNode node : gen)
+                    update((CellComposite) node, state);
         }
 
         @Override
-        public void nodeVisited(final TreeNode node) {
-            update((CellComposite) node, State.VISITED);
+        public void nodeGerminated(final PathFinderEvent e) {
+            dispatchPathFinder(e, State.GERMINATED);
         }
 
         @Override
-        public void nodeFound(final TreeNode node) {
-            update((CellComposite) node, State.VISITED);
+        public void nodeVisited(final PathFinderEvent e) {
+            dispatchPathFinder(e, State.VISITED);
+        }
+
+        @Override
+        public void nodeFound(final PathFinderEvent e) {
+            dispatchPathFinder(e, State.VISITED);
+            // Expand target path
             mzController.expand();
         }
 
         @Override
-        public void nodeTraversed(final TreeNode node) {
-            update((CellComposite) node, State.PATH);
+        public void nodeTraversed(final PathFinderEvent e) {
+            dispatchPathFinder(e, State.PATH);
         }
 
     }

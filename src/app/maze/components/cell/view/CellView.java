@@ -24,13 +24,12 @@ public final class CellView extends JPanel {
 
     private transient static CellView focused = null;
 
-    // TODO: Refactor
     @SuppressWarnings("unchecked")
     public final Consumer<Color> update = (Consumer<Color> & Serializable) color ->
             setBorder(BorderFactory.createLineBorder(color));
 
     {
-        // Set default background
+        // Set default background color
         update.accept(State.WALKABLE.getColor());
         addMouseListener(new SubjectListener());
     }
@@ -52,7 +51,7 @@ public final class CellView extends JPanel {
             manager.assertRunning();
             // Update walkable state
             clComposite.setWalkable(walk);
-            // Update background
+            // Update background color
             if (walk)
                 update.accept(State.WALKABLE.getColor());
             else
