@@ -30,7 +30,7 @@ public enum State {
         // Range through State
         for (final State state : values())
             // Return State if Color match
-            if (state.getColor() == color)
+            if (state.getColor().equals(color))
                 return state;
         return null;
     }

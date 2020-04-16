@@ -18,6 +18,8 @@ public class Randomizer extends Generator {
                 advance(child);
                 if (Math.random() < 0.5)
                     child.setWalkable(false);
+                else
+                    child.setWalkable(true);
             }
         }
     }

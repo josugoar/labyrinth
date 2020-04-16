@@ -8,6 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Enumeration;
 import java.util.Objects;
@@ -36,6 +38,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -457,14 +460,23 @@ public final class MazeView extends JFrame {
                 add(new MenuDecorator("File", KeyEvent.VK_F) {
                     private static final long serialVersionUID = 1L;
                     {
-                        // TODO: JFileChooser
+                        final JFileChooser chooser = new JFileChooser() {
+                            private static final long serialVersionUID = 1L;
+                            {
+                                setFileFilter(new FileNameExtensionFilter("SER file", "ser"));
+                            }
+                        };
                         add(new MenuItemDecorator("Open", "openIcon.gif", KeyEvent.VK_O) {
                             private static final long serialVersionUID = 1L;
                             {
                                 addActionListener(e -> {
                                     // Read serialized object
-                                    mzController.readMaze("components/ser/maze.ser");
-                                    // final int returnVal = new JFileChooser().showOpenDialog(MazeView.this);
+                                    if (chooser.showOpenDialog(MazeView.this) != JFileChooser.APPROVE_OPTION)
+                                        return;
+                                    final File file = chooser.getSelectedFile();
+                                    if (!file.canRead())
+                                        return;
+                                    mzController.readMaze(file.getAbsolutePath());
                                 });
                             }
                         });
@@ -474,8 +486,18 @@ public final class MazeView extends JFrame {
                             {
                                 addActionListener(e -> {
                                     // Serialize object
-                                    mzController.writeMaze("components/ser/maze.ser");
-                                    // final int returnVal = new JFileChooser().showSaveDialog(MazeView.this);
+                                    try {
+                                        if (chooser.showSaveDialog(MazeView.this) != JFileChooser.APPROVE_OPTION)
+                                            return;
+                                        final File file = chooser.getSelectedFile();
+                                        if (!file.exists())
+                                            file.createNewFile();
+                                        else if (!file.canWrite())
+                                            return;
+                                        mzController.writeMaze(file.getAbsolutePath());
+                                    } catch (final IOException l) {
+                                        JWrapper.dispatchException(l);
+                                }
                                 });
                             }
                         });

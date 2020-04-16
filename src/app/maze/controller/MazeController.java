@@ -183,7 +183,7 @@ public final class MazeController implements Serializable {
     public final void readMaze(final String path) {
         try {
             // Open Stream
-            final FileInputStream file = new FileInputStream(MazeModel.class.getResource(path).getPath());
+            final FileInputStream file = new FileInputStream(path);
             final ObjectInputStream in = new ObjectInputStream(file);
             // Read serialized object
             final PanelFlyweight otherFlyweight = (PanelFlyweight) in.readObject();
@@ -202,6 +202,7 @@ public final class MazeController implements Serializable {
             mzModel.setRoot(otherRoot);
             mzModel.setTarget(otherTarget);
         } catch (final IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             JWrapper.dispatchException(e);
         }
     }
@@ -211,7 +212,7 @@ public final class MazeController implements Serializable {
             // Assert running AlgorithmManager
             manager.assertRunning();
             // Open Stream
-            final FileOutputStream file = new FileOutputStream(MazeModel.class.getResource(path).getPath());
+            final FileOutputStream file = new FileOutputStream(path);
             final ObjectOutputStream out = new ObjectOutputStream(file);
             final CellComposite root = (CellComposite) mzModel.getRoot();
             // Unselect cell
@@ -219,7 +220,8 @@ public final class MazeController implements Serializable {
             // Remove node parent relationships
             mzModel.clear();
             // Remove endpoint relationships to enable graph serialization
-            root.override();
+            if (root != null)
+                root.override();
             // Serialize object
             out.writeObject(flyweight);
             out.writeObject(root);
@@ -228,7 +230,8 @@ public final class MazeController implements Serializable {
             out.close();
             file.close();
             // Reset TreeNode relationships
-            mzModel.initNeighbors(root);
+            if (root != null)
+                mzModel.initNeighbors(root);
         } catch (final InterruptedException | IOException e) {
             JWrapper.dispatchException(e);
         }

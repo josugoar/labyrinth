@@ -75,6 +75,10 @@ public final class CellView extends JPanel {
         // Focus CellView
         if (focused != null) {
             final State state = State.getState(focused.getBackground());
+            // Ignore if no State
+            if (state == null)
+                return;
+            // Switch on State
             switch (state) {
                 case WALKABLE:
                     focused.focus.accept(State.UNWALKABLE);
