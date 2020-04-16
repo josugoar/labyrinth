@@ -3,7 +3,7 @@ package app.maze.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.swing.JComponent;
+import javax.swing.BorderFactory;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -12,6 +12,7 @@ import javax.swing.tree.TreeNode;
 
 import app.maze.components.cell.State;
 import app.maze.components.cell.composite.CellComposite;
+import app.maze.components.cell.view.CellView;
 import app.maze.controller.MazeController;
 import app.maze.controller.components.panel.flyweight.PanelFlyweight;
 
@@ -34,11 +35,20 @@ public final class MazeModel extends DefaultTreeModel {
         this(null);
     }
 
+    // TODO: Find better solution
+
+    // private static final void update(final PanelFlyweight flyweight, final CellComposite node, final State state) {
+    //     Objects.requireNonNull(state, "State must not be null...");
+    //     final PanelFlyweight flyweight = mzController.getFlyweight();
+    //     // Update CellView background matching State
+    //     ((CellView) flyweight.request(node)).setBackground(state);
+    // }
+
     private final void update(final CellComposite node, final State state) {
         Objects.requireNonNull(state, "State must not be null...");
         final PanelFlyweight flyweight = mzController.getFlyweight();
-        // Update background color matching State
-        ((JComponent) flyweight.request(node)).setBackground(state.getColor());
+        // Update CellView background matching State
+        ((CellView) flyweight.request(node)).setBackground(state);
     }
 
     public final void reset() {

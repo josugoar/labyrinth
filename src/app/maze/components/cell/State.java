@@ -26,6 +26,15 @@ public enum State {
         this.color = color;
     }
 
+    public static final State getState(final Color color) {
+        // Range through State
+        for (final State state : values())
+            // Return State if Color match
+            if (state.getColor() == color)
+                return state;
+        return null;
+    }
+
     public final Color getColor() {
         return color;
     }

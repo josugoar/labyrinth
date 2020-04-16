@@ -31,7 +31,7 @@ public final class ProcessManager implements Serializable {
     private final PathFinderListener listener = new ManagerListener();
 
     {
-        // Set default algorithms
+        // Set default AlgorithmManager
         setAlgorithm(new Dijkstra());
         setAlgorithm(new Randomizer());
     }
@@ -45,7 +45,7 @@ public final class ProcessManager implements Serializable {
     }
 
     public final void interrupt() {
-        // Interrupt running state
+        // Interrupt AlgorithmManager running state
         if (pathFinder.isRunning())
             pathFinder.setRunning(false);
         else if (generator.isRunning())
@@ -53,7 +53,7 @@ public final class ProcessManager implements Serializable {
     }
 
     public final void await() {
-        // Set waiting state
+        // Set AlgorithmManager waiting state
         if (pathFinder.isRunning()) {
             pathFinder.setWaiting(!pathFinder.isWaiting());
             // Collapse JTree
@@ -68,7 +68,7 @@ public final class ProcessManager implements Serializable {
     public final void awake(final Class<? extends AlgorithmManager> algorithm) {
         try {
             Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
-            // Assert running algorithm
+            // Assert running AlgorithmManager
             assertRunning();
             final MazeModel mzModel = mzController.getModel();
             if (algorithm.equals(PathFinder.class)) {
@@ -77,7 +77,7 @@ public final class ProcessManager implements Serializable {
                 // Fire PathFinder
                 pathFinder.find((MutableTreeNode) mzModel.getRoot(), (MutableTreeNode) mzModel.getTarget());
             } else if (algorithm.equals(Generator.class)) {
-                // TODO: Refactor
+                // TODO: Refactor (add button to set all nodes (un)walkable)
                 final CellComposite[] reference = mzController.getFlyweight().getReferences();
                 final Walkable oldRoot = (Walkable) mzModel.getRoot();
                 // // Reset structure
@@ -98,13 +98,14 @@ public final class ProcessManager implements Serializable {
     }
 
     public final void assertRunning() throws InterruptedException {
-        // Assert running algorithm
+        // Assert running AlgorithmManager
         pathFinder.assertRunning();
         generator.assertRunning();
     }
 
     public final void setAlgorithm(final AlgorithmManager algorithm) {
         Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
+        // Update AlgorithmManager
         if (algorithm instanceof PathFinder) {
             pathFinder = (PathFinder) algorithm;
             // Add default PathFinderListener to PathFinder
@@ -138,25 +139,25 @@ public final class ProcessManager implements Serializable {
 
         private final void update(final CellComposite node, final State state) {
             final MazeModel mzModel = mzController.getModel();
-            // Ignore if root
+            // Ignore if TreeModel root
             if (node.equals(mzModel.getRoot()))
                 return;
             final CellView cell = (CellView) mzController.getFlyweight().request(node);
-            // Update background color
-            cell.setBackground(state.getColor());
-            // Ignore if unfocused
+            // Update CellView background
+            cell.setBackground(state);
+            // Ignore if unfocused CellView
             if (CellView.getFocused() == null || !CellView.getFocused().equals(cell))
                 return;
-            // Update border color
-            cell.update.accept(cell.getBackground());
+            // Update Border color
+            cell.update.accept(state);
         }
 
         private final void dispatchPathFinder(final PathFinderEvent e, final State state) {
             final TreeNode[] gen = e.getGeneration();
-            // Update single node if no generation
+            // Update single TreeNode if no generation
             if (gen == null)
                 update((CellComposite) e.getNode(), state);
-            // Update entire generation
+            // Update entire TreeNode generation
             else
                 for (final TreeNode node : gen)
                     update((CellComposite) node, state);
@@ -175,13 +176,13 @@ public final class ProcessManager implements Serializable {
         @Override
         public void nodeFound(final PathFinderEvent e) {
             dispatchPathFinder(e, State.VISITED);
-            // Expand target path
-            mzController.expand();
         }
 
         @Override
         public void nodeTraversed(final PathFinderEvent e) {
             dispatchPathFinder(e, State.PATH);
+            // Expand JTree target path
+            mzController.expand();
         }
 
     }

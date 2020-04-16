@@ -126,29 +126,29 @@ public final class MazeView extends JFrame {
                 addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public final void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-                        // Select cell
+                        // Select CellView
                         CellView.select(cell);
                     }
                     @Override
                     public final void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                        // Unselect cell
+                        // Unselect CellView
                         CellView.select(null);
                     }
                     @Override
                     public final void popupMenuCanceled(final PopupMenuEvent e) {
                     }
                 });
-                add(new MenuItemDecorator("Start", "startIcon.gif") {
+                add(new MenuItemDecorator("Start", "rootIcon.gif") {
                     private static final long serialVersionUID = 1L;
                     {
-                        // Set root
+                        // Set MazeMode root
                         addActionListener(e -> mzModel.setRoot(node));
                     }
                 });
-                add(new MenuItemDecorator("End", "endIcon.gif") {
+                add(new MenuItemDecorator("End", "targetIcon.gif") {
                     private static final long serialVersionUID = 1L;
                     {
-                        // Set target
+                        // Set MazeModel target
                         addActionListener(e -> mzModel.setTarget(node));
                     }
                 });
@@ -206,10 +206,10 @@ public final class MazeView extends JFrame {
                                     addTreeSelectionListener(e -> {
                                         final TreePath path = e.getNewLeadSelectionPath();
                                         if (path == null)
-                                            // Unselect cell
+                                            // Unselect CellView
                                             CellView.select(null);
                                         else
-                                            // Select cell
+                                            // Select CellView
                                             CellView.select((CellView) flyweight.request(path.getLastPathComponent()));
                                     });
                                 }

@@ -1,6 +1,7 @@
 package app.maze.components.algorithm.pathfinder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +24,7 @@ public abstract class PathFinder extends AlgorithmManager {
 
     protected final EventListenerList listeners = new EventListenerList();
 
-    protected MutableTreeNode start = null;
+    protected MutableTreeNode root = null;
 
     protected MutableTreeNode target = null;
 
@@ -35,6 +36,8 @@ public abstract class PathFinder extends AlgorithmManager {
         // Traverse entire TreeNode minimum spanning tree
         for (TreeNode parent = node.getParent(); parent.getParent() != null; parent = parent.getParent())
             path.add(parent);
+        // Reverse TreeNodePath
+        Collections.reverse(path);
         // Traverse generation
         fireNodeTraversed(new PathFinderEvent(this, path.toArray(new TreeNode[0])));
     }
@@ -44,7 +47,7 @@ public abstract class PathFinder extends AlgorithmManager {
             if (start == null)
                 throw new NullPointerException("No starting node found...");
             // Set endpoints
-            setStart(start);
+            setRoot(start);
             setTarget(target);
             // Run Thread
             start();
@@ -56,14 +59,14 @@ public abstract class PathFinder extends AlgorithmManager {
     @Override
     protected final void awake() {
         try {
-            if (start == null)
+            if (root == null)
                 throw new NullPointerException("PathFinder is not initialized...");
             visited = new HashSet<TreeNode>(0);
             traverse(advance(new HashSet<MutableTreeNode>() {
                 private static final long serialVersionUID = 1L;
                 {
                     // Construct first generation
-                    add(start);
+                    add(root);
                     // Set running
                     setRunning(true);
                 }
@@ -109,14 +112,14 @@ public abstract class PathFinder extends AlgorithmManager {
         fireEvent(e, (l, n) -> l.nodeTraversed(n));
     }
 
-    public final TreeNode getStart() {
-        return start;
+    public final TreeNode getRoot() {
+        return root;
     }
 
-    public synchronized final void setStart(final MutableTreeNode start) {
+    public synchronized final void setRoot(final MutableTreeNode root) {
         try {
             assertRunning();
-            this.start = Objects.requireNonNull(start, "Start must not be null...");
+            this.root = Objects.requireNonNull(root, "Start must not be null...");
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }

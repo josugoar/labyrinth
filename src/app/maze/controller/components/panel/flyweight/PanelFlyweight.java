@@ -31,7 +31,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     private boolean edged = false;
 
     {
-        // Set double buffer to prevent popping
+        // Set JComponent double buffer to prevent popping
         setDoubleBuffered(true);
         addContainerListener(new FlyweightListener());
     }
@@ -39,7 +39,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     public PanelFlyweight(final MazeController mzController) {
         super(new GridLayout());
         setController(mzController);
-        // Initialize default dimension
+        // Initialize PanelFlyweight default dimension
         resetDimension(20, 20);
     }
 
@@ -52,12 +52,12 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         removeAll();
         // Update LayoutManager to pack components
         setLayout(new GridLayout(width, height));
-        // Override reference
+        // Override PanelFlyweight reference
         reference = new ArrayList<CellComposite>(width * height);
     }
 
     public final void reset() {
-        // Override dimension with current dimension
+        // Override PanelFlyweight dimension with current dimension
         resetDimension(getRows(), getColumns());
     }
 
@@ -73,14 +73,14 @@ public final class PanelFlyweight extends JPanel implements Transformable {
             out = getReferences();
         } else
             throw new InvalidParameterException("Invalid Object...");
-        // Return other entry
+        // Return Object other entry
         return out[Arrays.asList(in).indexOf(o)];
     }
 
     public synchronized final void override(final PanelFlyweight other) {
-        // Revert components with other dimension
+        // Revert PanelFlyweight components with other dimension
         revert(other.getColumns(), other.getRows());
-        // Override component in foreach to preserve iteration order
+        // Override Component in foreach to preserve iteration order
         for (final CellView component : other.getComponents())
             add(component.getComposite(), component);
     }
@@ -113,18 +113,18 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     public final void add(CellComposite o1, CellView o2) throws NullPointerException {
         if (o1 == null && o2 == null)
             throw new NullPointerException("CellComposite and CellView must not be null...");
-        // Single relationships
+        // Single Object relationships
         if (o1 == null)
             o1 = new CellComposite(mzController);
         else if (o2 == null)
             o2 = new CellView(mzController, o1);
-        // Multiple relationships
+        // Multiple Object relationships
         else {
             o1.setController(mzController);
             o2.setController(mzController);
             o2.setComposite(o1);
         }
-        // Add component
+        // Add components
         reference.add(o1);
         add(o2);
     }
@@ -148,7 +148,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     }
 
     public synchronized final void resetDimension(final int width, final int height) {
-        // Revert component with new dimension
+        // Revert PanelFlyweight components with new dimension
         revert(width, height);
         // Insert new Object relationships
         for (int i = 0; i < width * height; i++)
@@ -212,16 +212,6 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         mzController.reset();
     }
 
-    private transient MazeController mzController;
-
-    public final MazeController getController() {
-        return mzController;
-    }
-
-    public final void setController(final MazeController mzController) {
-        this.mzController = mzController;
-    }
-
     @Override
     public CellView[] getComponents() {
         final Component[] component = super.getComponents();
@@ -235,6 +225,16 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         if (!(mgr instanceof GridLayout))
             throw new InvalidParameterException("LayoutManager must be GridLayout...");
         super.setLayout(mgr);
+    }
+
+    private transient MazeController mzController;
+
+    public final MazeController getController() {
+        return mzController;
+    }
+
+    public final void setController(final MazeController mzController) {
+        this.mzController = mzController;
     }
 
     private final class FlyweightListener implements ContainerListener, Serializable {

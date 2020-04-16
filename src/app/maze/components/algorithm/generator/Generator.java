@@ -14,7 +14,7 @@ public abstract class Generator extends AlgorithmManager {
 
     protected Set<Walkable> visited;
 
-    protected Walkable start;
+    protected Walkable root;
 
     protected int density = 50;
 
@@ -25,7 +25,7 @@ public abstract class Generator extends AlgorithmManager {
             if (start == null)
                 throw new NullPointerException("No starting node found...");
             // Set start
-            setStart(start);
+            setRoot(start);
             // Run Thread
             start();
         } catch (final NullPointerException e) {
@@ -36,11 +36,11 @@ public abstract class Generator extends AlgorithmManager {
     @Override
     protected final void awake() {
         try {
-            if (start == null)
+            if (root == null)
                 throw new NullPointerException("Generator is not initialized...");
             visited = new HashSet<Walkable>(0);
             setRunning(true);
-            advance(start);
+            advance(root);
         } catch (final NullPointerException | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
@@ -48,12 +48,12 @@ public abstract class Generator extends AlgorithmManager {
         }
     }
 
-    public final Walkable getStart() {
-        return start;
+    public final Walkable getRoot() {
+        return root;
     }
 
-    public final void setStart(final Walkable start) {
-        this.start = Objects.requireNonNull(start, "Walkable must not be null...");
+    public final void setRoot(final Walkable root) {
+        this.root = Objects.requireNonNull(root, "Walkable must not be null...");
     }
 
     public final int getDensity() {

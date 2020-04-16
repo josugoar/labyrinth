@@ -43,7 +43,7 @@ public class Dijkstra extends PathFinder {
                     // Visit generation
                     fireNodeGerminated(new PathFinderEvent(this, child));
                 }
-                if (child.equals(start))
+                if (child.equals(root))
                     child.setParent(null);
             }
         if (newGen.size() == 0)
