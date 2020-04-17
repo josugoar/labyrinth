@@ -6,8 +6,8 @@ import java.util.Set;
 
 import javax.swing.tree.MutableTreeNode;
 
+import app.maze.components.algorithm.TraverserListener.TraverserEvent;
 import app.maze.components.algorithm.pathfinder.PathFinder;
-import app.maze.components.algorithm.pathfinder.PathFinderListener.PathFinderEvent;
 
 public class Dijkstra extends PathFinder {
 
@@ -20,8 +20,8 @@ public class Dijkstra extends PathFinder {
         // Check for running state
         if (!running)
             throw new InterruptedException("Invokation interrupted...");
-        // Germinate generation
-        fireNodeVisited(new PathFinderEvent(this, currGen.toArray(new MutableTreeNode[0])));
+        // Fire visited PathFinderEvent
+        fireNodeVisited(new TraverserEvent(this, currGen.toArray(new MutableTreeNode[0])));
         // Initialize new empty generation
         final Set<MutableTreeNode> newGen = new HashSet<MutableTreeNode>(0);
         // Range through current generaton nodes cell neighbors
@@ -31,8 +31,8 @@ public class Dijkstra extends PathFinder {
                 // Check endpoint
                 if (child.equals(target)) {
                     child.setParent(node);
-                    // Visit generation
-                    fireNodeFound(new PathFinderEvent(this, newGen.toArray(new MutableTreeNode[0])));
+                    // Fire reached PathFinderEvent
+                    fireNodeReached(new TraverserEvent(this, newGen.toArray(new MutableTreeNode[0])));
                     return child;
                 }
                 // Check visited
@@ -40,8 +40,8 @@ public class Dijkstra extends PathFinder {
                     newGen.add(child);
                     child.setParent(node);
                     visited.add(child);
-                    // Visit generation
-                    fireNodeGerminated(new PathFinderEvent(this, child));
+                    // Fire germinated PathFinderEvent
+                    fireNodeGerminated(new TraverserEvent(this, child));
                 }
                 if (child.equals(root))
                     child.setParent(null);

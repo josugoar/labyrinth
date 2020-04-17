@@ -3,18 +3,27 @@ package app.maze.components.algorithm.generator;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.swing.event.EventListenerList;
+import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
+import app.maze.components.algorithm.Listenable;
+import app.maze.components.algorithm.TraverserListener;
+import app.maze.components.algorithm.TraverserListener.TraverserEvent;
 import app.maze.components.cell.Walkable;
 import utils.JWrapper;
 
-public abstract class Generator extends AlgorithmManager {
+public abstract class Generator extends AlgorithmManager implements Listenable {
 
     private static final long serialVersionUID = 1L;
 
     protected Set<Walkable> visited;
 
-    protected Walkable root;
+    protected final EventListenerList listeners = new EventListenerList();
+
+    protected Walkable root = null;
 
     protected int density = 50;
 
@@ -41,11 +50,32 @@ public abstract class Generator extends AlgorithmManager {
             visited = new HashSet<Walkable>(0);
             setRunning(true);
             advance(root);
+            fireNodeReached(new TraverserEvent(this, (TreeNode) null));
         } catch (final NullPointerException | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
             setRunning(false);
         }
+    }
+
+    @Override
+    public final void addListener(final TraverserListener l) {
+        listeners.add(TraverserListener.class, l);
+    }
+
+    @Override
+    public final void removeListener(final TraverserListener l) {
+        listeners.remove(TraverserListener.class, l);
+    }
+
+    @Override
+    public void fireEvent(final TraverserEvent e, final BiConsumer<TraverserListener, TraverserEvent> fire) {
+        final Object[] listeners = this.listeners.getListenerList();
+        // Range through listeners
+        for (int i = listeners.length - 2; i >= 0; i -= 2)
+            if (listeners[i] == TraverserListener.class)
+                // Accept event
+                fire.accept((TraverserListener) listeners[i + 1], e);
     }
 
     public final Walkable getRoot() {

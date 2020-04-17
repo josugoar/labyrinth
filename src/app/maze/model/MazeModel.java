@@ -41,7 +41,7 @@ public final class MazeModel extends DefaultTreeModel {
     }
 
     private final void clear(final CellComposite node) {
-        // Range through DefaultMutableTreeNode children
+        // Range through TreeNode children
         for (int i = 0; i < node.getChildCount(); i++) {
             final CellComposite child = (CellComposite) node.getChildAt(i);
             // Ignore if CellComposite orphan
@@ -110,16 +110,6 @@ public final class MazeModel extends DefaultTreeModel {
         }
     }
 
-    private transient MazeController mzController;
-
-    public final MazeController getController() {
-        return mzController;
-    }
-
-    public final void setController(final MazeController mzController) {
-        this.mzController = mzController;
-    }
-
     @Override
     public final void setRoot(final TreeNode root) {
         // Override MazeModel root
@@ -141,6 +131,16 @@ public final class MazeModel extends DefaultTreeModel {
             if (root != null)
                 ((CellComposite) root).getView().setState(State.ROOT);
         }
+    }
+
+    private transient MazeController mzController;
+
+    public final MazeController getController() {
+        return mzController;
+    }
+
+    public final void setController(final MazeController mzController) {
+        this.mzController = mzController;
     }
 
     private final class ModelListener implements TreeModelListener, Serializable {

@@ -70,8 +70,10 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
             // Ignore if no TreeModel root
             if (root == null)
                 return;
+            // Get Object neighbors
+            final Object[] neighbors = flyweight.getNeighbors(this);
             // Insert CellComposite neighbors
-            for (final CellComposite neighbor : Arrays.copyOf(flyweight.getNeighbors(this), getChildCount(), CellComposite[].class)) {
+            for (final CellComposite neighbor : Arrays.copyOf(neighbors, neighbors.length, CellComposite[].class)) {
                 // Ignore if not Walkable
                 if (!neighbor.isWalkable())
                     continue;
@@ -89,21 +91,20 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         } else {
             // Update CellView background
             clView.setState(State.UNWALKABLE);
-            // Ignore if DefaultMutableTreeNode leaf
-            if (isLeaf()) {
+            if (isLeaf())
                 // Notify TreeModelListener empty removal
                 mzModel.nodesWereRemoved(this, new int[0], new Object[0]);
-                return;
+            else {
+                // Remove CellComposite neighbors
+                new Vector<CellComposite>(children).forEach(child -> child.children.remove(this));
+                // Get old DefaultMutableTreeNode enpoints
+                final int[] oldIndex = IntStream.range(0, getChildCount()).toArray();
+                final Object[] oldChildren = children.toArray();
+                // Remove all DefaultMutableTreeNode children
+                removeAllChildren();
+                // Notify TreeModelListener removal
+                mzModel.nodesWereRemoved(this, oldIndex, oldChildren);
             }
-            // Remove CellComposite neighbors
-            new Vector<CellComposite>(children).forEach(child -> child.children.remove(this));
-            // Get old DefaultMutableTreeNode enpoints
-            final int[] oldIndex = IntStream.range(0, getChildCount()).toArray();
-            final Object[] oldChildren = children.toArray();
-            // Remove all DefaultMutableTreeNode children
-            removeAllChildren();
-            // Notify TreeModelListener removal
-            mzModel.nodesWereRemoved(this, oldIndex, oldChildren);
         }
     }
 

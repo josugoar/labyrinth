@@ -40,6 +40,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -141,6 +142,8 @@ public final class MazeView extends JFrame {
                     }
                     @Override
                     public final void popupMenuCanceled(final PopupMenuEvent e) {
+                        // Unselect CellView
+                        CellView.select(null);
                     }
                 });
                 add(new MenuItemDecorator("Start", "rootIcon.gif") {
@@ -393,19 +396,19 @@ public final class MazeView extends JFrame {
                                         add(new JRadioButtonMenuItem("A Star", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new AStar()));
+                                                addItemListener(e -> manager.setAlgorithm(new AStar(), PathFinder.class));
                                             }
                                         });
                                         add(new JRadioButtonMenuItem("BFS", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new BFS()));
+                                                addItemListener(e -> manager.setAlgorithm(new BFS(), PathFinder.class));
                                             }
                                         });
                                         add(new JRadioButtonMenuItem("Dijkstra", null, true) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new Dijkstra()));
+                                                addItemListener(e -> manager.setAlgorithm(new Dijkstra(), PathFinder.class));
                                             }
                                         });
                                     }
@@ -424,25 +427,25 @@ public final class MazeView extends JFrame {
                                         add(new JRadioButtonMenuItem("BackTracker", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new BackTracker()));
+                                                addItemListener(e -> manager.setAlgorithm(new BackTracker(), Generator.class));
                                             }
                                         });
                                         add(new JRadioButtonMenuItem("DFS", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new DFS()));
+                                                addItemListener(e -> manager.setAlgorithm(new DFS(), Generator.class));
                                             }
                                         });
                                         add(new JRadioButtonMenuItem("Prim", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new Prim()));
+                                                addItemListener(e -> manager.setAlgorithm(new Prim(), Generator.class));
                                             }
                                         });
                                         add(new JRadioButtonMenuItem("Randomizer", null, true) {
                                             private static final long serialVersionUID = 1L;
                                             {
-                                                addItemListener(e -> manager.setAlgorithm(new Randomizer()));
+                                                addItemListener(e -> manager.setAlgorithm(new Randomizer(), Generator.class));
                                             }
                                         });
                                     }
@@ -461,7 +464,7 @@ public final class MazeView extends JFrame {
                 add(new MenuDecorator("File", KeyEvent.VK_F) {
                     private static final long serialVersionUID = 1L;
                     {
-                        final JFileChooser chooser = new JFileChooser() {
+                        final JFileChooser chooser = new JFileChooser((File) null, (FileSystemView) null) {
                             private static final long serialVersionUID = 1L;
                             {
                                 // Set custom FileNameExtensionFilter

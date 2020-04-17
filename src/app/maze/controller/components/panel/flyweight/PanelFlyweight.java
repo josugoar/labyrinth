@@ -256,20 +256,20 @@ public final class PanelFlyweight extends JPanel implements Transformable {
 
         private static final long serialVersionUID = 1L;
 
-        private final void update(final Component component) {
+        private final void update() {
             // Update draw for each Component change
-            component.revalidate();
-            component.repaint();
+            PanelFlyweight.this.revalidate();
+            PanelFlyweight.this.repaint();
         }
 
         @Override
         public void componentAdded(final ContainerEvent e) {
-            update(PanelFlyweight.this);
+            update();
         }
 
         @Override
         public void componentRemoved(final ContainerEvent e) {
-            update(PanelFlyweight.this);
+            update();
         }
 
     }

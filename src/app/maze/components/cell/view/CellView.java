@@ -60,14 +60,14 @@ public final class CellView extends JPanel {
 
     public synchronized static void select(final CellView selected) {
         // Focus CellView
-        focus(selected);
+        focus(selected, false);
         // Update selected CellView
         CellView.selected = selected;
     }
 
-    public synchronized static final void focus(final CellView focused) {
+    public synchronized static final void focus(final CellView focused, final boolean select) {
         // Ignore if selected CellView
-        if (selected != null)
+        if (selected != null && select)
             return;
         // Unfocus CellView
         if (CellView.focused != null)
@@ -146,7 +146,7 @@ public final class CellView extends JPanel {
                 // Clear node parent relationships
                 mzController.clear();
                 // Focus CellView
-                focus(CellView.this);
+                focus(CellView.this, true);
                 // Check MouseEvent state
                 if (e.isShiftDown()) {
                     // Assert running AlgorithmManager
@@ -168,7 +168,7 @@ public final class CellView extends JPanel {
         @Override
         public final void mouseEntered(final MouseEvent e) {
             // Focus CellView
-            focus(CellView.this);
+            focus(CellView.this, true);
             // Dispatch MouseEvent
             dispatchButton(e);
         }
@@ -176,7 +176,7 @@ public final class CellView extends JPanel {
         @Override
         public final void mouseExited(final MouseEvent e) {
             // Unfocus CellView
-            focus(null);
+            focus(null, true);
         }
 
     };

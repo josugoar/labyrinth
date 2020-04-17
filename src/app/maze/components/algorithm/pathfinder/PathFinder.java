@@ -13,10 +13,12 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import app.maze.components.algorithm.AlgorithmManager;
-import app.maze.components.algorithm.pathfinder.PathFinderListener.PathFinderEvent;
+import app.maze.components.algorithm.Listenable;
+import app.maze.components.algorithm.TraverserListener;
+import app.maze.components.algorithm.TraverserListener.TraverserEvent;
 import utils.JWrapper;
 
-public abstract class PathFinder extends AlgorithmManager {
+public abstract class PathFinder extends AlgorithmManager implements Listenable{
 
     private static final long serialVersionUID = 1L;
 
@@ -39,7 +41,7 @@ public abstract class PathFinder extends AlgorithmManager {
         // Reverse TreeNodePath
         Collections.reverse(path);
         // Traverse generation
-        fireNodeTraversed(new PathFinderEvent(this, path.toArray(new TreeNode[0])));
+        fireNodeTraversed(new TraverserEvent(this, path.toArray(new TreeNode[0])));
     }
 
     public final void find(final MutableTreeNode start, final MutableTreeNode target) {
@@ -51,7 +53,7 @@ public abstract class PathFinder extends AlgorithmManager {
             setTarget(target);
             // Run Thread
             start();
-        } catch (final NullPointerException e) {
+        } catch (final NullPointerException | InterruptedException e) {
             JWrapper.dispatchException(e);
         }
     }
@@ -79,50 +81,33 @@ public abstract class PathFinder extends AlgorithmManager {
         }
     }
 
-    public final void addListener(final PathFinderListener l) {
-        listeners.add(PathFinderListener.class, l);
+    @Override
+    public final void addListener(final TraverserListener l) {
+        listeners.add(TraverserListener.class, l);
     }
 
-    public final void removeListener(final PathFinderListener l) {
-        listeners.remove(PathFinderListener.class, l);
+    @Override
+    public final void removeListener(final TraverserListener l) {
+        listeners.remove(TraverserListener.class, l);
     }
 
-    private void fireEvent(final PathFinderEvent e, final BiConsumer<PathFinderListener, PathFinderEvent> fire) {
+    @Override
+    public void fireEvent(final TraverserEvent e, final BiConsumer<TraverserListener, TraverserEvent> fire) {
         Object[] listeners = this.listeners.getListenerList();
         // Range through listeners
         for (int i = listeners.length - 2; i >= 0; i -= 2)
-            if (listeners[i] == PathFinderListener.class)
+            if (listeners[i] == TraverserListener.class)
                 // Accept event
-                fire.accept((PathFinderListener) listeners[i + 1], e);
-    }
-
-    protected final void fireNodeGerminated(final PathFinderEvent e) {
-        fireEvent(e, (l, n) -> l.nodeGerminated(n));
-    }
-
-    protected final void fireNodeVisited(final PathFinderEvent e) {
-        fireEvent(e, (l, n) -> l.nodeVisited(n));
-    }
-
-    protected final void fireNodeFound(final PathFinderEvent e) {
-        fireEvent(e, (l, n) -> l.nodeFound(n));
-    }
-
-    protected final void fireNodeTraversed(final PathFinderEvent e) {
-        fireEvent(e, (l, n) -> l.nodeTraversed(n));
+                fire.accept((TraverserListener) listeners[i + 1], e);
     }
 
     public final TreeNode getRoot() {
         return root;
     }
 
-    public synchronized final void setRoot(final MutableTreeNode root) {
-        try {
-            assertRunning();
-            this.root = Objects.requireNonNull(root, "Start must not be null...");
-        } catch (final InterruptedException e) {
-            JWrapper.dispatchException(e);
-        }
+    public synchronized final void setRoot(final MutableTreeNode root) throws InterruptedException {
+        assertRunning();
+        this.root = Objects.requireNonNull(root, "Start must not be null...");
     }
 
     public final TreeNode getTarget() {
