@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "vscjava.vscode-java-debug",
+            "vscjava.vscode-java-dependency",
+            "vscjava.vscode-java-test",
+            "redhat.java",
+            "vscjava.vscode-maven",
+            "visualstudioexptteam.vscodeintellicode",
+        ]
+    },
+    "settings": {
+        "editor.formatOnSave": false,
+        "java.dependency.packagePresentation": "flat",
+        "java.dependency.syncWithFolderExplorer": true
+    }
+}

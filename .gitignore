@@ -1,6 +1,4 @@
 .vscode/*
 *.class
 *.jar
-*.code-workspace
 *.stackdump
-*test.*
