@@ -33,7 +33,7 @@ public final class MazeModel extends DefaultTreeModel {
     }
 
     public final void reset() {
-        // Reset endpoints
+        // Hard reset MazeModel endpoints
         root = null;
         target = null;
         // Collapse JTree
@@ -41,45 +41,45 @@ public final class MazeModel extends DefaultTreeModel {
     }
 
     private final void clear(final CellComposite node) {
-        // Range through children
+        // Range through DefaultMutableTreeNode children
         for (int i = 0; i < node.getChildCount(); i++) {
             final CellComposite child = (CellComposite) node.getChildAt(i);
-            // Ignore if orphan
+            // Ignore if CellComposite orphan
             if (child.isOrphan())
                 continue;
-            // Reset State
+            // Reset CellView State
             if (!child.equals(root) && !child.equals(target))
                 child.getView().setState(State.WALKABLE);
-            // Remove parent
+            // Remove DefaultMutableTreeNode parent
             child.setParent(null);
-            // Remove children parent
+            // Remove CellComposite children parent
             clear(child);
         }
     }
 
     public final void clear() {
-        // Ignore if no root
+        // Ignore if no MazeModel root
         if (root == null)
             return;
-        // Remove node parent relationships
+        // Remove CellComposite parent relationships
         clear((CellComposite) root);
         // Collapse JTree
         mzController.collapse();
     }
 
     public final void initNeighbors(final CellComposite node) {
-        // Ignore if not walkable or not leaf
+        // Ignore if CellComposite not walkable or not leaf
         if (!node.isWalkable() || !node.isLeaf())
             return;
         final PanelFlyweight flyweight = mzController.getFlyweight();
-        // Range through neighbors
+        // Range through CellComposite neighbors
         for (final Object neighbor : flyweight.getNeighbors(node)) {
-            // Ignore if not walkable neighbor
+            // Ignore if CellComposite not walkable neighbor
             if (!((CellComposite) neighbor).isWalkable())
                 continue;
-            // Add children
+            // Add MutableTreeNode children
             node.add((MutableTreeNode) neighbor);
-            // Add children children
+            // Add CellComposite children children
             initNeighbors((CellComposite) neighbor);
         }
     }
@@ -89,22 +89,22 @@ public final class MazeModel extends DefaultTreeModel {
     }
 
     public final void setTarget(final TreeNode target) {
-        // Override target
+        // Override MazeModel target
         if (this.target != null && this.target.equals(target)) {
             ((CellComposite) this.target).getView().setState(State.WALKABLE);
             this.target = null;
             mzController.collapse();
         } else {
-            // Update walkable state
+            // Update Walkable state
             if (target != null)
                 ((CellComposite) target).setWalkable(true);
-            // Get old target
+            // Get old MazeModel target
             final CellComposite oldTarget = (CellComposite) this.target;
             this.target = target;
-            // Override old target
+            // Override old MazeModel target
             if (oldTarget != null)
                 oldTarget.getView().setState(State.WALKABLE);
-            // Set new target
+            // Set new MazeModel target
             if (target != null)
                 ((CellComposite) target).getView().setState(State.TARGET);
         }
@@ -122,22 +122,22 @@ public final class MazeModel extends DefaultTreeModel {
 
     @Override
     public final void setRoot(final TreeNode root) {
-        // Override root
+        // Override MazeModel root
         if (this.root != null && this.root.equals(root)) {
             ((CellComposite) this.root).getView().setState(State.WALKABLE);
             this.root = null;
             mzController.collapse();
         } else {
-            // Update walkable state
+            // Update Walkable state
             if (root != null)
                 ((CellComposite) root).setWalkable(true);
-            // Get old root
+            // Get old MazeModel root
             final CellComposite oldRoot = (CellComposite) this.root;
             super.setRoot(root);
-            // Override old root
+            // Override old MazeModel root
             if (oldRoot != null)
                 oldRoot.getView().setState(State.WALKABLE);
-            // Set new root
+            // Set new MazeModel root
             if (root != null)
                 ((CellComposite) root).getView().setState(State.ROOT);
         }
@@ -149,14 +149,14 @@ public final class MazeModel extends DefaultTreeModel {
 
         @Override
         public final void treeStructureChanged(final TreeModelEvent e) {
-            // Ignore if no root
+            // Ignore if no MazeModel root
             if (e.getTreePath() == null) {
                 mzController.collapse();
                 return;
             }
-            // Remove node relationships
+            // Remove CellComposite relationships
             ((CellComposite) root).override();
-            // Initialize all node neighbors
+            // Initialize all CellComposite neighbors
             initNeighbors((CellComposite) root);
             // Collapse JTree
             mzController.collapse();
@@ -166,13 +166,13 @@ public final class MazeModel extends DefaultTreeModel {
         public final void treeNodesRemoved(final TreeModelEvent e) {
             // Collapse JTree
             mzController.collapse();
-            // Ignore if root not removed
+            // Ignore if MazeModel root not removed
             if (!((CellComposite) e.getTreePath().getLastPathComponent()).equals(root))
                 return;
-            // Remove node relationships
+            // Remove CellComposite relationships
             for (final Object children : e.getChildren())
                 ((CellComposite) children).override();
-            // Reset root
+            // Reset MazeModel root
             root = null;
             // Collapse JTree
             mzController.collapse();

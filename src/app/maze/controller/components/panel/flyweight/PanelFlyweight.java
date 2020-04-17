@@ -37,7 +37,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
     }
 
     public PanelFlyweight(final MazeController mzController) {
-        super(new GridLayout());
+        super(new GridLayout(1, 0, 0, 0));
         setController(mzController);
         // Initialize PanelFlyweight default dimension
         resetDimension(20, 20);
@@ -51,7 +51,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         // Remove Component to prevent overlapping
         removeAll();
         // Update LayoutManager to pack components
-        setLayout(new GridLayout(width, height));
+        setLayout(new GridLayout(width, height, 0, 0));
         // Override PanelFlyweight reference
         reference = new ArrayList<CellComposite>(width * height);
     }
@@ -65,6 +65,7 @@ public final class PanelFlyweight extends JPanel implements Transformable {
         // Initialize empty arrays
         Object[] in;
         Object[] out;
+        // Set Object I/O order
         synchronized (getTreeLock()) {
             if (o instanceof CellComposite) {
                 in = getReferences();

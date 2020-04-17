@@ -10,27 +10,27 @@ public final class Maze extends Thread implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final MazeModel MazeModel;
+    private final MazeModel mzModel;
 
-    private final MazeView MazeView;
+    private final MazeView mzView;
 
-    private final MazeController MazeController;
+    private final MazeController mzController;
 
-    public Maze() {
-        MazeModel = new MazeModel();
-        MazeView = new MazeView();
-        MazeController = new MazeController();
+    {
+        mzModel = new MazeModel();
+        mzView = new MazeView();
+        mzController = new MazeController();
     }
 
     private final void initMaze() {
-        MazeModel.setController(MazeController);
-        MazeView.setController(MazeController);
-        MazeController.setModel(MazeModel);
-        MazeController.setView(MazeView);
+        mzModel.setController(mzController);
+        mzView.setController(mzController);
+        mzController.setModel(mzModel);
+        mzController.setView(mzView);
     }
 
     private final void runMaze() {
-        MazeView.display();
+        mzView.display();
     }
 
     @Override
@@ -43,9 +43,9 @@ public final class Maze extends Thread implements Serializable {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((MazeController == null) ? 0 : MazeController.hashCode());
-        result = prime * result + ((MazeModel == null) ? 0 : MazeModel.hashCode());
-        result = prime * result + ((MazeView == null) ? 0 : MazeView.hashCode());
+        result = prime * result + ((mzController == null) ? 0 : mzController.hashCode());
+        result = prime * result + ((mzModel == null) ? 0 : mzModel.hashCode());
+        result = prime * result + ((mzView == null) ? 0 : mzView.hashCode());
         return result;
     }
 
@@ -58,20 +58,20 @@ public final class Maze extends Thread implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         final Maze other = (Maze) obj;
-        if (MazeController == null)
-            if (other.MazeController != null)
+        if (mzController == null)
+            if (other.mzController != null)
                 return false;
-            else if (!MazeController.equals(other.MazeController))
+            else if (!mzController.equals(other.mzController))
                 return false;
-        if (MazeModel == null)
-            if (other.MazeModel != null)
+        if (mzModel == null)
+            if (other.mzModel != null)
                 return false;
-            else if (!MazeModel.equals(other.MazeModel))
+            else if (!mzModel.equals(other.mzModel))
                 return false;
-        if (MazeView == null)
-            if (other.MazeView != null)
+        if (mzView == null)
+            if (other.mzView != null)
                 return false;
-            else if (!MazeView.equals(other.MazeView))
+            else if (!mzView.equals(other.mzView))
                 return false;
         return true;
     }

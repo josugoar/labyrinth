@@ -1,7 +1,10 @@
 package app.maze.controller.components.process.manager;
 
 import java.io.Serializable;
+import java.security.InvalidAlgorithmParameterException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -23,11 +26,11 @@ public final class ProcessManager implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // private final Set<AlgorithmManager> algorithms = new HashSet<AlgorithmManager>(0);
+
     private PathFinder pathFinder;
 
     private Generator generator;
-
-    private final PathFinderListener listener = new ManagerListener();
 
     {
         // Set default AlgorithmManager
@@ -100,13 +103,29 @@ public final class ProcessManager implements Serializable {
         generator.assertRunning();
     }
 
+    // public final void setAlgorithm(final AlgorithmManager algorithm, final Class<? extends AlgorithmManager> clazz)
+    //         throws InvalidAlgorithmParameterException {
+    //     Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
+    //     Objects.requireNonNull(clazz, "Class must not be null...");
+    //     if (!(clazz.equals(PathFinder.class)) && !(clazz.equals(Generator.class)))
+    //         throw new InvalidAlgorithmParameterException("Class must be PathFinder or Generator...");
+    //     if (!algorithm.getClass().isAssignableFrom(clazz))
+    //         throw new InvalidAlgorithmParameterException("AlgorithmManager must extend Class...");
+    //     if (clazz.equals(PathFinder.class))
+    //         ((PathFinder) algorithm).addListener(new ManagerListener());
+    //     else
+    //         System.out.println("addGeneratorListener(new ManagerListener())");
+    //     algorithms.removeIf(a -> a.getClass().equals(clazz));
+    //     algorithms.add(algorithm);
+    // }
+
     public final void setAlgorithm(final AlgorithmManager algorithm) {
         Objects.requireNonNull(algorithm, "AlgorithmManager must not be null...");
         // Update AlgorithmManager
         if (algorithm instanceof PathFinder) {
             pathFinder = (PathFinder) algorithm;
             // Add default PathFinderListener to PathFinder
-            pathFinder.addListener(listener);
+            pathFinder.addListener(new ManagerListener());
         } else if (algorithm instanceof Generator)
             generator = (Generator) algorithm;
     }
@@ -146,7 +165,7 @@ public final class ProcessManager implements Serializable {
             if (CellView.getFocused() == null || !CellView.getFocused().equals(cell))
                 return;
             // Update Border color
-            cell.focus.accept(state);
+            cell.recolor.accept(state);
         }
 
         private final void dispatchPathFinder(final PathFinderEvent e, final State state) {

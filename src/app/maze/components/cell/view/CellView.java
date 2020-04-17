@@ -24,12 +24,12 @@ public final class CellView extends JPanel {
     private transient static CellView focused = null;
 
     @SuppressWarnings("unchecked")
-    public final Consumer<State> focus = (Consumer<State> & Serializable) state ->
+    public final Consumer<State> recolor = (Consumer<State> & Serializable) state ->
             setBorder(BorderFactory.createLineBorder(state.getColor()));
 
     {
         // Set default Border
-        focus.accept(State.WALKABLE);
+        recolor.accept(State.WALKABLE);
         addMouseListener(new SubjectListener());
     }
 
@@ -52,7 +52,7 @@ public final class CellView extends JPanel {
             if (walk)
                 return;
             // Update CellView
-            focus.andThen(this::setState).accept(State.UNWALKABLE);
+            recolor.andThen(this::setState).accept(State.UNWALKABLE);
         } catch (final InterruptedException e) {
             JWrapper.dispatchException(e);
         }
@@ -71,7 +71,7 @@ public final class CellView extends JPanel {
             return;
         // Unfocus CellView
         if (CellView.focused != null)
-            CellView.focused.focus.accept(State.WALKABLE);
+            CellView.focused.recolor.accept(State.WALKABLE);
         // Focus CellView
         if (focused != null) {
             final State state = State.getState(focused.getBackground());
@@ -81,10 +81,10 @@ public final class CellView extends JPanel {
             // Switch on State
             switch (state) {
                 case WALKABLE:
-                    focused.focus.accept(State.UNWALKABLE);
+                    focused.recolor.accept(State.UNWALKABLE);
                     break;
                 default:
-                    focused.focus.accept(state);
+                    focused.recolor.accept(state);
             }
         }
         // Update focused CellView
