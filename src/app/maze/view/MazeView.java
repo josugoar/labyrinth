@@ -10,7 +10,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.Enumeration;
 import java.util.Objects;
 
@@ -66,63 +65,86 @@ import app.maze.view.components.widget.decorator.MenuDecorator;
 import app.maze.view.components.widget.decorator.MenuItemDecorator;
 import utils.JWrapper;
 
+/**
+ * Maze MVC View representation, extending <code>javax.swing.JFrame</code>.
+ *
+ * @see javax.swing.JFrame JFrame
+ */
 public final class MazeView extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public JTree tree;
+    /**
+     * Current dynamic <code>javax.swing.JTree</code> structure.
+     */
+    private JTree tree;
 
-    public JLabel label;
+    /**
+     * Current dynamic <code>javax.swing.JLabel</code> structure.
+     */
+    private JLabel label;
 
     static {
-        // Set UIManager cross-platform look-and-feel
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
             final Exception l = new UnsupportedLookAndFeelException("Unsupported look and feel...");
             JWrapper.dispatchException(l.initCause(e));
         }
-        // Do not consume JPopupMenu event on close
         UIManager.put("PopupMenu.consumeEventOnClose", false);
     }
 
     {
-        // Change Cursor state depending on KeyEvent
         addKeyListener(new KeyAdapter() {
             @Override
             public final void keyPressed(final KeyEvent e) {
-                // Dispatch KeyEvent
                 mzController.dispatchKey(e);
             }
             @Override
             public final void keyReleased(final KeyEvent e) {
-                // Reset Cursor state
                 setCursor(Cursor.getDefaultCursor());
             }
         });
     }
 
+    /**
+     * Enclose MazeController.
+     *
+     * @param mzController MazeController
+     */
     public MazeView(final MazeController mzController) {
         super("MazeApp");
         setController(mzController);
     }
 
+    /**
+     * Create empty View.
+     */
     public MazeView() {
         this(null);
     }
 
+    /**
+     * Display View.
+     */
     public final void display() {
         try {
             initComponent();
             initFrame();
-            // Set JFrame visible
             setVisible(true);
         } catch (final NullPointerException e) {
             JWrapper.dispatchException(e);
         }
     }
 
-    public final JPopupMenu releasePopup(final CellView clView) throws InvalidParameterException {
+    /**
+     * Release <code>app.maze.components.cell.view.CellView</code>
+     * <code>javax.swing.JPopupMenu</code>.
+     *
+     * @param clView CellView
+     * @return JPopupMenu
+     */
+    public final JPopupMenu releasePopup(final CellView clView) {
         Objects.requireNonNull(clView, "CellSubject must not be null...");
         return new JPopupMenu() {
             private static final long serialVersionUID = 1L;
@@ -132,31 +154,26 @@ public final class MazeView extends JFrame {
                 addPopupMenuListener(new PopupMenuListener() {
                     @Override
                     public final void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-                        // Select CellView
                         CellView.select(clView);
                     }
                     @Override
                     public final void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                        // Unselect CellView
                         CellView.select(null);
                     }
                     @Override
                     public final void popupMenuCanceled(final PopupMenuEvent e) {
-                        // Unselect CellView
                         CellView.select(null);
                     }
                 });
                 add(new MenuItemDecorator("Start", "rootIcon.gif") {
                     private static final long serialVersionUID = 1L;
                     {
-                        // Set MazeModel root
                         addActionListener(e -> mzModel.setRoot(clComposite));
                     }
                 });
                 add(new MenuItemDecorator("End", "targetIcon.gif") {
                     private static final long serialVersionUID = 1L;
                     {
-                        // Set MazeModel target
                         addActionListener(e -> mzModel.setTarget(clComposite));
                     }
                 });
@@ -164,19 +181,26 @@ public final class MazeView extends JFrame {
         };
     }
 
+    /**
+     * Initialize <code>javax.swing.JFrame</code>.
+     */
     private final void initFrame() {
-        // Set default JFrame parameters
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(450, 525));
         setLocationRelativeTo(null);
         setFocusable(true);
-        // Pack Window
         pack();
     }
 
+    /**
+     * Current dynamic <code>javax.swing.JSplitPane</code> structure.
+     */
     private JSplitPane split;
 
-    private final void initComponent() throws NullPointerException {
+    /**
+     * Initialize <code>java.awt.Component</code>.
+     */
+    private final void initComponent() {
         Objects.requireNonNull(mzController, "MazeController must not be null...");
         final PanelFlyweight flyweight = mzController.getFlyweight();
         final ProcessManager manager = mzController.getManager();
@@ -206,7 +230,6 @@ public final class MazeView extends JFrame {
                                                                                             final int row,
                                                                                             final boolean hasFocus) {
                                             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                                            // Dispatch Object
                                             mzController.dispatchCell(this, value);
                                             return this;
                                         }
@@ -214,10 +237,8 @@ public final class MazeView extends JFrame {
                                     addTreeSelectionListener(e -> {
                                         final TreePath path = e.getNewLeadSelectionPath();
                                         if (path == null)
-                                            // Unselect CellView
                                             CellView.select(null);
                                         else
-                                            // Select CellView
                                             CellView.select(((CellComposite) path.getLastPathComponent()).getView());
                                     });
                                 }
@@ -241,17 +262,13 @@ public final class MazeView extends JFrame {
                                         {
                                             label = this;
                                             final Timer timer = new Timer(2500, e -> {
-                                                // Set default JLabel text
                                                 setText("Maze");
                                                 ((Timer) e.getSource()).stop();
                                             });
-                                            // Set Component visible cycling value
                                             addPropertyChangeListener("enabled", e -> setVisible(!isVisible()));
                                             addPropertyChangeListener("text", e -> {
-                                                // Restart Timer
                                                 if (timer.isRunning())
                                                     timer.restart();
-                                                // Start Timer
                                                 else
                                                     timer.start();
                                             });
@@ -267,7 +284,6 @@ public final class MazeView extends JFrame {
                             split = this;
                             setEnabled(false);
                             setBorder(null);
-                            // Set default JSplitPane divider location
                             addPropertyChangeListener("enabled", e -> setDividerLocation(-1));
                         }
                     }, BorderLayout.CENTER);
@@ -293,10 +309,8 @@ public final class MazeView extends JFrame {
                                                             {
                                                                 setPreferredSize(new Dimension(100, getPreferredSize().height));
                                                                 addChangeListener(e -> {
-                                                                    // Ignore if adjusting JSlider value
                                                                     if (getValueIsAdjusting())
                                                                         return;
-                                                                    // Resize PanelFlyweight with JSlider value
                                                                     mzController.resize(getValue());
                                                                 });
                                                             }
@@ -317,7 +331,6 @@ public final class MazeView extends JFrame {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 setPreferredSize(new Dimension(100, getPreferredSize().height));
-                                                                // Set AlgorithmManager delay with JSlider value
                                                                 addChangeListener(e -> manager.setDelay(getValue()));
                                                             }
                                                         };
@@ -337,7 +350,6 @@ public final class MazeView extends JFrame {
                                                             private static final long serialVersionUID = 1L;
                                                             {
                                                                 setPreferredSize(new Dimension(100, getPreferredSize().height));
-                                                                // Set Generator density with JSlider value
                                                                 addChangeListener(e -> manager.setDensity(getValue()));
                                                             }
                                                         };
@@ -364,14 +376,12 @@ public final class MazeView extends JFrame {
                                                 add(new ButtonDecorator("Run PathFinder", "pathfinderRunIcon.gif") {
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        // Awake PathFinder
                                                         addActionListener(e -> manager.awake(PathFinder.class));
                                                     }
                                                 });
                                                 add(new ButtonDecorator("Run Generator", "generatorRunIcon.gif") {
                                                     private static final long serialVersionUID = 1L;
                                                     {
-                                                        // Awake Generator
                                                         addActionListener(e -> manager.awake(Generator.class));
                                                     }
                                                 });
@@ -423,7 +433,6 @@ public final class MazeView extends JFrame {
                                 for (final Enumeration<AbstractButton> e = new ButtonGroup() {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Set Generator
                                         add(new JRadioButtonMenuItem("BackTracker", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {
@@ -467,7 +476,6 @@ public final class MazeView extends JFrame {
                         final JFileChooser chooser = new JFileChooser((File) null, (FileSystemView) null) {
                             private static final long serialVersionUID = 1L;
                             {
-                                // Set custom FileNameExtensionFilter
                                 setFileFilter(new FileNameExtensionFilter("SER file", "ser"));
                             }
                         };
@@ -475,14 +483,11 @@ public final class MazeView extends JFrame {
                             private static final long serialVersionUID = 1L;
                             {
                                 addActionListener(e -> {
-                                    // Ignore if JFileChooser not approved
                                     if (chooser.showOpenDialog(MazeView.this) != JFileChooser.APPROVE_OPTION)
                                         return;
                                     final File file = chooser.getSelectedFile();
-                                    // Ignore if cannot read File
                                     if (!file.canRead())
                                         return;
-                                    // Read serialized Object
                                     mzController.readMaze(file.getAbsolutePath());
                                 });
                             }
@@ -493,17 +498,13 @@ public final class MazeView extends JFrame {
                             {
                                 addActionListener(e -> {
                                     try {
-                                        // Ignore if JFileChooser not approved
                                         if (chooser.showSaveDialog(MazeView.this) != JFileChooser.APPROVE_OPTION)
                                             return;
                                         final File file = chooser.getSelectedFile();
-                                        // Create File if non-existent
                                         if (!file.exists())
                                             file.createNewFile();
-                                        // Ignore if cannot write File
                                         else if (!file.canWrite())
                                             return;
-                                        // Serialize Object
                                         mzController.writeMaze(file.getAbsolutePath());
                                     } catch (final IOException l) {
                                         JWrapper.dispatchException(l);
@@ -522,14 +523,12 @@ public final class MazeView extends JFrame {
                                 add(new MenuItemDecorator("Clear", "clearIcon.gif", KeyEvent.VK_Z) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Clear MazeController structure
                                         addActionListener(e -> mzController.clear());
                                     }
                                 });
                                 add(new MenuItemDecorator("Reset", "resetIcon.gif", KeyEvent.VK_R) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Reset MazeController structure
                                         addActionListener(e -> mzController.reset());
                                     }
                                 });
@@ -542,21 +541,18 @@ public final class MazeView extends JFrame {
                                 add(new JCheckBoxMenuItem("Periodic", null, false) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Set PanelFlyweight periodic cycling value
                                         addActionListener(e -> flyweight.setPeriodic(!flyweight.isPeriodic()));
                                     }
                                 });
                                 add(new JCheckBoxMenuItem("Edged", null, false) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Set PanelFlyweight edged cycling value
                                         addActionListener(e -> flyweight.setEdged(!flyweight.isEdged()));
                                     }
                                 });
                                 add(new JCheckBoxMenuItem("Status Bar", null, true) {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Enable Component cycling value
                                         addItemListener(e -> label.setEnabled(!label.isEnabled()));
                                     }
                                 });
@@ -565,9 +561,7 @@ public final class MazeView extends JFrame {
                                     {
                                         addItemListener(e -> {
                                             final Component component = split.getLeftComponent();
-                                            // Set Component enabled cycling value
                                             split.setEnabled(!split.isEnabled());
-                                            // Set Component visible cycling value
                                             component.setVisible(!component.isVisible());
                                         });
                                     }
@@ -582,14 +576,12 @@ public final class MazeView extends JFrame {
                         add(new MenuItemDecorator("PathFinder", "pathfinderRunIcon.gif", KeyEvent.VK_1) {
                             private static final long serialVersionUID = 1L;
                             {
-                                // Awake PathFinder
                                 addActionListener(e -> manager.awake(PathFinder.class));
                             }
                         });
                         add(new MenuItemDecorator("Generator", "generatorRunIcon.gif", KeyEvent.VK_2) {
                             private static final long serialVersionUID = 1L;
                             {
-                                // Awake Generator
                                 addActionListener(e -> manager.awake(Generator.class));
                             }
                         });
@@ -599,20 +591,43 @@ public final class MazeView extends JFrame {
         }, BorderLayout.NORTH);
     }
 
+    /**
+     * Return current dynamic <code>javax.swing.JTree</code> structure.
+     *
+     * @return JTree
+     */
     public final JTree getTree() {
         return tree;
     }
 
+    /**
+     * Return current dynamic <code>javax.swing.JLabel</code> structure.
+     *
+     * @return JLabel
+     */
     public final JLabel getLabel() {
         return label;
     }
 
+    /**
+     * <code>app.maze.controller.MazeController</code> relationship.
+     */
     private transient MazeController mzController;
 
+    /**
+     * Return current <code>app.maze.controller.MazeController</code> relationship.
+     *
+     * @return MazeController
+     */
     public final MazeController getController() {
         return mzController;
     }
 
+    /**
+     * Set current <code>app.maze.controller.MazeController</code> relationship.
+     *
+     * @param mzController MazeController
+     */
     public final void setController(final MazeController mzController) {
         this.mzController = mzController;
     }

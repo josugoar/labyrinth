@@ -18,7 +18,6 @@ public class SliderDecorator extends JSlider {
     private static final long serialVersionUID = 1L;
 
     {
-        // Set custom size
         this.setPreferredSize(new Dimension(100, this.getPreferredSize().height));
     }
 

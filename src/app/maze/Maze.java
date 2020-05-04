@@ -6,14 +6,37 @@ import app.maze.controller.MazeController;
 import app.maze.model.MazeModel;
 import app.maze.view.MazeView;
 
+/**
+ * Maze structure representation, extending <code>java.lang.Thread</code> and
+ * implementing <code>java.io.Serializable</code>.
+ *
+ * @author JoshGoA
+ * @see java.lang.Thread Thread
+ * @see java.io.Serializable Serializable
+ */
 public final class Maze extends Thread implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Current <code>app.maze.model.MazeModel</code>.
+     *
+     * @see app.maze.model.MazeModel MazeModel
+     */
     private final MazeModel mzModel;
 
+    /**
+     * Current <code>app.maze.view.MazeView</code>.
+     *
+     * @see app.maze.view.MazeView MazeView
+     */
     private final MazeView mzView;
 
+    /**
+     * Current <code>app.maze.controller.MazeController</code>.
+     *
+     * @see app.maze.controller.MazeController MazeController
+     */
     private final MazeController mzController;
 
     {
@@ -22,6 +45,9 @@ public final class Maze extends Thread implements Serializable {
         mzController = new MazeController();
     }
 
+    /**
+     * Initialize maze.
+     */
     private final void initMaze() {
         mzModel.setController(mzController);
         mzView.setController(mzController);
@@ -29,6 +55,9 @@ public final class Maze extends Thread implements Serializable {
         mzController.setView(mzView);
     }
 
+    /**
+     * Run maze.
+     */
     private final void runMaze() {
         mzView.display();
     }

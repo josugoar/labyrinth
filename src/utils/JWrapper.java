@@ -2,13 +2,18 @@ package utils;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * <code>java.lang.FunctionalInterface</code> wrapper for
- * <code>java.awt.Component</code> references.
+ * <code>java.awt.Component</code> references, extending
+ * <code>Serializable</code>.
+ *
+ * @see java.io.Serializable Serializable
  */
 @FunctionalInterface
-public interface JWrapper {
+public interface JWrapper extends Serializable{
 
     /**
      * Self-reference pointer.
@@ -28,19 +33,17 @@ public interface JWrapper {
      */
     @SafeVarargs
     public static <T extends Container, U extends Component> void add(final T parent, final U... children) {
-        for (final U child : children) {
-            parent.add(child);
-        }
+        Arrays.asList(children).forEach(parent::add);
     }
 
     /**
-     * Dispatch generic <code>java.lang.Throwable</code> by printing in error output
-     * stream.
+     * Dispatch generic <code>java.lang.Throwable</code> by printing in error
+     * PrintStream.
      *
      * @param e Throwable
      */
-    public static void dispatchException(Throwable e) {
-        System.err.println(e.toString());
+    public static void dispatchException(final Throwable e) {
+        System.err.println(e);
     }
 
 }
