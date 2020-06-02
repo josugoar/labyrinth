@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Delegate pointer.
+ *
+ * @deprecated
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -402,7 +402,6 @@ public final class MazeView extends JFrame {
                                 for (final Enumeration<AbstractButton> e = new ButtonGroup() {
                                     private static final long serialVersionUID = 1L;
                                     {
-                                        // Set PathFinder
                                         add(new JRadioButtonMenuItem("A Star", null, false) {
                                             private static final long serialVersionUID = 1L;
                                             {

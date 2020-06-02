@@ -13,7 +13,7 @@ public class Randomizer extends Generator {
     @Override
     protected void advance(final Walkable node) throws InterruptedException {
         // Fire visited TraverserEvent
-        fireNodeVisited(new TraverserEvent(this, node));
+        // fireNodeVisited(new TraverserEvent(this, node));
         // Range through TreeNode children
         for (int i = 0; i < node.getChildCount(); i++) {
             final Walkable child = (Walkable) node.getChildAt(i);

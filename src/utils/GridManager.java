@@ -14,6 +14,7 @@ import java.util.function.BiFunction;
  * @param <T> GridManager.GridObject<T>
  * @see java.io.Serializable Serializable
  * @see utils.GridManager.GridObject GridObject
+ * @deprecated
  */
 public class GridManager<T extends GridManager.GridObject<T>> implements Serializable {
 

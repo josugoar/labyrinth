@@ -16,7 +16,5 @@
     },
     "settings": {
         "editor.formatOnSave": false,
-        "java.dependency.packagePresentation": "flat",
-        "java.dependency.syncWithFolderExplorer": true
     }
 }

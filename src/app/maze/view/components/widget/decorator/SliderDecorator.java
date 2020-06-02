@@ -12,6 +12,7 @@ import javax.swing.JSlider;
  *
  * @see javax.swing.JSlider JSlider
  * @see app.view.components.RangedSlider.BoundedRange
+ * @deprecated
  */
 public class SliderDecorator extends JSlider {
 
