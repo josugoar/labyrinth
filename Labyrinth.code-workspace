@@ -27,10 +27,10 @@
     "settings": {
         "editor.formatOnSave": false,
         "files.exclude": {
-            "**/.classpath": true,
-            "**/.project": true,
-            "**/.settings": true,
-            "**/.factorypath": true
+            "**/.classpath": false,
+            "**/.project": false,
+            "**/.settings": false,
+            "**/.factorypath": false
         },
         "java.implementationsCodeLens.enabled": true,
         "java.semanticHighlighting.enabled": true
