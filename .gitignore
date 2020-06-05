@@ -1,3 +1,7 @@
+.classpath
+.project
 *.stackdump
+*.ucls
 bin/
 lib/
+.settings/

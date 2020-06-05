@@ -113,7 +113,7 @@ public final class MazeView extends JFrame {
      * @param mzController MazeController
      */
     public MazeView(final MazeController mzController) {
-        super("MazeApp");
+        super("Labyrinth");
         setController(mzController);
     }
 
@@ -257,12 +257,12 @@ public final class MazeView extends JFrame {
                             add(new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5)) {
                                 private static final long serialVersionUID = 1L;
                                 {
-                                    add(new JLabel("Maze", null, SwingConstants.LEADING) {
+                                    add(new JLabel("Labyrinth", null, SwingConstants.LEADING) {
                                         private static final long serialVersionUID = 1L;
                                         {
                                             label = this;
                                             final Timer timer = new Timer(2500, e -> {
-                                                setText("Maze");
+                                                setText("Labyrinth");
                                                 ((Timer) e.getSource()).stop();
                                             });
                                             addPropertyChangeListener("enabled", e -> setVisible(!isVisible()));

@@ -1,0 +1,38 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "extensions": {
+        "recommendations": [
+            "vscjava.vscode-java-debug",
+            "vscjava.vscode-java-dependency",
+            "vscjava.vscode-java-test",
+            "redhat.java",
+            "vscjava.vscode-maven",
+            "visualstudioexptteam.vscodeintellicode",
+        ]
+    },
+    "launch": {
+        "configurations": [
+            {
+                "type": "java",
+                "name": "Java",
+                "request": "launch",
+                "mainClass": "Run"
+            }
+        ]
+    },
+    "settings": {
+        "editor.formatOnSave": false,
+        "files.exclude": {
+            "**/.classpath": true,
+            "**/.project": true,
+            "**/.settings": true,
+            "**/.factorypath": true
+        },
+        "java.implementationsCodeLens.enabled": true,
+        "java.semanticHighlighting.enabled": true
+    }
+}

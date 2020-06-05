@@ -18,6 +18,10 @@ public final class Maze extends Thread implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final void main(final String[] args) {
+        new Maze().start();
+    }
+
     /**
      * Current <code>app.maze.model.MazeModel</code>.
      *
