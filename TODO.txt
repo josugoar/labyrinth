@@ -1,1 +1,2 @@
-Implement algorithms
+TODO: Update slider on dimension change
+TODO: Implement algorithms

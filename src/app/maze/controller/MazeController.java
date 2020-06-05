@@ -197,8 +197,6 @@ public final class MazeController implements Serializable {
         renderer.setIcon(WidgetFactory.createIcon(fileName));
     }
 
-    // TODO: Update slider on dimension change
-
     /**
      * Read Maze representation from path and restore its state and processes.
      *
