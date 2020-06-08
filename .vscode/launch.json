@@ -11,7 +11,7 @@
             "type": "java",
             "name": "Java",
             "request": "launch",
-            "mainClass": "Run"
+            "mainClass": "app.maze.Maze"
         }
     ]
 }

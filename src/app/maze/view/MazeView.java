@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 import javax.swing.AbstractButton;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -21,6 +22,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -29,6 +31,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
@@ -40,6 +43,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -91,6 +95,7 @@ public final class MazeView extends JFrame {
             final Exception l = new UnsupportedLookAndFeelException("Unsupported look and feel...");
             JWrapper.dispatchException(l.initCause(e));
         }
+        UIManager.put("OptionPane.okButtonText", "OK");
         UIManager.put("PopupMenu.consumeEventOnClose", false);
     }
 
@@ -584,6 +589,49 @@ public final class MazeView extends JFrame {
                                 addActionListener(e -> manager.awake(Generator.class));
                             }
                         });
+                    }
+                });
+                // IMPORTANT: Do not use JSeparator since it conflict with look and feel
+                add(Box.createHorizontalGlue());
+                add(new ButtonDecorator("Info", "infoIcon.gif") {
+                    private static final long serialVersionUID = 1L;
+                    final String[] cols = {"Command", "Binding"};
+                    final String[][] rows = {
+                        {"Set Obstacle", "Shift+Mouse1"},
+                        {"Remove Obstacle", "Shift+Mouse3"},
+                        {"Endpoint Menu", "Mouse3"},
+                        {"Set All Obstacles", "Right"},
+                        {"Remove All Obstacles", "Left"},
+                        {"File Menu", "Alt+F"},
+                        {"Open", "Ctrl+O"},
+                        {"Save", "Ctrl+S"},
+                        {"Edit Menu", "Alt+E"},
+                        {"Clear", "Ctrl+Z"},
+                        {"Reset", "Ctrl+R"},
+                        {"Run Menu", "Alt+R"},
+                        {"PathFinder", "Ctrl+1"},
+                        {"Generator", "Ctrl+2"},
+                        {"PathFinder Menu", "Alt+P"},
+                        {"Generator Menu", "Alt+G"}
+                    };
+                    {
+                        addActionListener(e -> JOptionPane.showMessageDialog(MazeView.this,
+                            new JScrollPane(new JTable(rows, cols) {
+                                private static final long serialVersionUID = 1L;
+                                {
+                                    getTableHeader().setReorderingAllowed(false);
+                                    setAutoCreateRowSorter(true);
+                                    setPreferredScrollableViewportSize(new Dimension(100, 100));
+                                    setModel(new DefaultTableModel(rows, cols) {
+                                        private static final long serialVersionUID = 1L;
+                                        @Override
+                                        public final boolean isCellEditable(final int rows, final int cols) {
+                                            return false;
+                                        }
+                                    });
+                                }
+                            }),
+                            "Information", JOptionPane.INFORMATION_MESSAGE));
                     }
                 });
             }
