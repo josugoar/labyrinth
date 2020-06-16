@@ -13,7 +13,8 @@ public class BFS extends PathFinder {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected TreeNode advance(final Set<MutableTreeNode> currGen) throws StackOverflowError, InterruptedException {
+    protected final TreeNode advance(final Set<MutableTreeNode> currGen)
+            throws StackOverflowError, InterruptedException {
         return null;
     }
 

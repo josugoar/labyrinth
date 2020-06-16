@@ -64,7 +64,7 @@ public abstract class PathFinder extends AlgorithmManager implements Listenable{
             if (root == null)
                 throw new NullPointerException("PathFinder is not initialized...");
             visited = new HashSet<TreeNode>(0);
-            traverse(advance(new HashSet<MutableTreeNode>() {
+            final TreeNode tagret = advance(new HashSet<MutableTreeNode>() {
                 private static final long serialVersionUID = 1L;
                 {
                     // Construct first generation
@@ -72,7 +72,10 @@ public abstract class PathFinder extends AlgorithmManager implements Listenable{
                     // Set running
                     setRunning(true);
                 }
-            }));
+            });
+            if (target == null)
+                return;
+            traverse(tagret);
         } catch (final NullPointerException | StackOverflowError | InterruptedException e) {
             JWrapper.dispatchException(e);
         } finally {
