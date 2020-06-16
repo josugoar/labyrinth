@@ -89,6 +89,7 @@ public final class MazeView extends JFrame {
     private JLabel label;
 
     static {
+        // IMPORTANT: Override default UIManager behaviour
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final Exception e) {
@@ -591,7 +592,7 @@ public final class MazeView extends JFrame {
                         });
                     }
                 });
-                // IMPORTANT: Do not use JSeparator since it conflict with look and feel
+                // IMPORTANT: Do not use JSeparator since it conflicts with look and feel
                 add(Box.createHorizontalGlue());
                 add(new ButtonDecorator("Info", "infoIcon.gif") {
                     private static final long serialVersionUID = 1L;
