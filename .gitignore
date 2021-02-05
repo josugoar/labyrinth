@@ -5,3 +5,5 @@
 bin/
 lib/
 .settings/
+.devcontainer/
+*.jar

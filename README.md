@@ -1,25 +1,29 @@
-# Labyrinth
+# labyrinth
 
-![Author](https://img.shields.io/badge/author-JoshGoA-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Author](https://img.shields.io/badge/author-josugoar-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 Java (Swing, AWT) interactive and responsive Graphical User Interface (GUI) maze editor, generator and solver desktop application, implementing custom pathfinder and generator self-made generic algorithmic listener structure.
 
+<center>
+
 |               Labyrinth             |
 | :---------------------------------: |
-| ![Labyrinth](<media/Labyrinth.gif>) |
+| ![Labyrinth](<media/labyrinth.gif>) |
+
+</center>
 
 ## Installation
 
 1. Install [Red Hat Open JDK](https://developers.redhat.com/products/openjdk/download?sc_cid=701f2000000RWTnAAO)
 
-2. Dowload [Labyrinth.jar](Labyrinth.jar)
+2. Dowload **labyrinth.jar**
 
 ## Usage
 
-Run [Labyrinth.jar](Labyrinth.jar) from terminal (recommended) or double click it from the file explorer
+Run **labyrinth.jar** from terminal (recommended) or double click it from the file explorer
 
 ```sh
-java -jar Labyrinth.jar
+java -jar labyrinth.jar
 ```
 
 ## Contributors
