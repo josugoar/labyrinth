@@ -1,7 +1,5 @@
-# labyrinth
-
 <p align="center">
-  <img alt="labyrinth" src="media/labyrinth.gif" />
+  <img alt="labyrinth" src="assets/labyrinth.svg" width="400" />
 </p>
 
 <p align="center">
@@ -10,6 +8,8 @@
 </p>
 
 <h1></h1>
+
+<img align="right" alt="labyrinth" src="assets/labyrinth.gif" width="400" />
 
 Java (Swing, AWT) interactive and responsive Graphical User Interface (GUI) maze editor, generator and solver desktop application, implementing custom pathfinder and generator self-made generic algorithmic listener structure.
 
@@ -21,12 +21,12 @@ Java (Swing, AWT) interactive and responsive Graphical User Interface (GUI) maze
 
 ## Usage
 
-Run **labyrinth.jar** from terminal (recommended) or double click it from the file explorer
+Run **labyrinth.jar** from terminal execute it from the file explorer
 
 ```sh
-java -jar labyrinth.jar
+$ java -jar labyrinth.jar
 ```
 
 ## Contributors
 
-- **JoshGoA** - _Main contributor_ - [GitHub](https://github.com/JoshGoA)
+- **josugoar** - _Main contributor_ - [GitHub](https://github.com/josugoar)
