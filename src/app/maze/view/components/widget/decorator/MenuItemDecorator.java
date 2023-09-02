@@ -30,7 +30,7 @@ public class MenuItemDecorator extends JMenuItem {
         if (mnemonic == null)
             return;
         setMnemonic(mnemonic);
-        setAccelerator(KeyStroke.getKeyStroke(mnemonic, InputEvent.CTRL_MASK));
+        setAccelerator(KeyStroke.getKeyStroke(mnemonic, InputEvent.CTRL_DOWN_MASK));
     }
 
     /**

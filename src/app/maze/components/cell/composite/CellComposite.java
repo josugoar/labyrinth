@@ -34,7 +34,7 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
         if (isLeaf())
             return;
         // Remove MutableTreeNode children
-        new Vector<CellComposite>(children).forEach(child -> {
+        ((Vector<CellComposite>)children.clone()).forEach(child -> {
             removeAllChildren();
             child.override();
         });
@@ -96,7 +96,7 @@ public final class CellComposite extends DefaultMutableTreeNode implements Walka
                 mzModel.nodesWereRemoved(this, new int[0], new Object[0]);
             else {
                 // Remove CellComposite neighbors
-                new Vector<CellComposite>(children).forEach(child -> child.children.remove(this));
+                ((Vector<CellComposite>)children.clone()).forEach(child -> child.children.remove(this));
                 // Get old DefaultMutableTreeNode enpoints
                 final int[] oldIndex = IntStream.range(0, getChildCount()).toArray();
                 final Object[] oldChildren = children.toArray();

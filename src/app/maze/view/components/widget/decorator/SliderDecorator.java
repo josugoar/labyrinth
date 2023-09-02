@@ -14,6 +14,7 @@ import javax.swing.JSlider;
  * @see app.view.components.RangedSlider.BoundedRange
  * @deprecated
  */
+@Deprecated
 public class SliderDecorator extends JSlider {
 
     private static final long serialVersionUID = 1L;
