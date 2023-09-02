@@ -27,6 +27,13 @@ Run **labyrinth.jar** from terminal execute it from the file explorer
 $ java -jar labyrinth.jar
 ```
 
+## Building
+
+```sh
+$ javac -d bin/ $(find -name "*.java")
+$ jar --create --file labyrinth.jar --manifest META-INF/MANIFEST.mf -C bin/ .
+```
+
 ## Contributors
 
 - **josugoar** - _Main contributor_ - [GitHub](https://github.com/josugoar)
