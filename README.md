@@ -9,9 +9,11 @@
 
 <h1></h1>
 
-<img align="right" alt="labyrinth" src="assets/labyrinth.gif" width="50%" />
-
 Java (Swing, AWT) interactive and responsive Graphical User Interface (GUI) maze editor, generator and solver desktop application, implementing custom pathfinder and generator self-made generic algorithmic listener structure.
+
+<p align="center">
+  <img alt="labyrinth" src="assets/labyrinth.gif" width="300" height="350" />
+</p>
 
 ## Installation
 
