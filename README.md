@@ -1,3 +1,5 @@
+# labyrinth
+
 <p align="center">
   <img src="assets/labyrinth.png" alt="labyrinth" width="640" height="320" />
 </p>
