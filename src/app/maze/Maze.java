@@ -10,7 +10,7 @@ import app.maze.view.MazeView;
  * Maze structure representation, extending <code>java.lang.Thread</code> and
  * implementing <code>java.io.Serializable</code>.
  *
- * @author JoshGoA
+ * @author josugoar
  * @see java.lang.Thread Thread
  * @see java.io.Serializable Serializable
  */
